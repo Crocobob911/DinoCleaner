@@ -1,6 +1,6 @@
 {
-    "name": "DinoClean.Cleaning",
-    "rootNamespace": "",
+    "name": "DinoCleaner.Cleaning",
+    "rootNamespace": "DinoCleaner.Cleaning",
     "references": [
         "GUID:f867894c16d0b944d9c31e2bd594e9c7"
     ],
@@ -9,7 +9,7 @@
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
-    "autoReferenced": true,
+    "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false
