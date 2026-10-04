@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace DinoWash.Cleaning
+namespace DinoCleaner.Cleaning
 {
     // 오물 마스크용 RenderTexture을 하나 생성하고 관리하는 class
     // R=진흙 G=이끼/화산재 B=배설물 A=비누 (1 = 더러움)
@@ -35,6 +35,7 @@ namespace DinoWash.Cleaning
             if (Texture == null) return;
             Texture.Release();
             UnityEngine.Object.Destroy(Texture);
+            Debug.Log("Texture safely released.");
         }
     }
 }
