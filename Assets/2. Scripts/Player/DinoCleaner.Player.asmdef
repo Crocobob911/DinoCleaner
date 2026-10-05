@@ -1,0 +1,16 @@
+{
+    "name": "DinoCleaner.Player",
+    "rootNamespace": "DinoCleaner.Player",
+    "references": [
+        "GUID:f867894c16d0b944d9c31e2bd594e9c7"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
