@@ -1,67 +1,74 @@
-// ¸Ş½Ã¸¦ UV °ø°£À¸·Î ÆîÃÄ¼­ ¿À¹° ¸¶½ºÅ©¸¦ Áö¿ì´Â ¼ÎÀÌ´õ.
-// Ä«¸Ş¶ó°¡ ¾Æ´Ï¶ó DirtPainter°¡ Á÷Á¢ È£ÃâÇÑ´Ù.
+ï»¿// ë©”ì‹œë¥¼ UV ê³µê°„ìœ¼ë¡œ í¼ì³ì„œ ì˜¤ë¬¼ ë§ˆìŠ¤í¬ë¥¼ ì§€ìš°ëŠ” ì…°ì´ë”.
+// ì¹´ë©”ë¼ê°€ ì•„ë‹ˆë¼ DirtPainterê°€ ì§ì ‘ í˜¸ì¶œí•œë‹¤.
 Shader "Hidden/DinoWash/S_DirtPaint"
 {
+    // CGINCLUDE ì•ˆì˜ ì½”ë“œëŠ” ì•„ë˜ ëª¨ë“  Passì— ìë™ìœ¼ë¡œ ë¶™ëŠ”ë‹¤ (ê³µìš© ì½”ë“œ)
+    CGINCLUDE
+    #include "UnityCG.cginc"
+
+    struct appdata
+    {
+        float4 vertex : POSITION;
+        float2 uv     : TEXCOORD0;
+    };
+
+    struct v2f
+    {
+        float4 pos      : SV_POSITION;
+        float2 uv       : TEXCOORD0;
+        float3 worldPos : TEXCOORD1;
+    };
+
+    // ë©”ì‹œë¥¼ UV ìœ„ì¹˜ë¡œ í¼ì¹œë‹¤ (ë‘ Pass ê³µìš©)
+    v2f vert(appdata v)
+    {
+        v2f o;
+        o.pos = float4(v.uv * 2 - 1, 0.5, 1);
+        #if UNITY_UV_STARTS_AT_TOP
+        o.pos.y = -o.pos.y;
+        #endif
+        o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+        o.uv = v.uv;
+        return o;
+    }
+    ENDCG
+
     SubShader
     {
-        // ¾ÕµŞ¸é, ±íÀÌ »ó°ü¾øÀÌ ÀüºÎ ±×¸°´Ù
         Cull Off ZWrite Off ZTest Always
 
+        // Pass 0: Paint â€” ë¸ŒëŸ¬ì‹œ ì£¼ë³€ ì§„í™ ì§€ìš°ê¸°
         Pass
         {
             CGPROGRAM
             #pragma vertex vert
-            #pragma fragment frag
-            #include "UnityCG.cginc"
+            #pragma fragment fragPaint
 
-            sampler2D _SourceMask;     // Ä¥ÇÏ±â Á÷Àü ¸¶½ºÅ©ÀÇ º¹»çº»
-            float4 _DW_BrushPos;       // xyz = ºê·¯½Ã Áß½É(¿ùµå ÁÂÇ¥), w = ¹İ°æ
-            float  _DW_BrushAmount;    // ÀÌ¹ø ½ºÆ®·ÎÅ©¿¡ Áö¿ï ¾ç
+            sampler2D _SourceMask;
+            float4 _DW_BrushPos;
+            float  _DW_BrushAmount;
 
-            struct appdata
-            {
-                float4 vertex : POSITION;
-                float2 uv     : TEXCOORD0;
-            };
-
-            struct v2f
-            {
-                float4 pos      : SV_POSITION;
-                float2 uv       : TEXCOORD0;
-                float3 worldPos : TEXCOORD1;
-            };
-
-            v2f vert(appdata v)
-            {
-                v2f o;
-
-                // ¨ç È­¸é À§Ä¡ ´ë½Å UV À§Ä¡¿¡ ±×¸°´Ù (¸Ş½Ã¸¦ Àü°³µµ·Î ÆîÄ§)
-                //    UV(0~1)¸¦ GPU È­¸é ÁÂÇ¥(-1~1)·Î º¯È¯
-                o.pos = float4(v.uv * 2 - 1, 0.5, 1);
-                #if UNITY_UV_STARTS_AT_TOP
-                o.pos.y = -o.pos.y;   // DirectX °è¿­Àº À§¾Æ·¡°¡ ¹İ´ë¶ó¼­ µÚÁı¾îÁÜ
-                #endif
-
-                // ¨è ¿ø·¡ ¿ùµå À§Ä¡´Â µû·Î ±â¾ïÇØµĞ´Ù
-                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
-                o.uv = v.uv;
-                return o;
-            }
-
-            // ¸¶½ºÅ©ÀÇ ÇÈ¼¿ ÇÏ³ªÇÏ³ª¸¶´Ù ½ÇÇàµÈ´Ù
-            float4 frag(v2f i) : SV_Target
+            float4 fragPaint(v2f i) : SV_Target
             {
                 float4 mask = tex2D(_SourceMask, i.uv);
-
-                // ÀÌ ÇÈ¼¿ÀÌ ºê·¯½Ã Áß½É¿¡¼­ ¾ó¸¶³ª ¸Õ°¡
                 float dist = distance(i.worldPos, _DW_BrushPos.xyz);
-
-                // Áß½ÉÀº 1, ¹İ°æ ³¡Àº 0À¸·Î ºÎµå·´°Ô ÁÙ¾îµå´Â °ª
                 float falloff = 1 - smoothstep(0, _DW_BrushPos.w, dist);
-
-                // ÁøÈë(R)¸¸ ÁÙÀÎ´Ù. saturate = 0~1 ¹üÀ§·Î ÀÚ¸£±â
                 mask.r = saturate(mask.r - _DW_BrushAmount * falloff);
                 return mask;
+            }
+            ENDCG
+        }
+
+        // Pass 1: Init â€” ë©”ì‹œê°€ ë®ëŠ” ê³³ë§Œ ì§„í™ìœ¼ë¡œ ì±„ìš°ê¸°
+        Pass
+        {
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment fragInit
+
+            float4 fragInit(v2f i) : SV_Target
+            {
+                return float4(1, 0, 0, 0);   // R(ì§„í™) = 1, ë‚˜ë¨¸ì§€ 0
             }
             ENDCG
         }
