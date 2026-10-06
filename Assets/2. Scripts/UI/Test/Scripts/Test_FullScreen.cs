@@ -2,7 +2,7 @@ using DinoCleaner.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DinoCleaner.Dev.DngU
+namespace DinoCleaner.UI.Test
 {
     /// <summary>
     /// UILoader 테스트용 FullScreen. 레이어 미지정(기본 FullScreen) + 데이터 없는 Show 확인용.

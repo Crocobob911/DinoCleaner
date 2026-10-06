@@ -207,7 +207,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e45f165e396af9048a0ec4048fac4e90, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: DinoCleaner.Dev.DngU::DinoCleaner.Dev.DngU.Test_Popup
+  m_EditorClassIdentifier: DinoCleaner.UI.Test::DinoCleaner.UI.Test.Test_Popup
   messageText: {fileID: 7850289917564180042}
   closeButton: {fileID: 4589139710799722046}
   bgCanvasGroup: {fileID: 1994638526672339934}

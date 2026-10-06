@@ -4,7 +4,7 @@ using DinoCleaner.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DinoCleaner.Dev.DngU
+namespace DinoCleaner.UI.Test
 {
     /// <summary>
     /// UILoader 테스트용 Popup. Popup 레이어 + DOTween 열기/닫기 연출 + string 데이터 수신 확인용.

@@ -3,7 +3,7 @@ using DinoCleaner.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DinoCleaner.Dev.DngU
+namespace DinoCleaner.UI.Test
 {
     /// <summary>
     /// UILoader 테스트용 Top. Top 레이어 + ValueTuple 데이터 수신 + 연출 없는 Hide 확인용.

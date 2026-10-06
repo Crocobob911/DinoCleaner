@@ -291,7 +291,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8d384489db0555a40b87343ed3b17761, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: DinoCleaner.Dev.DngU::DinoCleaner.Dev.DngU.Test_FullScreen
+  m_EditorClassIdentifier: DinoCleaner.UI.Test::DinoCleaner.UI.Test.Test_FullScreen
   openPopupButton: {fileID: 6140284246701106169}
   openTopButton: {fileID: 6087513702788563417}
   unloadPopupButton: {fileID: 5123900875507680883}

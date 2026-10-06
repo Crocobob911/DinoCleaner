@@ -9,21 +9,21 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 
-namespace DinoCleaner.Dev.DngU.Editor
+namespace DinoCleaner.UI.Test.Editor
 {
     /// <summary>
     /// UILoader 테스트 환경(테스트 프리팹 + Addressables 등록 + dng_u 씬)을 생성합니다.
-    /// 메뉴: DinoCleaner/Dev/Build dng_u UI Test Scene
+    /// 메뉴: DinoCleaner/UI/Build UI Test Scene (dng_u)
     /// </summary>
-    public static class DngUTestSceneBuilder
+    public static class UITestSceneBuilder
     {
-        private const string PrefabDir = "Assets/0. DEV/dng_u/UI";
+        private const string PrefabDir = "Assets/2. Scripts/UI/Test/Prefabs";
         private const string ScenePath = "Assets/1. Scenes/dng_u.unity";
         private const string AddressableGroupName = "UI";
 
         private static Font font;
 
-        [MenuItem("DinoCleaner/Dev/Build dng_u UI Test Scene")]
+        [MenuItem("DinoCleaner/UI/Build UI Test Scene (dng_u)")]
         public static void Build()
         {
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
@@ -41,7 +41,7 @@ namespace DinoCleaner.Dev.DngU.Editor
 
             BuildScene();
 
-            Debug.Log($"[DngU] 테스트 씬 생성 완료: {ScenePath}");
+            Debug.Log($"[UITest] 테스트 씬 생성 완료: {ScenePath}");
         }
 
         #region Prefabs
@@ -121,7 +121,7 @@ namespace DinoCleaner.Dev.DngU.Editor
         {
             if (!AssetDatabase.IsValidFolder(PrefabDir))
             {
-                AssetDatabase.CreateFolder("Assets/0. DEV/dng_u", "UI");
+                AssetDatabase.CreateFolder("Assets/2. Scripts/UI/Test", "Prefabs");
             }
             string path = $"{PrefabDir}/{name}.prefab";
             PrefabUtility.SaveAsPrefabAsset(root, path);

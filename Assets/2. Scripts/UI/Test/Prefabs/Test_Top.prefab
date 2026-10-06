@@ -124,7 +124,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f01b68a94bc880e4a98576e667654ab4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: DinoCleaner.Dev.DngU::DinoCleaner.Dev.DngU.Test_Top
+  m_EditorClassIdentifier: DinoCleaner.UI.Test::DinoCleaner.UI.Test.Test_Top
   messageText: {fileID: 8870976689788007320}
 --- !u!1 &7661158308177642050
 GameObject:
