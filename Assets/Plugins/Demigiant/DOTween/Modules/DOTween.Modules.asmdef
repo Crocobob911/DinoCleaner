@@ -1,19 +1,15 @@
 {
-    "name": "DinoCleaner.UI",
-    "rootNamespace": "DinoCleaner.UI",
+    "name": "DOTween.Modules",
+    "rootNamespace": "",
     "references": [
-        "GUID:f867894c16d0b944d9c31e2bd594e9c7",
-        "Unity.Addressables",
-        "Unity.ResourceManager",
-        "UnityEngine.UI",
-        "DOTween.Modules"
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
-    "autoReferenced": false,
+    "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false

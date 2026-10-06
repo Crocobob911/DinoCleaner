@@ -112,3 +112,6 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# UI 참고자료 (Spell_It 원본 복사본, 로컬 전용)
+/UI_Bundle/

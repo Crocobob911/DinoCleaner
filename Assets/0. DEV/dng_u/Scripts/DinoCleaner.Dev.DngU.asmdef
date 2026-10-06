@@ -1,12 +1,10 @@
 {
-    "name": "DinoCleaner.UI",
-    "rootNamespace": "DinoCleaner.UI",
+    "name": "DinoCleaner.Dev.DngU",
+    "rootNamespace": "DinoCleaner.Dev.DngU",
     "references": [
-        "GUID:f867894c16d0b944d9c31e2bd594e9c7",
-        "Unity.Addressables",
-        "Unity.ResourceManager",
-        "UnityEngine.UI",
-        "DOTween.Modules"
+        "DinoCleaner.UI",
+        "DOTween.Modules",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

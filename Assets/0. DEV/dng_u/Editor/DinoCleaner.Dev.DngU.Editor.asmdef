@@ -1,14 +1,17 @@
 {
-    "name": "DinoCleaner.UI",
-    "rootNamespace": "DinoCleaner.UI",
+    "name": "DinoCleaner.Dev.DngU.Editor",
+    "rootNamespace": "DinoCleaner.Dev.DngU.Editor",
     "references": [
-        "GUID:f867894c16d0b944d9c31e2bd594e9c7",
+        "DinoCleaner.UI",
+        "DinoCleaner.Dev.DngU",
         "Unity.Addressables",
-        "Unity.ResourceManager",
-        "UnityEngine.UI",
-        "DOTween.Modules"
+        "Unity.Addressables.Editor",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
