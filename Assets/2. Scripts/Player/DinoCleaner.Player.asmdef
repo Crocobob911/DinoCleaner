@@ -3,7 +3,8 @@
     "rootNamespace": "DinoCleaner.Player",
     "references": [
         "GUID:f867894c16d0b944d9c31e2bd594e9c7",
-        "GUID:75469ad4d38634e559750d17036d5f7c"
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:009b12fc3b8589a4abd07d8596db005f"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

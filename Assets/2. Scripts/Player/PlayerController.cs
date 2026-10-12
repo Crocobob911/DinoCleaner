@@ -4,15 +4,16 @@ using UnityEngine.InputSystem;
 namespace DinoCleaner.Player
 {
     [RequireComponent(typeof(CharacterController))]
+    [RequireComponent(typeof(PlayerEquipment))]
     public class PlayerController : MonoBehaviour
     {
-        [Header("Movement Settings")]
+        [Header("움직임 세팅")]
         public float walkSpeed = 5f;
         public float crouchSpeed = 2.5f;
         public float jumpHeight = 1.5f;
         public float gravity = -9.81f;
 
-        [Header("Look Settings")]
+        [Header("시야(감도) 세팅")]
         public Transform cameraTransform; // Main Camera를 할당해주세요
         public float mouseSensitivity = 20f;
         private float xRotation = 0f;
@@ -28,9 +29,15 @@ namespace DinoCleaner.Player
         private bool isGrounded;
         private bool isCrouching = false;
 
+        
+        // 장비류 세팅
+        PlayerEquipment equipment;
+        private bool isFiring = false;
+
         private void Awake()
         {
             controller = GetComponent<CharacterController>();
+            equipment = GetComponent<PlayerEquipment>();
             
             // Input System 초기화
             inputActions = new PlayerControls();
@@ -39,6 +46,8 @@ namespace DinoCleaner.Player
             inputActions.Player.Jump.performed += ctx => Jump();
             // 웅크리기 입력
             inputActions.Player.Crouch.performed += ctx => ToggleCrouch();
+            inputActions.Player.Fire.started += ctx => isFiring = true;  // 마우스 누름
+            inputActions.Player.Fire.canceled += ctx => isFiring = false; // 마우스 뗌
         }
 
         private void OnEnable()
@@ -66,6 +75,11 @@ namespace DinoCleaner.Player
             HandleLook();
             HandleMovement();
             ApplyGravity();
+
+            if(isFiring)
+            {
+                equipment.UseCurrentTool();
+            }
         }
 
         private void HandleLook()
