@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 186962d83dc646b4fb1e7ef46da66b7f, type: 3}
+  m_Name: PaddleLadder
+  m_EditorClassIdentifier: DinoCleaner.Core::DinoCleaner.Core.DeployItemData
+  itemName: "\uC0AC\uB2E4\uB9AC"
+  deployedPrefab: {fileID: 3945186088147167522, guid: 6dd71cf3428979845a1ef9991bb00c3a, type: 3}
+  hologramPrefab: {fileID: 0}

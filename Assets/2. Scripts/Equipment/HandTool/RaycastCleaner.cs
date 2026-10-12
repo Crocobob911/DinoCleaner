@@ -1,0 +1,31 @@
+using UnityEngine;
+
+namespace DinoCleaner.Equipment
+{
+    public class RaycastCleaner : Tool
+    {
+        [SerializeField] private CleaningToolData toolData;
+
+        public override void UseTool(Transform originTransform)
+        {
+            if (toolData == null)
+            {
+                Debug.LogWarning("[RaycastCleaner] CleaningToolData가 연결되지 않았습니다!");
+                return;
+            }
+
+            // 레이저 발싸
+            Ray ray = new Ray(originTransform.position, originTransform.forward);
+
+            // 레이캐스트 충돌 검사
+            if (Physics.Raycast(ray, out RaycastHit hit, toolData.Range))
+            {
+                // 테스트용 로그 출력: 닿은 좌표와 오브젝트 이름
+                Debug.Log($"[RaycastCleaner] 물발싸!!!!!!!!!!!! 닿은 대상: {hit.collider.name}, 좌표: {hit.point}");
+                
+                // 에디터 Scene 창에서 레이캐스트가 맞은 지점까지 선을 그려줍니다 (빨간선 0.1초 유지)
+                Debug.DrawLine(ray.origin, hit.point, Color.red, 0.1f);
+            }
+        }
+    }
+}
