@@ -1,10 +1,13 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using DinoCleaner.Core;
+using DinoCleaner.Equipment;
 
 namespace DinoCleaner.Player
 {
     [RequireComponent(typeof(CharacterController))]
     [RequireComponent(typeof(PlayerEquipment))]
+    [RequireComponent(typeof(PlayerInteraction))]
     public class PlayerController : MonoBehaviour
     {
         [Header("움직임 세팅")]
@@ -28,17 +31,23 @@ namespace DinoCleaner.Player
         private Vector3 velocity;
         private bool isGrounded;
         private bool isCrouching = false;
+        private float defaultSlopeLimit;
 
         
         // 장비류 세팅
         PlayerEquipment equipment;
         private bool isFiring = false;
 
+        PlayerInteraction interaction;
+
         private void Awake()
         {
             controller = GetComponent<CharacterController>();
             equipment = GetComponent<PlayerEquipment>();
+            interaction = GetComponent<PlayerInteraction>();
             
+            defaultSlopeLimit = controller.slopeLimit;
+
             // Input System 초기화
             inputActions = new PlayerControls();
             
@@ -48,6 +57,20 @@ namespace DinoCleaner.Player
             inputActions.Player.Crouch.performed += ctx => ToggleCrouch();
             inputActions.Player.Fire.started += ctx => isFiring = true;  // 마우스 누름
             inputActions.Player.Fire.canceled += ctx => isFiring = false; // 마우스 뗌
+            // 상호작용 입력
+            inputActions.Player.Interact.performed += ctx => interaction.TryInteract();
+            // r키로 회전 등록
+            inputActions.Player.Rotate.started += ctx =>
+            {
+                // 사다리 모드일 때만 R키가 작동하도록
+                if (equipment.hasDeployItem && equipment.deployTool is DeployableTool tool)
+                {
+                    tool.RotateHologram();
+                } else
+                {
+                    // 청소 도구 회전 구현 TODO
+                }
+            };
         }
 
         private void OnEnable()
@@ -156,6 +179,23 @@ namespace DinoCleaner.Player
         {
             velocity.y += gravity * Time.deltaTime;
             controller.Move(velocity * Time.deltaTime);
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            // 플레이어가 "Ladder" 태그를 가진 투명 박스 안에 들어가면 한계를 80으로 늘림
+            if (other.CompareTag("Ladder"))
+            {
+                controller.slopeLimit = 85f;
+            }
+        }
+        private void OnTriggerExit(Collider other)
+        {
+            // 사다리 영역에서 빠져나가면 다시 원래 값(45)으로 원상복구
+            if (other.CompareTag("Ladder"))
+            {
+                controller.slopeLimit = defaultSlopeLimit;
+            }
         }
     }
 }
