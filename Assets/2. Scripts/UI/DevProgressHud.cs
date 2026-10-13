@@ -1,4 +1,4 @@
-using DinoWash.Core;
+using DinoCleaner.Core;
 using UnityEngine;
 
 namespace DinoCleaner.UI
@@ -32,16 +32,28 @@ namespace DinoCleaner.UI
 
         void OnChanged(ICleanProgress progress) => _updateCount++;
 
+        // 디버그용 간단한 GUI. 실제 UI에선 Unity UI로 교체 필요
         void OnGUI()
         {
             if (_style == null) _style = new GUIStyle(GUI.skin.label) { fontSize = 32 };
 
-            string text = _progress.IsReady
-                ? $"Clean: {_progress.TotalProgress:P0}"
-                : "Measuring...";
+            float y = 20;
+            if (!_progress.IsReady)
+            {
+                GUI.Label(new Rect(20, y, 800, 50), "Measuring...", _style);
+                return;
+            }
 
-            GUI.Label(new Rect(20, 20, 600, 50), text, _style);
-            GUI.Label(new Rect(20, 60, 600, 50), $"Updates: {_updateCount}", _style);
+            GUI.Label(new Rect(20, y, 800, 50), $"Clean: {_progress.TotalProgress:P0}   (Updates: {_updateCount})", _style);
+            y += 50;
+
+            // 부위별 줄
+            foreach (var region in _progress.Regions)
+            {
+                string check = region.IsCompleted ? "[v]" : "[  ]";
+                GUI.Label(new Rect(20, y, 800, 50), $"{check} {region.DisplayName}: {region.Progress:P0}", _style);
+                y += 40;
+            }
         }
     }
 }

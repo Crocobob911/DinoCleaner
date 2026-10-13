@@ -233,6 +233,33 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fe8d9b24b3abc814d9b58bdc94a847cf, type: 3}
+--- !u!1 &494782698 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3477903515640148249, guid: 4a77ad79e8a41e04180000ab3335a9da, type: 3}
+  m_PrefabInstance: {fileID: 1047302262}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &494782699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 494782698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b1366ea184d908479b4086fb796b627, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DinoCleaner.Cleaning::DinoCleaner.Cleaning.CleanableObject
+  maskResolution: 1024
+  maskProperty: _DirtMask
+  paintShader: {fileID: 4800000, guid: a2b8d5c4319fe8d46925e19518d2f536, type: 3}
+  progressPackShader: {fileID: 0}
+  regionMap: {fileID: 0}
+  regions: []
+  regionCompleteThreshold: 0.9
+  cleanThreshold: 0.1
+  progressResolution: 256
+  progressInterval: 0.25
 --- !u!1001 &502092907
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -495,6 +522,17 @@ MonoBehaviour:
   maskResolution: 1024
   maskProperty: _DirtMask
   paintShader: {fileID: 4800000, guid: a2b8d5c4319fe8d46925e19518d2f536, type: 3}
+  progressPackShader: {fileID: 4800000, guid: 79ce462547728644c84c7f445796d9b8, type: 3}
+  regionMap: {fileID: 2800000, guid: f97653eaaf65fc84f9d56434441b993f, type: 3}
+  regions:
+  - id: 1
+    displayName: Top
+  - id: 2
+    displayName: Middle
+  - id: 3
+    displayName: Bottom
+  regionCompleteThreshold: 0.9
+  cleanThreshold: 0.1
   progressResolution: 256
   progressInterval: 0.25
 --- !u!135 &868812397
@@ -767,10 +805,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: Raptor_Animated_LODG_Blue
       objectReference: {fileID: 0}
+    - target: {fileID: 3477903515640148249, guid: 4a77ad79e8a41e04180000ab3335a9da, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3477903515640148249, guid: 4a77ad79e8a41e04180000ab3335a9da, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 494782699}
   m_SourcePrefab: {fileID: 100100000, guid: 4a77ad79e8a41e04180000ab3335a9da, type: 3}
 --- !u!1 &1086454696
 GameObject:
@@ -918,7 +963,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1148339377
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -934,6 +979,11 @@ MonoBehaviour:
   maskResolution: 1024
   maskProperty: _DirtMask
   paintShader: {fileID: 4800000, guid: a2b8d5c4319fe8d46925e19518d2f536, type: 3}
+  progressPackShader: {fileID: 0}
+  regionMap: {fileID: 0}
+  regions: []
+  regionCompleteThreshold: 0.9
+  cleanThreshold: 0.1
   progressResolution: 256
   progressInterval: 0.25
 --- !u!135 &1148339378
@@ -1232,7 +1282,7 @@ Transform:
   m_GameObject: {fileID: 1774045490}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: -5.61, y: 1, z: -9.57}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1250,7 +1300,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08e0417de3a06cf4e93a5281e6a4b5c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DinoClean.Cleaning::DinoCleaner.Cleaning.DebugStrokeGun
-  isFiring: 0
+  isFiring: 1
   range: 20
   radius: 0.3
   strength: 1
@@ -1438,7 +1488,6 @@ GameObject:
   - component: {fileID: 2108463339}
   - component: {fileID: 2108463338}
   - component: {fileID: 2108463337}
-  - component: {fileID: 2108463336}
   m_Layer: 0
   m_Name: CleanableCube
   m_TagString: Untagged
@@ -1446,23 +1495,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2108463336
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2108463335}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b1366ea184d908479b4086fb796b627, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: DinoCleaner.Cleaning::DinoCleaner.Cleaning.CleanableObject
-  maskResolution: 1024
-  maskProperty: _DirtMask
-  paintShader: {fileID: 0}
-  progressResolution: 256
-  progressInterval: 0.25
 --- !u!65 &2108463337
 BoxCollider:
   m_ObjectHideFlags: 0
