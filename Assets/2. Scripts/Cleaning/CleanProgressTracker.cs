@@ -10,6 +10,7 @@ namespace DinoCleaner.Cleaning
     internal class CleanProgressTracker : IDisposable
     {
         static readonly int RegionMapId = Shader.PropertyToID("_RegionMap");
+        static readonly int MaskTexId = Shader.PropertyToID("_MaskTex");
 
         RenderTexture _small;   // CPU 전달용으로 축소한 마스크
         readonly Material _packMaterial;     // ProgressPack 셰이더
@@ -18,7 +19,7 @@ namespace DinoCleaner.Cleaning
 
 
         readonly RegionDefinition[] _regions;
-        readonly int[] _indexById = new int[256];   // 부위 ID(0~255) → _regions 배열 칸 번호 (-1 = 없음)
+        readonly int[] _indexById = new int[256];   // 부위 ID(0~255) -> _regions 배열 칸 번호 (-1 = 없음)
         readonly int[] _initialDirtyPerRegion;      // 부위별 처음 더러운 픽셀 수
         readonly int[] _dirtyPerRegion;             // 부위별 지금 더러운 픽셀 수
         readonly RegionProgress[] _regionProgress;  // 밖에 보여줄 결과
@@ -88,6 +89,7 @@ namespace DinoCleaner.Cleaning
         {
             if (_disposed || IsPending) return;
 
+            _packMaterial.SetTexture(MaskTexId, mask);
             Graphics.Blit(mask, _small, _packMaterial);   // GPU 안에서 1024 → 256으로 줄여 복사
             IsPending = true;
             AsyncGPUReadback.Request(_small, 0, TextureFormat.RGBA32, OnReadback);  // 콜백 설정하고 실행
@@ -110,9 +112,16 @@ namespace DinoCleaner.Cleaning
             Array.Clear(_dirtyPerRegion, 0, _dirtyPerRegion.Length);   // 부위별 더러운 픽셀 수 초기화
             int dirtyPixels = 0;
 
+            // DEBUG: 가장 깨끗한 픽셀 값
+            byte minR = 255;
+
             for (int i = 0; i < pixels.Length; i++)
             {
                 Color32 p = pixels[i];
+
+                // DEBUG:
+                if (p.r < minR) minR = p.r;
+
                 if (p.r > _cleanThreshold)   // 진흙(R)이 기준값보다 크면 더러운 픽셀
                 {
                     dirtyPixels++;
@@ -134,15 +143,13 @@ namespace DinoCleaner.Cleaning
                 for (int id = 0; id < 256; id++)
                     if (histogram[id] > 0) sb.Append($"{id}번={histogram[id]}픽셀  ");
                 Debug.Log(sb.ToString());
-
-                Debug.Log($"[Cleaning] 가운데 픽셀 = {pixels[pixels.Length / 2]}");
                 // =============================================
 
                 WarnEmptyRegions();
             }
 
             // DEBUG: 측정할 때마다 출력
-            Debug.Log($"[Cleaning] 측정: 더러운 픽셀 {dirtyPixels} / 처음 {_initialDirtyPixels}");
+            Debug.Log($"[Cleaning] 측정: 더러운 픽셀 {dirtyPixels} / 처음 {_initialDirtyPixels}, 가장 깨끗한 값 {minR}");
 
             // 전체 진행도 계산
             Progress = Ratio(dirtyPixels, _initialDirtyPixels);

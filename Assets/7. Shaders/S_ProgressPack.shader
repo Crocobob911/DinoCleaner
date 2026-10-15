@@ -12,13 +12,13 @@ Shader "Hidden/DinoWash/ProgressPack"
             #pragma fragment frag
             #include "UnityCG.cginc"
 
-            sampler2D _MainTex;     // 오물 마스크 (Graphics.Blit이 자동으로 넣어줌)
+            sampler2D _MaskTex;     // 오물 마스크 (직접 넣어주는 것으로 변경)
             sampler2D _RegionMap;   // 부위 맵
 
             float4 frag(v2f_img i) : SV_Target
             {
-                float4 mask  = tex2D(_MainTex, i.uv);
-                float dirt   = max(mask.r, max(mask.g, mask.b));   // 비누(A)는 오물이 아님
+                float4 mask = tex2D(_MaskTex, i.uv);
+                float dirt = max(mask.r, max(mask.g, mask.b));   // 비누(A)는 오물이 아님
                 float region = tex2D(_RegionMap, i.uv).r;
                 return float4(dirt, region, 0, 1);
             }
