@@ -149,7 +149,7 @@ namespace DinoCleaner.Cleaning
             }
 
             // DEBUG: 측정할 때마다 출력
-            Debug.Log($"[Cleaning] 측정: 더러운 픽셀 {dirtyPixels} / 처음 {_initialDirtyPixels}, 가장 깨끗한 값 {minR}");
+            //Debug.Log($"[Cleaning] 측정: 더러운 픽셀 {dirtyPixels} / 처음 {_initialDirtyPixels}, 가장 깨끗한 값 {minR}");
 
             // 전체 진행도 계산
             Progress = Ratio(dirtyPixels, _initialDirtyPixels);

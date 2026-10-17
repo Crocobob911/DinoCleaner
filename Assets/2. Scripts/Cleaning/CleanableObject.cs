@@ -105,8 +105,8 @@ namespace DinoCleaner.Cleaning
             if (_painter == null) return;
 
             // DEBUG: 1초에 한 번쯤 스트로크 값 출력
-            if (Time.frameCount % 60 == 0)
-                Debug.Log($"[{name}] Stroke: 위치 {stroke.Position}, 반경 {stroke.Radius}, 세기 {stroke.Strength}, dt {stroke.DeltaTime:F4}");
+            //if (Time.frameCount % 60 == 0)
+            //    Debug.Log($"[{name}] Stroke: 위치 {stroke.Position}, 반경 {stroke.Radius}, 세기 {stroke.Strength}, dt {stroke.DeltaTime:F4}");
 
             _painter.Paint(stroke);
             _maskChanged = true;
