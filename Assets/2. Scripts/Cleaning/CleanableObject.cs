@@ -34,6 +34,7 @@ namespace DinoCleaner.Cleaning
         [SerializeField] float progressInterval = 0.25f;
 
         Renderer[] _renderers;
+        
         DirtMask _mask;
         DirtPainter _painter;
         CleanProgressTracker _tracker;
@@ -70,6 +71,8 @@ namespace DinoCleaner.Cleaning
                                                 progressPackShader, regionMap,
                                                 regions, regionCompleteThreshold);
             _tracker.Updated += () => Changed?.Invoke(this);
+            // tracker로부터 부위 완료 이벤트를 받으면 EventBus로 전달
+            _tracker.RegionCompleted += region => EventBus<RegionCompleteEvent>.Publish(new RegionCompleteEvent(this, region));
 
             BindMaskToRenderers();
             _tracker.Request(_mask.Texture); // 첫 진행도 요청

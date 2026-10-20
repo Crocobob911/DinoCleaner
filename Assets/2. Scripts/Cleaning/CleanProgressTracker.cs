@@ -33,11 +33,13 @@ namespace DinoCleaner.Cleaning
         public IReadOnlyList<RegionProgress> Regions => _regionProgress;
 
         public event Action Updated;
+        public event Action<RegionProgress> RegionCompleted;   // 부위가 처음 완료된 순간
 
         public CleanProgressTracker(int resolution, float cleanThreshold,
             Shader packShader, Texture regionMap, 
             RegionDefinition[] regions, float regionCompleteThreshold)
         {
+            // Threshold를 0~1 float에서 0~255 byte로 변환
             _cleanThreshold = (byte)Mathf.RoundToInt(Mathf.Clamp01(cleanThreshold) * 255f);
             _regionCompleteThreshold = regionCompleteThreshold;
 
@@ -48,18 +50,15 @@ namespace DinoCleaner.Cleaning
             };
             _small.Create();
 
-            _packMaterial = new Material(packShader);
-
             //DEBUG
-            Debug.Log($"[Cleaning] Pack 셰이더 = {packShader.name}, 사용 가능 = {packShader.isSupported}");
-
+            //Debug.Log($"[Cleaning] Pack 셰이더 = {packShader.name}, 사용 가능 = {packShader.isSupported}");
+            _packMaterial = new Material(packShader);
             _packMaterial.SetTexture(RegionMapId, regionMap != null ? regionMap : Texture2D.blackTexture);
 
-            //=== 부위 표 만들기 ===
+            // === 부위 표 만들기 ===
             _regions = regions ?? Array.Empty<RegionDefinition>();
 
-            for (int i = 0; i < _indexById.Length; i++) _indexById[i] = -1;
-
+            System.Array.Fill<int>(_indexById, -1);
             for (int i = 0; i < _regions.Length; i++)
             {
                 int id = _regions[i].id;
@@ -75,6 +74,7 @@ namespace DinoCleaner.Cleaning
                 }
                 _indexById[id] = i;
             }
+            //=========================
 
             _initialDirtyPerRegion = new int[_regions.Length];
             _dirtyPerRegion = new int[_regions.Length];
@@ -162,6 +162,11 @@ namespace DinoCleaner.Cleaning
                 bool completed = wasCompleted || progress >= _regionCompleteThreshold;   // 한 번 완료되면 유지
 
                 _regionProgress[i] = new RegionProgress(_regions[i].id, _regions[i].displayName, progress, completed);
+
+                if (!wasCompleted && completed)
+                {
+                    RegionCompleted?.Invoke(_regionProgress[i]);
+                }
             }
 
             Updated?.Invoke();
@@ -184,6 +189,7 @@ namespace DinoCleaner.Cleaning
             }
         }
 
+        // Dispose 패턴. GPU 리소스 해제
         public void Dispose()
         {
             _disposed = true;
