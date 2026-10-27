@@ -1,5 +1,7 @@
 using UnityEngine;
 
+// 스테이지와 관련된 IEvent 정의. StageController에서 Publish()로 발행됨. Subscribe()로 구독가능
+
 namespace DinoCleaner.Core
 {
     // 스테이지 상태가 바뀜 (UI 화면 전환, BGM)
@@ -11,11 +13,11 @@ namespace DinoCleaner.Core
     }
 
     // 공룡이 생성됨. UI는 여기서 진행도 확인 위해 ICleanProgress 받아감
-    public readonly struct DinoArrivedEvent : IEvent
+    public readonly struct DinoSpawnedEvent : IEvent
     {
         public readonly GameObject Dino;
         public readonly ICleanProgress Progress;
-        public DinoArrivedEvent(GameObject dino, ICleanProgress progress) { Dino = dino; Progress = progress; }
+        public DinoSpawnedEvent(GameObject dino, ICleanProgress progress) { Dino = dino; Progress = progress; }
     }
 
     // 판정이 끝나고 결과가 나옴(클리어 화면)

@@ -23,7 +23,7 @@ namespace DinoCleaner.UI
         void OnEnable()
         {
             EventBus<StageStateChangedEvent>.Subscribe(OnStateChanged);
-            EventBus<DinoArrivedEvent>.Subscribe(OnDinoArrived);
+            EventBus<DinoSpawnedEvent>.Subscribe(OnDinoArrived);
             EventBus<RegionCompleteEvent>.Subscribe(OnRegionComplete);
             EventBus<StageFinishedEvent>.Subscribe(OnStageFinished);
         }
@@ -31,13 +31,13 @@ namespace DinoCleaner.UI
         void OnDisable()
         {
             EventBus<StageStateChangedEvent>.Unsubscribe(OnStateChanged);
-            EventBus<DinoArrivedEvent>.Unsubscribe(OnDinoArrived);
+            EventBus<DinoSpawnedEvent>.Unsubscribe(OnDinoArrived);
             EventBus<RegionCompleteEvent>.Unsubscribe(OnRegionComplete);
             EventBus<StageFinishedEvent>.Unsubscribe(OnStageFinished);
         }
 
         void OnStateChanged(StageStateChangedEvent e) => _state = e.To;
-        void OnDinoArrived(DinoArrivedEvent e) => _progress = e.Progress;
+        void OnDinoArrived(DinoSpawnedEvent e) => _progress = e.Progress;
         void OnStageFinished(StageFinishedEvent e) => _result = e.Result;
 
         void OnRegionComplete(RegionCompleteEvent e)

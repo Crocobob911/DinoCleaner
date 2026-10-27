@@ -32,6 +32,7 @@ namespace DinoCleaner.Stage
                                && progress.TotalProgress >= stage.completeThreshold;
             bool timeOver = stage.timeLimit > 0f && Controller.WashTime >= stage.timeLimit;
 
+            // 스테이지 진행 중에 목표 달성 / 시간 초과 / 세차완료 버튼 중 하나라도 발생하면 판정으로 넘어간다.
             if (_finishRequested || reachedGoal || timeOver)
                 Controller.ChangeState(StageState.Judging);
         }
