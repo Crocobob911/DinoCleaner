@@ -17,6 +17,9 @@ namespace DinoCleaner.Cleaning
         readonly RenderTexture _source;   // 셰이더가 읽을 복사본
         readonly CommandBuffer _cmd;
 
+        const int PaintPass = 0;
+        const int InitPass = 1;
+
         public DirtPainter(DirtMask mask, Renderer[] renderers, Shader paintShader)
         {
             _mask = mask;
@@ -30,6 +33,25 @@ namespace DinoCleaner.Cleaning
             _material.SetTexture(SourceMaskId, _source);
 
             _cmd = new CommandBuffer { name = "S_DirtPaint" };
+        }
+
+        public void Init()
+        {
+            _cmd.Clear();
+            _cmd.SetRenderTarget(_mask.Texture);
+            _cmd.ClearRenderTarget(false, true, Color.clear);  // 전부 0(깨끗)
+            DrawRenderers(InitPass);                           // 메시 영역만 진흙
+            Graphics.ExecuteCommandBuffer(_cmd);
+        }
+
+        // renderer마다 그리는 명령 전달
+        void DrawRenderers(int pass)
+        {
+            foreach (var r in _renderers)
+            {
+                for (int sub = 0; sub < r.sharedMaterials.Length; sub++)
+                    _cmd.DrawRenderer(r, _material, sub, pass);
+            }
         }
 
         public void Paint(in CleanStroke stroke)
@@ -47,14 +69,9 @@ namespace DinoCleaner.Cleaning
             // 3.그릴 곳 = 원본 마스크
             _cmd.SetRenderTarget(_mask.Texture);
 
-            // 4.메시들을 언랩해서 그린다
-            foreach (var r in _renderers)
-            {
-                // 머티리얼 슬롯 하나 = 서브메시 하나
-                for (int sub = 0; sub < r.sharedMaterials.Length; sub++)
-                    _cmd.DrawRenderer(r, _material, sub, 0);
-            }
-
+            // 4. shader의 PaintPass부분 실행명령
+            DrawRenderers(PaintPass);
+            
             // 5. 쌓아둔 명령을 GPU에 한 번에 실행
             Graphics.ExecuteCommandBuffer(_cmd);
         }
