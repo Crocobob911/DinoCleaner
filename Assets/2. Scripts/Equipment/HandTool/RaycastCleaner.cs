@@ -1,6 +1,6 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using DinoCleaner.Core;
-
 namespace DinoCleaner.Equipment
 {
     public class RaycastCleaner : Tool
@@ -16,7 +16,16 @@ namespace DinoCleaner.Equipment
             }
 
             // 레이저 발싸
-            Ray ray = new Ray(originTransform.position, originTransform.forward);
+            Ray ray;
+            if (Cursor.lockState == CursorLockMode.Locked)
+            {
+                ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+            }
+            else
+            {
+                Vector2 mousePos = Mouse.current.position.ReadValue();
+                ray = Camera.main.ScreenPointToRay(mousePos);
+            }
 
             // 레이캐스트 충돌 검사
             if (Physics.Raycast(ray, out RaycastHit hit, toolData.Range))
@@ -46,4 +55,4 @@ namespace DinoCleaner.Equipment
             }
         }
     }
-}
+}       
