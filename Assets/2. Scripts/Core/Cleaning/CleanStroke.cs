@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace DinoCleaner.Core
 {
-    public enum CleanerFlags { None = 0, Water = 1, Pressure = 2 }
+    public enum CleanerFlags { None = 0, Water = 1, Pressure = 2, Soap = 3 }
     
-    // Ã»¼ÒÇÏ´Â ÇàÀ§(1ÇÁ·¹ÀÓ ´ÜÀ§)
+    // ì²­ì†Œí•˜ëŠ” í–‰ìœ„(1í”„ë ˆìž„ ë‹¨ìœ„)
     public struct CleanStroke
     {
         public Vector3 Position;

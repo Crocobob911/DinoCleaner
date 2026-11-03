@@ -25,8 +25,27 @@ namespace DinoCleaner.Cleaning
         [Tooltip("부위의 이 비율 이상이 깨끗해지면 그 부위 완료")]
         [SerializeField, Range(0f, 1f)] float regionCompleteThreshold = 0.9f;
 
+        [Header("처음 묻어 있는 오물")]
+        [Tooltip("이끼/화산재 얼룩 개수")]
+        [SerializeField] int mossPatches = 3;
+        [Tooltip("이끼/화산재 얼룩 반경")]
+        [SerializeField] float mossRadius = 0.35f;
+        [Tooltip("배설물 개수")]
+        [SerializeField] int poopSplats = 5;
+        [Tooltip("배설물 반경 (m)")]
+        [SerializeField] float poopRadius = 0.12f;
+
+        static readonly Vector4 MossDirt = new Vector4(0, 1, 0, 0);   // G 채널
+        static readonly Vector4 PoopDirt = new Vector4(0, 0, 1, 0);   // B 채널
+
+        [Header("청소 브러시")]
+        [Tooltip("0 = 가운데만 세게, 0.85 = 반경의 85%까지 균일하게 지워짐")]
+        [SerializeField, Range(0f, 0.95f)] float brushHardness = 0.85f;
+        [Tooltip("브러시에 닿은 곳이 이 값 아래로 내려가면 바로 0(깨끗)으로. Clean Threshold 이상으로 둘 것")]
+        [SerializeField, Range(0f, 0.5f)] float cleanSnap = 0.2f;
+
         [Header("진행도 측정")]
-        [Tooltip("진흙 값이 이 이하로 내려가야 깨끗한 픽셀로 센다")]
+        [Tooltip("오염도 값이 이 이하로 내려가야 깨끗한 픽셀로 센다")]
         [SerializeField, Range(0f, 1f)] float cleanThreshold = 0.1f;
         [Tooltip("진행도 계산용 압축 해상도")]
         [SerializeField] int progressResolution = 256;
@@ -63,7 +82,11 @@ namespace DinoCleaner.Cleaning
             
             // DirtPainter 초기화
             _painter = new DirtPainter(_mask, _renderers, paintShader);
-            _painter.Init();
+            _painter.BrushHardness = brushHardness;
+            _painter.CleanSnap = cleanSnap;
+            _painter.Init(); // 전체 진흙으로 덮음
+
+            ScatterDirt(); // 랜덤한 면에 이끼와 배설물 뿌림
 
             ValidateRegionMap();
             // ProgressTracker 초기화, event설정
@@ -115,12 +138,31 @@ namespace DinoCleaner.Cleaning
             _maskChanged = true;
         }
 
+        // 랜덤한 면에 이끼와 배설물을 뿌린다 (진흙은 Init에서 이미 전체에 칠해짐)
+        void ScatterDirt()
+        {
+            var surface = new SurfacePoints(_renderers);
+            Scatter(surface, mossPatches, mossRadius, MossDirt);   // 이끼
+            Scatter(surface, poopSplats, poopRadius, PoopDirt);    // 배설물
+        }
+
+        void Scatter(SurfacePoints surface, int count, float radius, Vector4 dirtType)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                if (surface.TryPickRandom(out var point))
+                    _painter.SetDirt(point, radius, dirtType);
+            }
+        }
+
         //============================디버그용 기능============================
         // Debug용(Play 중 컴포넌트에서 실행가능)
         [ContextMenu("Test/표면 더럽히기")]
-        void TestFillDirty()
+        void TestFillDirt()
         {
-            _painter?.Init();
+            if (_painter == null) return;
+            _painter.Init();
+            ScatterDirt();
             _maskChanged = true;
         }
 
