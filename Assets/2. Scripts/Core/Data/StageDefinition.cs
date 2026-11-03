@@ -9,6 +9,12 @@ namespace DinoCleaner.Core
         [Tooltip("레벨 선택 화면에 보일 이름")]
         public string displayName = "Stage 1";
 
+        [Tooltip("의뢰 카드와 의뢰 설명에 보일 공룡 이미지")]
+        public Sprite cardImage;
+
+        [Tooltip("의뢰 설명에 보일 문구")]
+        [TextArea(3, 8)] public string description;
+
         [Tooltip("CleanableObject가 붙은 공룡 Prefab")]
         public GameObject dinoPrefab;
 

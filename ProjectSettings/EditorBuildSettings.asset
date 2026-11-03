@@ -6,14 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/1. Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: "Assets/1. Scenes/\uB3D9\uC6B0/Home.unity"
+    guid: 02f7e7f3c5c850a47a57ce01eaae5636
   - enabled: 1
-    path: "Assets/1. Scenes/\uC601\uC900/Stage.unity"
-    guid: 5049a8c2b300679468a042de2cf09fb1
-  - enabled: 1
-    path: "Assets/1. Scenes/\uC601\uC900/Home.unity"
-    guid: efc044245b474094eb2d172bca55ac23
+    path: "Assets/1. Scenes/\uB3D9\uC6B0/Stage.unity"
+    guid: 7e653e58cccd77d4dbb1af46f70b6726
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: d87d631688b6dd845a7bb5e19135b5fb, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
