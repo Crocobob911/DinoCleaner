@@ -11,13 +11,13 @@ namespace DinoCleaner.Player
         public float centerY; // 보통 X, Z는 0으로 고정이니 Y값만 뺍니다.
         public float cameraHeight;
     }
+    public enum PlayerStance { Standing, Crouching, Prone }
     [RequireComponent(typeof(CharacterController))]
     [RequireComponent(typeof(PlayerEquipment))]
     [RequireComponent(typeof(PlayerInteraction))]
     public class PlayerController : MonoBehaviour
     {
-        public enum PlayerStance { Standing, Crouching, Prone }
-
+        
         [Header("움직임 세팅")]
         public float walkSpeed = 5f;
         public float crouchSpeed = 2.5f;
