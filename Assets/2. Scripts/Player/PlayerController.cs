@@ -1,18 +1,27 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
-using DinoCleaner.Core;
 using DinoCleaner.Equipment;
 
 namespace DinoCleaner.Player
 {
+
+    [System.Serializable]
+    public struct StanceSetting
+    {
+        public float height;
+        public float centerY; // 보통 X, Z는 0으로 고정이니 Y값만 뺍니다.
+        public float cameraHeight;
+    }
+    public enum PlayerStance { Standing, Crouching, Prone }
     [RequireComponent(typeof(CharacterController))]
     [RequireComponent(typeof(PlayerEquipment))]
     [RequireComponent(typeof(PlayerInteraction))]
     public class PlayerController : MonoBehaviour
     {
+        
         [Header("움직임 세팅")]
         public float walkSpeed = 5f;
         public float crouchSpeed = 2.5f;
+        public float proneSpeed = 1.0f;
         public float jumpHeight = 1.5f;
         public float gravity = -9.81f;
 
@@ -20,6 +29,13 @@ namespace DinoCleaner.Player
         public Transform cameraTransform; // Main Camera를 할당해주세요
         public float mouseSensitivity = 20f;
         private float xRotation = 0f;
+
+        [Header("자세별 물리 세팅")]
+        public StanceSetting standSetting = new StanceSetting { height = 2f, centerY = 0f, cameraHeight = 0.6f };
+        public StanceSetting crouchSetting = new StanceSetting { height = 1f, centerY = -0.5f, cameraHeight = 0.1f };
+        public StanceSetting proneSetting = new StanceSetting { height = 0.5f, centerY = -0.75f, cameraHeight = -0.4f };
+        public float stanceTransitionSpeed = 10f;
+        private StanceSetting targetStanceSetting;
 
         // Components & Input
         private CharacterController controller;
@@ -30,13 +46,16 @@ namespace DinoCleaner.Player
         private Vector2 lookInput;
         private Vector3 velocity;
         private bool isGrounded;
-        private bool isCrouching = false;
+        private PlayerStance currentStance = PlayerStance.Standing;
         private float defaultSlopeLimit;
 
         
         // 장비류 세팅
         PlayerEquipment equipment;
         private bool isFiring = false;
+
+        // 카메라 잠금 선택
+        private bool isCameraLocked = false;
 
         PlayerInteraction interaction;
 
@@ -54,11 +73,13 @@ namespace DinoCleaner.Player
             // 점프 입력
             inputActions.Player.Jump.performed += ctx => Jump();
             // 웅크리기 입력
-            inputActions.Player.Crouch.performed += ctx => ToggleCrouch();
+            inputActions.Player.Crouch.performed += ctx => ToggleStance();
             inputActions.Player.Fire.started += ctx => isFiring = true;  // 마우스 누름
             inputActions.Player.Fire.canceled += ctx => isFiring = false; // 마우스 뗌
             // 상호작용 입력
             inputActions.Player.Interact.performed += ctx => interaction.TryInteract();
+            // c 키로 카메라 잠금 입력
+            inputActions.Player.CameraLock.started += ctx => ToggleCameraLock();
             // r키로 회전 등록
             inputActions.Player.Rotate.started += ctx =>
             {
@@ -71,12 +92,15 @@ namespace DinoCleaner.Player
                     // 청소 도구 회전 구현 TODO
                 }
             };
+            currentStance = PlayerStance.Standing;
+            targetStanceSetting = standSetting;
         }
 
         private void OnEnable()
         {
             inputActions.Enable();
             Cursor.lockState = CursorLockMode.Locked; // 마우스 커서 숨기기 및 고정
+            Cursor.visible = false;
         }
 
         private void OnDisable()
@@ -103,10 +127,12 @@ namespace DinoCleaner.Player
             {
                 equipment.UseCurrentTool();
             }
+            HandleStanceTransition();
         }
 
         private void HandleLook()
         {
+            if (isCameraLocked || cameraTransform == null) return;
             if (cameraTransform == null) return;
 
             // 마우스 상하 이동 (X축 회전) - 위아래로 고개 끄덕이기
@@ -122,7 +148,9 @@ namespace DinoCleaner.Player
 
         private void HandleMovement()
         {
-            float currentSpeed = isCrouching ? crouchSpeed : walkSpeed;
+            float currentSpeed = walkSpeed;
+            if (currentStance == PlayerStance.Crouching) currentSpeed = crouchSpeed;
+            else if (currentStance == PlayerStance.Prone) currentSpeed = proneSpeed;
 
             // 카메라가 보는 방향을 기준으로 이동 벡터 계산
             Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
@@ -131,39 +159,60 @@ namespace DinoCleaner.Player
 
         private void Jump()
         {
-            if (isGrounded && !isCrouching)
+            if (isGrounded && currentStance == PlayerStance.Standing)
             {
                 velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
             }
         }
 
-        private void ToggleCrouch()
+        private void ToggleStance()
         {
-        
-            isCrouching = !isCrouching;
+            // 다음 상태로 즉시 변경
+            currentStance = (PlayerStance)(((int)currentStance + 1) % 3);
 
-            // Player Controller 조정
-            if(isCrouching)
+            // 결정된 다음 상태를 목표치로 세팅
+            switch (currentStance)
             {
-                controller.height = 1f;
-                controller.center = new Vector3(0, -0.5f, 0);
+                case PlayerStance.Standing: targetStanceSetting = standSetting; break;
+                case PlayerStance.Crouching: targetStanceSetting = crouchSetting; break;
+                case PlayerStance.Prone: targetStanceSetting = proneSetting; break;
+            }
+        }
+
+        private void HandleStanceTransition()
+        {
+            if (Mathf.Abs(controller.height - targetStanceSetting.height) < 0.001f) return;
+
+            controller.height = Mathf.Lerp(controller.height, targetStanceSetting.height, Time.deltaTime * stanceTransitionSpeed);
+            controller.center = new Vector3(0, Mathf.Lerp(controller.center.y, targetStanceSetting.centerY, Time.deltaTime * stanceTransitionSpeed), 0);
+
+            if (cameraTransform != null)
+            {
+                cameraTransform.localPosition = new Vector3(
+                    cameraTransform.localPosition.x,
+                    Mathf.Lerp(cameraTransform.localPosition.y, targetStanceSetting.cameraHeight, Time.deltaTime * stanceTransitionSpeed),
+                    cameraTransform.localPosition.z
+                );
+            }
+        }
+
+        private void ToggleCameraLock()
+        {
+            isCameraLocked = !isCameraLocked;
+
+            if (isCameraLocked)
+            {
+                // 카메라 회전 중지, 마우스 커서 화면에 표시 및 자유 이동
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
             }
             else
             {
-                controller.height = 2f;
-                controller.center = new Vector3(0, 0f, 0);
+                // 다시 FPS 모드로 복귀 (커서 중앙 고정 및 숨김)
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
             }
-
-            // 카메라 위치 조정
-            if (cameraTransform != null)
-            {
-                float targetCameraHeight = isCrouching ? 0.1f : 0.6f;
-                // x, z를 0으로 해도 되지만, 확장성을 위해 기존 x, z값을 유지하도록 설정
-                cameraTransform.localPosition = new Vector3(cameraTransform.localPosition.x, targetCameraHeight, cameraTransform.localPosition.z);
-            }
-
         }
-
         private void CheckGrounded()
         {
             // 이번에는 CharacterController 내장 기능인 isGrounded를 우선 사용해봅니다.
