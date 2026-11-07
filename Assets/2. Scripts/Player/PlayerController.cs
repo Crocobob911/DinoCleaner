@@ -18,9 +18,6 @@ namespace DinoCleaner.Player
     public class PlayerController : MonoBehaviour
     {
         
-        [Header("현재 장착된 이동 장비")]
-        public MovementEquipment currentMovement;
-
         [Header("시야(감도) 세팅")]
         public Transform cameraTransform; // Main Camera를 할당해주세요
         public float mouseSensitivity = 20f;
@@ -51,6 +48,12 @@ namespace DinoCleaner.Player
         PlayerEquipment equipment;
         private bool isFiring = false;
 
+        [Header("점프/비행 세팅")]
+        private bool wasGrounded = true;
+        private float prevElevationInput = 0f;
+        private float airTime = 0f; // 공중에 떠 있는 시간을 누적할 변수
+        private float doubleJumpCooldown = 0.15f; // 첫 점프 후 요정 변신까지의 최소 대기 시간
+        private bool isFairyEquipped = false;
         // 카메라 잠금 선택
         private bool isCameraLocked = false;
 
@@ -92,6 +95,7 @@ namespace DinoCleaner.Player
             };
             currentStance = PlayerStance.Standing;
             targetStanceSetting = standSetting;
+
         }
 
         private void OnEnable()
@@ -113,48 +117,79 @@ namespace DinoCleaner.Player
             moveInput = inputActions.Player.Move.ReadValue<Vector2>();
             lookInput = inputActions.Player.Look.ReadValue<Vector2>();
             float flyElevationInput = inputActions.Player.FlyElevation.ReadValue<float>();
+            bool isJumpPressedThisFrame = flyElevationInput > 0 && prevElevationInput <= 0;
             // 2. 상태 업데이트
             CheckGrounded();
             
             // 3. 실행
             HandleLook();
-            if (currentMovement)
-            {
-                Stance st;
-                switch(currentStance)
-                {
-                    case PlayerStance.Standing:
-                        st = Stance.Standing;
-                        break;
-                    case PlayerStance.Crouching:
-                        st = Stance.Crouching;
-                        break;
-                    case PlayerStance.Prone:
-                        st = Stance.Prone;
-                        break;
-                    default:
-                        st = Stance.Standing;
-                        break;
-                }
-                Vector3 frameMovement = currentMovement.CalculateMovement(
-                transform, 
-                moveInput, 
-                flyElevationInput, 
-                controller.isGrounded, 
-                Time.deltaTime,
-                st,
-                isSprinting
-            );
-
-            // 5. 캐릭터 컨트롤러로 실제 이동
-            controller.Move(frameMovement);
-            }
 
             if(isFiring)
             {
                 equipment.UseCurrentTool();
             }
             HandleStanceTransition();
+
+            if (equipment.CurrentMovement == null)
+            {
+                Debug.LogWarning("[PlayerController] PlayerEquipment에 movement 장비가 할당되지 않았습니다. 기본 이동 장비를 확인하세요.");
+                return;
+            }
+
+            if (controller.isGrounded)
+            {
+                airTime = 0f; // 땅에 닿아있으면 0으로 초기화
+            }
+            else
+            {
+                airTime += Time.deltaTime; // 공중에 있으면 시간 계속 누적
+            }
+
+            
+            
+            Stance st;
+            switch(currentStance)
+            {
+                case PlayerStance.Standing:
+                    st = Stance.Standing;
+                    break;
+                case PlayerStance.Crouching:
+                    st = Stance.Crouching;
+                    break;
+                case PlayerStance.Prone:
+                    st = Stance.Prone;
+                    break;
+                default:
+                    st = Stance.Standing;
+                    break;
+            }
+            Vector3 frameMovement = equipment.CurrentMovement.CalculateMovement(
+            transform, 
+            moveInput, 
+            flyElevationInput, 
+            controller.isGrounded, 
+            Time.deltaTime,
+            st,
+            isSprinting
+            );
+
+            // 5. 캐릭터 컨트롤러로 실제 이동
+            controller.Move(frameMovement);
+
+            if (controller.isGrounded && !wasGrounded)
+            {
+                equipment.EquipDefaultShoes();
+                isFairyEquipped = false;
+            }
+
+            if (!controller.isGrounded && airTime > doubleJumpCooldown && isJumpPressedThisFrame)
+            {
+                equipment.EquipFairyDino();
+                isFairyEquipped = true;
+            }
+
+            wasGrounded = controller.isGrounded;
+            prevElevationInput = flyElevationInput;
         }
 
         private void HandleLook()
@@ -175,6 +210,7 @@ namespace DinoCleaner.Player
 
         private void ToggleStance()
         {
+            if (isFairyEquipped) return; // 요정 공룡 상태에서는 자세 전환 불가
             // 다음 상태로 즉시 변경
             currentStance = (PlayerStance)(((int)currentStance + 1) % 3);
 
