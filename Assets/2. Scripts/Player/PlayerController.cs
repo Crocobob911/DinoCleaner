@@ -48,6 +48,7 @@ namespace DinoCleaner.Player
         private bool isGrounded;
         private PlayerStance currentStance = PlayerStance.Standing;
         private float defaultSlopeLimit;
+        private bool isSprinting = false;
 
         
         // 장비류 세팅
@@ -76,6 +77,9 @@ namespace DinoCleaner.Player
             inputActions.Player.Crouch.performed += ctx => ToggleStance();
             inputActions.Player.Fire.started += ctx => isFiring = true;  // 마우스 누름
             inputActions.Player.Fire.canceled += ctx => isFiring = false; // 마우스 뗌
+            // 달리기 입력
+            inputActions.Player.Sprint.started += ctx => isSprinting = true;
+            inputActions.Player.Sprint.canceled += ctx => isSprinting = false;
             // 상호작용 입력
             inputActions.Player.Interact.performed += ctx => interaction.TryInteract();
             // c 키로 카메라 잠금 입력
@@ -151,6 +155,7 @@ namespace DinoCleaner.Player
             float currentSpeed = walkSpeed;
             if (currentStance == PlayerStance.Crouching) currentSpeed = crouchSpeed;
             else if (currentStance == PlayerStance.Prone) currentSpeed = proneSpeed;
+            if (isSprinting) currentSpeed *= 1.5f;
 
             // 카메라가 보는 방향을 기준으로 이동 벡터 계산
             Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
