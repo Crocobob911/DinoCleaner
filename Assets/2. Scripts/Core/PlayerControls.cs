@@ -199,6 +199,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FlyElevation"",
+                    ""type"": ""Value"",
+                    ""id"": ""15a9129b-6b37-4499-850a-f0e07f88b493"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -619,6 +628,39 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""CameraLock"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""6ca62040-0b42-4ba4-bc10-8a112c80522d"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FlyElevation"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""37ea12dc-3595-42ea-b8c0-7ae70bf098c7"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FlyElevation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""744ae3d7-6f47-46c5-badc-d30b48456352"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FlyElevation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         },
@@ -1216,6 +1258,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
         m_Player_Rotate = m_Player.FindAction("Rotate", throwIfNotFound: true);
         m_Player_CameraLock = m_Player.FindAction("CameraLock", throwIfNotFound: true);
+        m_Player_FlyElevation = m_Player.FindAction("FlyElevation", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1321,6 +1364,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Fire;
     private readonly InputAction m_Player_Rotate;
     private readonly InputAction m_Player_CameraLock;
+    private readonly InputAction m_Player_FlyElevation;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1380,6 +1424,10 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/CameraLock".
         /// </summary>
         public InputAction @CameraLock => m_Wrapper.m_Player_CameraLock;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/FlyElevation".
+        /// </summary>
+        public InputAction @FlyElevation => m_Wrapper.m_Player_FlyElevation;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1442,6 +1490,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @CameraLock.started += instance.OnCameraLock;
             @CameraLock.performed += instance.OnCameraLock;
             @CameraLock.canceled += instance.OnCameraLock;
+            @FlyElevation.started += instance.OnFlyElevation;
+            @FlyElevation.performed += instance.OnFlyElevation;
+            @FlyElevation.canceled += instance.OnFlyElevation;
         }
 
         /// <summary>
@@ -1489,6 +1540,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @CameraLock.started -= instance.OnCameraLock;
             @CameraLock.performed -= instance.OnCameraLock;
             @CameraLock.canceled -= instance.OnCameraLock;
+            @FlyElevation.started -= instance.OnFlyElevation;
+            @FlyElevation.performed -= instance.OnFlyElevation;
+            @FlyElevation.canceled -= instance.OnFlyElevation;
         }
 
         /// <summary>
@@ -1873,6 +1927,13 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnCameraLock(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "FlyElevation" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnFlyElevation(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

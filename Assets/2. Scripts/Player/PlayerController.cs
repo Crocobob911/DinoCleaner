@@ -18,12 +18,8 @@ namespace DinoCleaner.Player
     public class PlayerController : MonoBehaviour
     {
         
-        [Header("움직임 세팅")]
-        public float walkSpeed = 5f;
-        public float crouchSpeed = 2.5f;
-        public float proneSpeed = 1.0f;
-        public float jumpHeight = 1.5f;
-        public float gravity = -9.81f;
+        [Header("현재 장착된 이동 장비")]
+        public MovementEquipment currentMovement;
 
         [Header("시야(감도) 세팅")]
         public Transform cameraTransform; // Main Camera를 할당해주세요
@@ -71,8 +67,6 @@ namespace DinoCleaner.Player
             // Input System 초기화
             inputActions = new PlayerControls();
             
-            // 점프 입력
-            inputActions.Player.Jump.performed += ctx => Jump();
             // 웅크리기 입력
             inputActions.Player.Crouch.performed += ctx => ToggleStance();
             inputActions.Player.Fire.started += ctx => isFiring = true;  // 마우스 누름
@@ -118,14 +112,43 @@ namespace DinoCleaner.Player
             // 1. 매 프레임 입력값 읽기
             moveInput = inputActions.Player.Move.ReadValue<Vector2>();
             lookInput = inputActions.Player.Look.ReadValue<Vector2>();
-
+            float flyElevationInput = inputActions.Player.FlyElevation.ReadValue<float>();
             // 2. 상태 업데이트
             CheckGrounded();
             
             // 3. 실행
             HandleLook();
-            HandleMovement();
-            ApplyGravity();
+            if (currentMovement)
+            {
+                Stance st;
+                switch(currentStance)
+                {
+                    case PlayerStance.Standing:
+                        st = Stance.Standing;
+                        break;
+                    case PlayerStance.Crouching:
+                        st = Stance.Crouching;
+                        break;
+                    case PlayerStance.Prone:
+                        st = Stance.Prone;
+                        break;
+                    default:
+                        st = Stance.Standing;
+                        break;
+                }
+                Vector3 frameMovement = currentMovement.CalculateMovement(
+                transform, 
+                moveInput, 
+                flyElevationInput, 
+                controller.isGrounded, 
+                Time.deltaTime,
+                st,
+                isSprinting
+            );
+
+            // 5. 캐릭터 컨트롤러로 실제 이동
+            controller.Move(frameMovement);
+            }
 
             if(isFiring)
             {
@@ -148,26 +171,6 @@ namespace DinoCleaner.Player
             // 마우스 좌우 이동 (Y축 회전) - 몸통 전체가 회전
             float mouseX = lookInput.x * mouseSensitivity * Time.deltaTime;
             transform.Rotate(Vector3.up * mouseX);
-        }
-
-        private void HandleMovement()
-        {
-            float currentSpeed = walkSpeed;
-            if (currentStance == PlayerStance.Crouching) currentSpeed = crouchSpeed;
-            else if (currentStance == PlayerStance.Prone) currentSpeed = proneSpeed;
-            if (isSprinting) currentSpeed *= 1.5f;
-
-            // 카메라가 보는 방향을 기준으로 이동 벡터 계산
-            Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
-            controller.Move(move * currentSpeed * Time.deltaTime);
-        }
-
-        private void Jump()
-        {
-            if (isGrounded && currentStance == PlayerStance.Standing)
-            {
-                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            }
         }
 
         private void ToggleStance()
@@ -227,12 +230,6 @@ namespace DinoCleaner.Player
             {
                 velocity.y = -2f; 
             }
-        }
-
-        private void ApplyGravity()
-        {
-            velocity.y += gravity * Time.deltaTime;
-            controller.Move(velocity * Time.deltaTime);
         }
 
         private void OnTriggerEnter(Collider other)
