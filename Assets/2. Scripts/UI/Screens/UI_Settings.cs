@@ -62,6 +62,13 @@ namespace DinoCleaner.UI
             returnButton.onClick.AddListener(OnClickReturn);
         }
 
+        // 설정 창이 닫힐 때 바뀐 설정을 한 번에 파일로 저장
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            SettingsSystem.SaveIfDirty();
+        }
+
         public void ReceiveData(SettingsMode mode)
         {
             IGameSettings settings = GameServices.Settings;

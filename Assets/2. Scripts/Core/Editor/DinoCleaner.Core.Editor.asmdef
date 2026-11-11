@@ -1,0 +1,19 @@
+{
+    "name": "DinoCleaner.Core.Editor",
+    "rootNamespace": "DinoCleaner.Core.Editor",
+    "references": [
+        "DinoCleaner.Core",
+        "DinoCleaner.UI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

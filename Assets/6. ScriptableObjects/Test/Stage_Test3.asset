@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa124abcd824c5f40b423de42f8252aa, type: 3}
   m_Name: Stage_Test3
   m_EditorClassIdentifier: DinoCleaner.Core::DinoCleaner.Core.StageDefinition
+  stageId: 102
   displayName: "\ud14c\uc2a4\ud2b8 \uc758\ub8b0 3"
   cardImage: {fileID: 0}
   description: "\ub9c8\uc6b0\uc2a4 \ud720 \uc2a4\ud06c\ub864 \ud14c\uc2a4\ud2b8\uc6a9 \uc758\ub8b0\uc785\ub2c8\ub2e4. \uc2e4\uc81c \uacf5\ub8e1\uc740 Stage 1\uacfc \uac19\uc2b5\ub2c8\ub2e4."

@@ -18,6 +18,12 @@ namespace DinoCleaner.Core
         // 돈이 부족하거나 최대 단계면 false
         bool TryUpgrade(string upgradeId);
 
+        // 공룡(스테이지)별 클리어 여부. stageId는 StageDefinition.stageId
+        bool IsStageCleared(int stageId);
+
+        // 성공 판정이 났을 때 호출. 처음 클리어면 저장하고 Changed 호출
+        void MarkStageCleared(int stageId);
+
         void SaveCleaningProgress();
     }
 }
