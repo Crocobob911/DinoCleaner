@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using DinoCleaner.Cleaning;
 using DinoCleaner.UI;
 using UnityEditor;
 using UnityEngine;
@@ -61,9 +62,13 @@ namespace DinoCleaner.Core.Editor
             DrawSeparator();
             DrawStageSection();
             DrawSeparator();
+            DrawSlotSection();
+            DrawSeparator();
             DrawUpgradeSection();
             DrawSeparator();
             DrawSettingsSection();
+            DrawSeparator();
+            DrawDirtMaskSection();
 
             if (!string.IsNullOrEmpty(lastResult)) EditorGUILayout.HelpBox(lastResult, MessageType.Info);
             if (Application.isPlaying)
@@ -193,6 +198,42 @@ namespace DinoCleaner.Core.Editor
             if (stages.Count == 0) EditorGUILayout.LabelField("StageDefinition 에셋이 없습니다.");
         }
 
+        private void DrawSlotSection()
+        {
+            EditorGUILayout.LabelField("공룡별 진행도 슬롯 (save.json + Dirt/dirt_{ID}.png)", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("저장 기능만 있음. 언제 저장·삭제할지(이어하기)는 스테이지 쪽에서 연결 예정.", EditorStyles.wordWrappedMiniLabel);
+
+            List<StageSlot> slots = SaveSystem.Data.stageSlots;
+            if (slots.Count == 0)
+            {
+                EditorGUILayout.LabelField("슬롯 없음");
+                return;
+            }
+
+            foreach (StageSlot slot in slots.ToArray())
+            {
+                bool hasDirt = File.Exists(StageSlots.DirtPath(slot.stageId));
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField(
+                        $"[{slot.stageId}] 진행도 {slot.progress:P0} · 청소 {slot.washTime:F0}초 · 부위 {slot.regions.Count}개 · 오물 지도 {(hasDirt ? "있음" : "없음")}");
+
+                    if (GUILayout.Button("슬롯 삭제", GUILayout.Width(80)))
+                    {
+                        StageSlots.Delete(slot.stageId);
+                        lastResult = $"[{slot.stageId}] 진행도 슬롯과 오물 지도 파일 삭제";
+                    }
+                    if (hasDirt && GUILayout.Button("PNG", GUILayout.Width(45)))
+                    {
+                        EditorUtility.RevealInFinder(StageSlots.DirtPath(slot.stageId));
+                    }
+                }
+
+                foreach (RegionSlot r in slot.regions)
+                    EditorGUILayout.LabelField($"      부위 [{r.id}] {r.progress:P0}{(r.completed ? " ✔완료" : "")}");
+            }
+        }
+
         private void DrawUpgradeSection()
         {
             EditorGUILayout.LabelField("업그레이드", EditorStyles.boldLabel);
@@ -297,6 +338,85 @@ namespace DinoCleaner.Core.Editor
                 }
             }
         }
+
+        // ===== [기술 검증] 오물 지도 저장/불러오기 =====
+
+        private static string DirtTestPath(CleanableObject obj) =>
+            Path.Combine(SaveSystem.SaveDirectory, "DirtTest", obj.name.Replace("(Clone)", "").Trim() + ".png");
+
+        private void DrawDirtMaskSection()
+        {
+            EditorGUILayout.LabelField("[기술 검증] 오물 지도 + 부위별 진행도 저장/불러오기", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(
+                "① Play → 공룡을 반쯤 닦기 → 저장   ② Play 종료 후 다시 Play → 공룡 도착 후 불러오기   ③ 모양·전체 진행도·부위별 진행도가 저장할 때와 같은지 비교",
+                EditorStyles.wordWrappedMiniLabel);
+
+            if (!Application.isPlaying)
+            {
+                EditorGUILayout.HelpBox("Play 중에만 동작합니다. (오물 지도는 공룡이 생성될 때 만들어짐)", MessageType.Info);
+                return;
+            }
+
+            CleanableObject[] targets = Object.FindObjectsByType<CleanableObject>(FindObjectsSortMode.None);
+            if (targets.Length == 0)
+            {
+                EditorGUILayout.LabelField("씬에 공룡(CleanableObject)이 없습니다. 도착할 때까지 기다리세요.");
+                return;
+            }
+
+            foreach (CleanableObject target in targets)
+            {
+                string path = DirtTestPath(target);
+                DirtMaskSnapshot.Info saved = DirtMaskSnapshot.ReadInfo(path);
+
+                EditorGUILayout.LabelField(target.name, EditorStyles.miniBoldLabel);
+                EditorGUILayout.LabelField("전체 진행도",
+                    $"지금 {(target.IsReady ? $"{target.TotalProgress:P1}" : "측정 중…")}   |   저장할 때 {(saved != null ? $"{saved.totalProgress:P1}" : "-")}");
+
+                // 부위별: 지금 vs 저장할 때
+                foreach (RegionProgress r in target.Regions)
+                {
+                    DirtMaskSnapshot.RegionRecord old = saved?.regions.Find(x => x.id == r.RegionId);
+                    string now = $"{r.Progress:P0}{(r.IsCompleted ? " ✔완료" : "")}";
+                    string then = old != null ? $"{old.progress:P0}{(old.completed ? " ✔완료" : "")}" : "-";
+                    EditorGUILayout.LabelField($"   [{r.RegionId}] {r.DisplayName}", $"지금 {now}   |   저장할 때 {then}");
+                }
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    using (new EditorGUI.DisabledScope(!target.IsReady))
+                    {
+                        if (GUILayout.Button("오물 저장"))
+                        {
+                            lastResult = Describe(target, DirtMaskSnapshot.Save(target, path));
+                        }
+                    }
+
+                    // 첫 측정(전부 진흙 기준)이 끝난 뒤에 불러와야 진행도가 0%로 돌아가지 않음
+                    using (new EditorGUI.DisabledScope(!File.Exists(path) || !target.IsReady))
+                    {
+                        if (GUILayout.Button("오물 불러오기"))
+                        {
+                            DirtMaskSnapshot.Result r = DirtMaskSnapshot.Load(target, path);
+                            lastResult = Describe(target, r) +
+                                (r.Ok ? "\n0.25초쯤 뒤 '지금'이 '저장할 때'와 같아지는지 확인하세요. 이미 완료됐던 부위는 완료 알림이 다시 뜨지 않아야 합니다." : "");
+                        }
+                    }
+
+                    using (new EditorGUI.DisabledScope(!File.Exists(path)))
+                    {
+                        if (GUILayout.Button("파일 위치"))
+                        {
+                            EditorUtility.RevealInFinder(path);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static string Describe(CleanableObject target, DirtMaskSnapshot.Result r) =>
+            r.Ok ? $"[{target.name}] {r.Message} — 파일 {r.Bytes / 1024f:F0} KB, {r.Milliseconds:F1} ms"
+                 : $"[{target.name}] {r.Message}";
 
         private static string ReadOrNone(string path) => File.Exists(path) ? File.ReadAllText(path) : "(파일 없음)";
 

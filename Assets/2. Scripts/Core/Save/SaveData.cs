@@ -42,6 +42,21 @@ namespace DinoCleaner.Core
             return true;
         }
 
+        // 공룡별 진행도 슬롯 (가벼운 정보). 직접 고치지 말고 StageSlots를 쓸 것
+        public List<StageSlot> stageSlots = new();
+
+        public StageSlot GetStageSlot(int stageId) => stageSlots.Find(s => s.stageId == stageId);
+
+        // 같은 stageId가 있으면 교체 (메모리만 바꿈)
+        public void SetStageSlot(StageSlot slot)
+        {
+            int index = stageSlots.FindIndex(s => s.stageId == slot.stageId);
+            if (index >= 0) stageSlots[index] = slot;
+            else stageSlots.Add(slot);
+        }
+
+        public bool RemoveStageSlot(int stageId) => stageSlots.RemoveAll(s => s.stageId == stageId) > 0;
+
         // 구매한 업그레이드 단계. 목록에 없는 업그레이드는 시작 단계로 취급. 직접 고치지 말고 아래 메서드를 쓸 것
         public List<UpgradeSaveEntry> upgrades = new();
 

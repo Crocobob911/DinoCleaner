@@ -24,6 +24,9 @@ namespace DinoCleaner.Core
         // 성공 판정이 났을 때 호출. 처음 클리어면 저장하고 Changed 호출
         void MarkStageCleared(int stageId);
 
+        // 공룡별 진행도 슬롯(StageSlots)이 있으면 true와 전체 진행도(0~1). 게시판 "N% 진행 중" 표시용
+        bool TryGetStageProgress(int stageId, out float progress);
+
         void SaveCleaningProgress();
     }
 }

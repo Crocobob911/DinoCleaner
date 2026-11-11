@@ -172,6 +172,17 @@ namespace DinoCleaner.Cleaning
             Updated?.Invoke();
         }
 
+        // 저장해 둔 "완료된 부위" 기록을 되살림. 다음 측정 때 이 부위들은 이미 완료로 취급되어 완료 알림이 다시 울리지 않음
+        public void RestoreCompletedRegions(ICollection<int> completedIds)
+        {
+            for (int i = 0; i < _regionProgress.Length; i++)
+            {
+                RegionProgress r = _regionProgress[i];
+                if (r.IsCompleted || !completedIds.Contains(r.RegionId)) continue;
+                _regionProgress[i] = new RegionProgress(r.RegionId, r.DisplayName, r.Progress, true);
+            }
+        }
+
         // 처음 더러운 양 대비 지금 남은 양으로 완료율 계산
         static float Ratio(int dirtyNow, int dirtyAtStart)
         {

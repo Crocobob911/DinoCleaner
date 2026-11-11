@@ -54,10 +54,11 @@ namespace DinoCleaner.Core
             JsonFile.WriteAtomic(FilePath, data, "SaveSystem");
         }
 
-        // 게임 진행만 지움. 설정(settings.json)은 그대로
+        // 게임 진행(+공룡별 오물 지도 파일)만 지움. 설정(settings.json)은 그대로
         public static void DeleteSave()
         {
             if (File.Exists(FilePath)) File.Delete(FilePath);
+            StageSlots.DeleteAllDirtFiles();
             data = null;
         }
 

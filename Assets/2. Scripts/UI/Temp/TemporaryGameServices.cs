@@ -130,6 +130,8 @@ namespace DinoCleaner.UI
             Changed?.Invoke();
         }
 
+        public bool TryGetStageProgress(int stageId, out float progress) => StageSlots.TryGetProgress(stageId, out progress);
+
         public void SaveCleaningProgress()
         {
             Debug.Log("[TemporaryGameServices] 저장 시스템 연결 전이라 실제로 저장하지 않습니다.");
