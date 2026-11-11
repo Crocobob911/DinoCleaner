@@ -60,6 +60,8 @@ namespace DinoCleaner.Core.Editor
             DrawTutorialSection();
             DrawSeparator();
             DrawUpgradeSection();
+            DrawSeparator();
+            DrawSettingsSection();
 
             if (!string.IsNullOrEmpty(lastResult)) EditorGUILayout.HelpBox(lastResult, MessageType.Info);
             if (Application.isPlaying)
@@ -70,9 +72,10 @@ namespace DinoCleaner.Core.Editor
             }
 
             DrawSeparator();
-            EditorGUILayout.LabelField("파일 내용 (디스크)", EditorStyles.boldLabel);
-            string json = File.Exists(SaveSystem.FilePath) ? File.ReadAllText(SaveSystem.FilePath) : "(파일 없음)";
-            EditorGUILayout.TextArea(json, GUILayout.MinHeight(120));
+            EditorGUILayout.LabelField("save.json (게임 진행)", EditorStyles.boldLabel);
+            EditorGUILayout.TextArea(ReadOrNone(SaveSystem.FilePath), GUILayout.MinHeight(120));
+            EditorGUILayout.LabelField("settings.json (설정)", EditorStyles.boldLabel);
+            EditorGUILayout.TextArea(ReadOrNone(SettingsSystem.FilePath), GUILayout.MinHeight(70));
 
             EditorGUILayout.EndScrollView();
         }
@@ -195,6 +198,62 @@ namespace DinoCleaner.Core.Editor
                 if (GUILayout.Button("업그레이드 기록만 초기화 (돈은 그대로)")) ResetUpgradesMenu();
             }
         }
+
+        private void DrawSettingsSection()
+        {
+            EditorGUILayout.LabelField("설정 (settings.json — 새 게임을 해도 유지)", EditorStyles.boldLabel);
+
+            // Play 중에는 실제 게임 경로(GameServices.Settings)로 바꿔야 실행 중인 게임에도 반영됨
+            IGameSettings live = Application.isPlaying ? GameServices.Settings : null;
+            SettingsData s = SettingsSystem.Data;
+
+            int bgm = EditorGUILayout.IntSlider("BGM", s.bgmVolume, SettingsData.MinValue, SettingsData.MaxValue);
+            int sfx = EditorGUILayout.IntSlider("SFX", s.sfxVolume, SettingsData.MinValue, SettingsData.MaxValue);
+            int sens = EditorGUILayout.IntSlider("마우스 감도", s.mouseSensitivity, SettingsData.MinValue, SettingsData.MaxValue);
+
+            if (bgm != s.bgmVolume || sfx != s.sfxVolume || sens != s.mouseSensitivity)
+            {
+                if (live != null)
+                {
+                    live.BgmVolume = bgm;
+                    live.SfxVolume = sfx;
+                    live.MouseSensitivity = sens;
+                }
+                else
+                {
+                    s.bgmVolume = bgm;
+                    s.sfxVolume = sfx;
+                    s.mouseSensitivity = sens;
+                    SettingsSystem.MarkDirty();
+                }
+            }
+
+            EditorGUILayout.LabelField("저장 대기", SettingsSystem.IsDirty ? "바뀐 값 있음 (아직 파일에 안 씀)" : "없음");
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                using (new EditorGUI.DisabledScope(!SettingsSystem.IsDirty))
+                {
+                    if (GUILayout.Button("지금 저장 (창 닫기와 같은 효과)"))
+                    {
+                        SettingsSystem.SaveIfDirty();
+                        lastResult = "설정을 settings.json에 저장";
+                    }
+                }
+                if (GUILayout.Button("파일에서 다시 불러오기"))
+                {
+                    SettingsSystem.Load();
+                    lastResult = "설정을 파일에서 다시 불러옴 (저장 안 한 변경은 버려짐)";
+                }
+                if (GUILayout.Button("기본값으로"))
+                {
+                    SettingsSystem.ResetToDefault();
+                    lastResult = "설정 파일 삭제 → 기본값 (BGM 50, SFX 65, 감도 40)";
+                }
+            }
+        }
+
+        private static string ReadOrNone(string path) => File.Exists(path) ? File.ReadAllText(path) : "(파일 없음)";
 
         private void SetLevelDirect(UpgradeInfo u, int level)
         {

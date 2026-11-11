@@ -7,7 +7,7 @@ namespace DinoCleaner.UI
 {
     /// <summary>
     /// 실제 저장/재화 시스템이 생기기 전까지 쓰는 임시 구현.
-    /// 돈·업그레이드 단계·튜토리얼 완료 여부는 SaveSystem으로 로컬에 저장되고, 설정값은 아직 Play 중에만 유지됩니다.
+    /// 돈·업그레이드 단계·튜토리얼 완료 여부는 SaveSystem(save.json), 설정값은 SettingsSystem(settings.json)에 저장됩니다.
     /// </summary>
     public class TemporaryGameServices : IGameProgress, IGameSettings
     {
@@ -36,9 +36,24 @@ namespace DinoCleaner.UI
                 SaveSystem.Save();
             }
         }
-        public int BgmVolume { get; set; } = 50;
-        public int SfxVolume { get; set; } = 65;
-        public int MouseSensitivity { get; set; } = 40;
+        // 설정값: 바꾸면 메모리에 바로 반영하고 저장 예약. 실제 저장은 설정 창이 닫힐 때(UI_Settings)·게임 종료 시
+        public int BgmVolume
+        {
+            get => SettingsSystem.Data.bgmVolume;
+            set => SetSetting(ref SettingsSystem.Data.bgmVolume, value);
+        }
+
+        public int SfxVolume
+        {
+            get => SettingsSystem.Data.sfxVolume;
+            set => SetSetting(ref SettingsSystem.Data.sfxVolume, value);
+        }
+
+        public int MouseSensitivity
+        {
+            get => SettingsSystem.Data.mouseSensitivity;
+            set => SetSetting(ref SettingsSystem.Data.mouseSensitivity, value);
+        }
 
         public event Action Changed;
 
@@ -90,6 +105,14 @@ namespace DinoCleaner.UI
                 Changed?.Invoke();
             }
             return true;
+        }
+
+        private static void SetSetting(ref int field, int value)
+        {
+            value = SettingsSystem.Clamp(value);
+            if (field == value) return;
+            field = value;
+            SettingsSystem.MarkDirty();
         }
 
         public void SaveCleaningProgress()

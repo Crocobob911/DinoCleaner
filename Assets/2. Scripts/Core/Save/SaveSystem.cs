@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -8,7 +7,7 @@ using UnityEngine;
 namespace DinoCleaner.Core
 {
     /// <summary>
-    /// SaveData를 Application.persistentDataPath/save.json 에 읽고 씁니다.
+    /// 게임 진행(SaveData)을 Application.persistentDataPath/save.json 에 읽고 씁니다. 설정은 SettingsSystem(settings.json).
     /// 처음 Data에 접근할 때 자동으로 불러오고, 저장은 값이 바뀐 쪽에서 Save()를 호출합니다.
     /// </summary>
     public static class SaveSystem
@@ -34,22 +33,15 @@ namespace DinoCleaner.Core
 
         public static void Load()
         {
-            data = new SaveData();
-            string path = FilePath;
-            if (!File.Exists(path)) return;
-
-            try
+            var loaded = new SaveData();
+            // 새 객체에 덮어쓰므로, 파일에 없는 필드는 SaveData의 초기값이 유지됨
+            if (JsonFile.TryReadInto(FilePath, loaded, "SaveSystem", "세이브 파일을 읽지 못해 새 게임으로 시작합니다."))
             {
-                // 새 객체에 덮어쓰므로, 파일에 없는 필드는 SaveData의 초기값이 유지됨
-                JsonUtility.FromJsonOverwrite(File.ReadAllText(path), data);
-                Migrate(data);
+                Migrate(loaded);
+                data = loaded;
             }
-            catch (Exception e)
+            else
             {
-                string brokenPath = Path.Combine(SaveDirectory,
-                    $"save_broken_{DateTime.Now:yyyyMMdd_HHmmss}.json");
-                Debug.LogError($"[SaveSystem] 세이브 파일을 읽지 못해 새 게임으로 시작합니다. 원본은 {brokenPath} 로 옮겼습니다.\n{e}");
-                TryMove(path, brokenPath);
                 data = new SaveData();
             }
         }
@@ -59,22 +51,10 @@ namespace DinoCleaner.Core
             if (data == null) return; // 불러온 적도 바꾼 적도 없음
 
             data.version = SaveData.CurrentVersion;
-            string path = FilePath;
-            string tempPath = path + ".tmp";
-
-            try
-            {
-                // 임시 파일에 다 쓴 뒤 교체해서, 쓰는 도중 꺼져도 기존 세이브가 깨지지 않게 함
-                File.WriteAllText(tempPath, JsonUtility.ToJson(data, true));
-                if (File.Exists(path)) File.Replace(tempPath, path, null);
-                else File.Move(tempPath, path);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"[SaveSystem] 저장에 실패했습니다: {path}\n{e}");
-            }
+            JsonFile.WriteAtomic(FilePath, data, "SaveSystem");
         }
 
+        // 게임 진행만 지움. 설정(settings.json)은 그대로
         public static void DeleteSave()
         {
             if (File.Exists(FilePath)) File.Delete(FilePath);
@@ -85,12 +65,6 @@ namespace DinoCleaner.Core
         private static void Migrate(SaveData loaded)
         {
             // 예) if (loaded.version < 2) { ...; loaded.version = 2; }
-        }
-
-        private static void TryMove(string from, string to)
-        {
-            try { File.Move(from, to); }
-            catch (Exception e) { Debug.LogWarning($"[SaveSystem] 깨진 세이브를 옮기지 못했습니다.\n{e}"); }
         }
 
         // Domain Reload를 꺼도 지난 Play의 값이 남지 않도록

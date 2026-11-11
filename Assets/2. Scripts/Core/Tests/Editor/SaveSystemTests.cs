@@ -21,6 +21,7 @@ namespace DinoCleaner.Core.Tests
             Directory.CreateDirectory(tempDir);
             SaveSystem.DirectoryOverride = tempDir;
             SaveSystem.Load(); // 빈 폴더 → 새 게임 상태
+            SettingsSystem.Load(); // 빈 폴더 → 기본 설정
         }
 
         [TearDown]
@@ -28,6 +29,7 @@ namespace DinoCleaner.Core.Tests
         {
             SaveSystem.DirectoryOverride = null;
             SaveSystem.Load(); // 실제 세이브 상태로 되돌림
+            SettingsSystem.Load();
             if (Directory.Exists(tempDir)) Directory.Delete(tempDir, true);
         }
 
@@ -192,6 +194,72 @@ namespace DinoCleaner.Core.Tests
             Assert.AreEqual(700, new Wallet().Money);
             Assert.IsNotNull(SaveSystem.Data.upgrades);
             Assert.AreEqual(0, SaveSystem.Data.upgrades.Count);
+        }
+
+        // ===== 설정 (settings.json) =====
+
+        [Test]
+        public void 설정파일이_없으면_기본값()
+        {
+            SettingsData s = SettingsSystem.Data;
+            Assert.AreEqual(50, s.bgmVolume);
+            Assert.AreEqual(65, s.sfxVolume);
+            Assert.AreEqual(40, s.mouseSensitivity);
+            Assert.IsFalse(File.Exists(SettingsSystem.FilePath));
+        }
+
+        [Test]
+        public void 설정은_MarkDirty_후_SaveIfDirty때만_저장()
+        {
+            SettingsSystem.SaveIfDirty(); // 바뀐 게 없으면 파일을 만들지 않음
+            Assert.IsFalse(File.Exists(SettingsSystem.FilePath));
+
+            SettingsSystem.Data.bgmVolume = 10;
+            SettingsSystem.MarkDirty();
+            SettingsSystem.SaveIfDirty();
+
+            Assert.IsTrue(File.Exists(SettingsSystem.FilePath));
+            Assert.IsFalse(SettingsSystem.IsDirty);
+            SettingsSystem.Load();
+            Assert.AreEqual(10, SettingsSystem.Data.bgmVolume);
+        }
+
+        [Test]
+        public void 설정과_게임진행은_다른_파일()
+        {
+            SettingsSystem.Data.sfxVolume = 5;
+            SettingsSystem.Save();
+            new Wallet().Income(100);
+
+            Assert.AreNotEqual(SaveSystem.FilePath, SettingsSystem.FilePath);
+
+            SaveSystem.DeleteSave(); // 새 게임
+            SettingsSystem.Load();
+            Assert.AreEqual(5, SettingsSystem.Data.sfxVolume, "새 게임을 해도 설정은 유지되어야 함");
+            Assert.AreEqual(SaveData.NewGameMoney, new Wallet().Money);
+        }
+
+        [Test]
+        public void 설정파일의_범위밖_값은_0에서_100으로_보정()
+        {
+            File.WriteAllText(SettingsSystem.FilePath, "{\"bgmVolume\":150,\"sfxVolume\":-5}");
+            SettingsSystem.Load();
+
+            Assert.AreEqual(100, SettingsSystem.Data.bgmVolume);
+            Assert.AreEqual(0, SettingsSystem.Data.sfxVolume);
+            Assert.AreEqual(40, SettingsSystem.Data.mouseSensitivity, "파일에 없는 항목은 기본값");
+        }
+
+        [Test]
+        public void 깨진_설정파일은_기본값으로()
+        {
+            File.WriteAllText(SettingsSystem.FilePath, "망가진 설정");
+            LogAssert.Expect(LogType.Error, new Regex("설정 파일을 읽지 못해"));
+
+            SettingsSystem.Load();
+
+            Assert.AreEqual(50, SettingsSystem.Data.bgmVolume);
+            Assert.AreEqual(1, Directory.GetFiles(tempDir, "settings_broken_*.json").Length);
         }
 
         [Test]
