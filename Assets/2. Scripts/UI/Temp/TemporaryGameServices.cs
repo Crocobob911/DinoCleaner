@@ -6,11 +6,12 @@ using UnityEngine;
 namespace DinoCleaner.UI
 {
     /// <summary>
-    /// 실제 저장/재화 시스템이 생기기 전까지 쓰는 임시 구현. 값은 Play 중에만 유지됩니다.
+    /// 실제 저장/재화 시스템이 생기기 전까지 쓰는 임시 구현.
+    /// 돈은 Wallet을 통해 로컬에 저장되고, 나머지 값은 아직 Play 중에만 유지됩니다.
     /// </summary>
     public class TemporaryGameServices : IGameProgress, IGameSettings
     {
-        private const int StartMoney = 1000;
+        private readonly Wallet wallet = new();
 
         private readonly List<UpgradeInfo> upgrades = new()
         {
@@ -20,7 +21,7 @@ namespace DinoCleaner.UI
             new UpgradeInfo("fairyDino", "요정 공룡", "요정 공룡의 도움으로 높은 곳까지 날아갈 수 있습니다.", 0, 1, 500),
         };
 
-        public int Money { get; private set; } = StartMoney;
+        public int Money => wallet.Money;
         public IReadOnlyList<UpgradeInfo> Upgrades => upgrades;
         public bool IsTutorialCompleted { get; set; }
         public int BgmVolume { get; set; } = 50;
@@ -28,6 +29,11 @@ namespace DinoCleaner.UI
         public int MouseSensitivity { get; set; } = 40;
 
         public event Action Changed;
+
+        public TemporaryGameServices()
+        {
+            wallet.Changed += () => Changed?.Invoke();
+        }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RegisterIfMissing()
@@ -39,8 +45,7 @@ namespace DinoCleaner.UI
 
         public void AddMoney(int amount)
         {
-            Money += amount;
-            Changed?.Invoke();
+            wallet.Income(amount);
         }
 
         public bool TryUpgrade(string upgradeId)
@@ -49,12 +54,12 @@ namespace DinoCleaner.UI
             if (index < 0) return false;
 
             UpgradeInfo current = upgrades[index];
-            if (current.IsMaxLevel || Money < current.NextCost) return false;
+            if (current.IsMaxLevel || !wallet.CanAfford(current.NextCost)) return false;
 
-            Money -= current.NextCost;
+            // 업그레이드를 먼저 반영한 뒤 돈을 빼야, wallet.Changed 시점에 UI가 새 단계를 읽음
             upgrades[index] = new UpgradeInfo(current.Id, current.DisplayName, current.Description,
                 current.Level + 1, current.MaxLevel, current.NextCost + 100);
-            Changed?.Invoke();
+            wallet.TryConsume(current.NextCost);
             return true;
         }
 

@@ -1,0 +1,138 @@
+using System.IO;
+using System.Text.RegularExpressions;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.TestTools;
+
+namespace DinoCleaner.Core.Tests
+{
+    /// <summary>
+    /// 저장/돈 기능 자동 테스트. 실제 세이브는 건드리지 않고 매번 빈 임시 폴더에서 실행됩니다.
+    /// 실행: Window > General > Test Runner > EditMode > Run All
+    /// </summary>
+    public class SaveSystemTests
+    {
+        private string tempDir;
+
+        [SetUp]
+        public void SetUp()
+        {
+            tempDir = Path.Combine(Path.GetTempPath(), "DinoCleanerSaveTest_" + System.Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(tempDir);
+            SaveSystem.DirectoryOverride = tempDir;
+            SaveSystem.Load(); // 빈 폴더 → 새 게임 상태
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            SaveSystem.DirectoryOverride = null;
+            SaveSystem.Load(); // 실제 세이브 상태로 되돌림
+            if (Directory.Exists(tempDir)) Directory.Delete(tempDir, true);
+        }
+
+        [Test]
+        public void 세이브가_없으면_시작자금으로_시작()
+        {
+            Assert.AreEqual(SaveData.NewGameMoney, new Wallet().Money);
+            Assert.IsFalse(File.Exists(SaveSystem.FilePath));
+        }
+
+        [Test]
+        public void Income하면_파일에_저장되고_다시_불러와도_유지()
+        {
+            new Wallet().Income(250);
+
+            Assert.IsTrue(File.Exists(SaveSystem.FilePath));
+            SaveSystem.Load(); // 게임을 껐다 켠 것과 같음
+            Assert.AreEqual(SaveData.NewGameMoney + 250, new Wallet().Money);
+        }
+
+        [Test]
+        public void TryConsume_돈이_충분하면_차감되고_저장()
+        {
+            var wallet = new Wallet();
+            wallet.Income(500);
+            Assert.IsTrue(wallet.TryConsume(300));
+
+            SaveSystem.Load();
+            Assert.AreEqual(SaveData.NewGameMoney + 200, new Wallet().Money);
+        }
+
+        [Test]
+        public void TryConsume_돈이_부족하면_실패하고_그대로()
+        {
+            var wallet = new Wallet();
+            Assert.IsFalse(wallet.TryConsume(SaveData.NewGameMoney + 1));
+            Assert.AreEqual(SaveData.NewGameMoney, wallet.Money);
+            Assert.IsFalse(File.Exists(SaveSystem.FilePath), "실패했는데 저장이 일어나면 안 됨");
+        }
+
+        [Test]
+        public void 돈이_바뀔때만_Changed_호출()
+        {
+            var wallet = new Wallet();
+            int count = 0;
+            wallet.Changed += () => count++;
+
+            wallet.Income(10);                                // +1
+            wallet.TryConsume(5);                             // +1
+            wallet.TryConsume(int.MaxValue);                  // 실패 → 호출 안 됨
+            wallet.Income(0);                                 // 변화 없음 → 호출 안 됨
+
+            Assert.AreEqual(2, count);
+        }
+
+        [Test]
+        public void Income에_음수가_오면_무시()
+        {
+            LogAssert.Expect(LogType.Warning, new Regex("음수"));
+            var wallet = new Wallet();
+            wallet.Income(-100);
+            Assert.AreEqual(SaveData.NewGameMoney, wallet.Money);
+        }
+
+        [Test]
+        public void 돈이_int_최대값을_넘지_않음()
+        {
+            var wallet = new Wallet();
+            wallet.Income(int.MaxValue);
+            wallet.Income(1); // 시작 자금이 0이어도 넘침 처리를 확인하도록 한 번 더
+            Assert.AreEqual(int.MaxValue, wallet.Money);
+        }
+
+        [Test]
+        public void 예전_세이브에_없는_필드는_기본값으로_채움()
+        {
+            // 저장 항목이 추가되기 전의 세이브 파일을 흉내냄
+            File.WriteAllText(SaveSystem.FilePath, "{\"version\":1}");
+            SaveSystem.Load();
+            Assert.AreEqual(SaveData.NewGameMoney, new Wallet().Money);
+        }
+
+        [Test]
+        public void 깨진_세이브는_따로_옮기고_새_게임으로_시작()
+        {
+            File.WriteAllText(SaveSystem.FilePath, "{ 이건 JSON이 아님");
+            LogAssert.Expect(LogType.Error, new Regex("세이브 파일을 읽지 못해"));
+
+            SaveSystem.Load();
+
+            Assert.AreEqual(SaveData.NewGameMoney, new Wallet().Money);
+            Assert.IsFalse(File.Exists(SaveSystem.FilePath));
+            Assert.AreEqual(1, Directory.GetFiles(tempDir, "save_broken_*.json").Length);
+        }
+
+        [Test]
+        public void 덮어쓰기_저장후_임시파일이_남지_않음()
+        {
+            var wallet = new Wallet();
+            wallet.Income(1);
+            wallet.Income(1); // 두 번째는 기존 파일을 교체하는 경로
+
+            Assert.IsFalse(File.Exists(SaveSystem.FilePath + ".tmp"));
+            SaveSystem.Load();
+            Assert.AreEqual(SaveData.NewGameMoney + 2, new Wallet().Money);
+        }
+    }
+}
