@@ -29,6 +29,19 @@ namespace DinoCleaner.Core
         // 튜토리얼을 끝까지 마쳤는지. true면 스테이지에서 튜토리얼을 다시 띄우지 않음
         public bool tutorialCompleted = false;
 
+        // 한 번이라도 성공한 스테이지의 stageId (StageDefinition.stageId). 직접 고치지 말고 아래 메서드를 쓸 것
+        public List<int> clearedStageIds = new();
+
+        public bool IsStageCleared(int stageId) => clearedStageIds.Contains(stageId);
+
+        // 처음 클리어면 true (메모리만 바꿈, 파일 저장은 호출한 쪽에서)
+        public bool MarkStageCleared(int stageId)
+        {
+            if (clearedStageIds.Contains(stageId)) return false;
+            clearedStageIds.Add(stageId);
+            return true;
+        }
+
         // 구매한 업그레이드 단계. 목록에 없는 업그레이드는 시작 단계로 취급. 직접 고치지 말고 아래 메서드를 쓸 것
         public List<UpgradeSaveEntry> upgrades = new();
 

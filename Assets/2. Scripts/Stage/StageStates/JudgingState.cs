@@ -21,7 +21,7 @@ namespace DinoCleaner.Stage
             bool success = total >= stage.minSuccessProgress;
             int reward = success ? Mathf.RoundToInt(stage.baseReward * total) : 0;
 
-            Controller.LastResult = new StageResult(success, total, regions, Controller.WashTime, reward);
+            Controller.LastResult = new StageResult(success, total, regions, Controller.WashTime, reward, stage.stageId);
             _elapsed = 0f;
         }
 

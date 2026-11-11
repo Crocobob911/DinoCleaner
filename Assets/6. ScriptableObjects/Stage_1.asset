@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa124abcd824c5f40b423de42f8252aa, type: 3}
   m_Name: Stage_1
   m_EditorClassIdentifier: DinoCleaner.Core::DinoCleaner.Core.StageDefinition
+  stageId: 1
   displayName: Stage 1
   dinoPrefab: {fileID: 2292835161945820159, guid: 6d9278c8df47b3d4ba80520ee6a1148c, type: 3}
   completeThreshold: 0.95

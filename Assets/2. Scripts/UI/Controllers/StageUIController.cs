@@ -45,6 +45,8 @@ namespace DinoCleaner.UI
 
         private void OnStageFinished(StageFinishedEvent e)
         {
+            // 실패·중도 포기는 기록하지 않음 (중도 포기는 이 이벤트 자체가 오지 않음)
+            if (e.Result.Success) GameServices.Progress.MarkStageCleared(e.Result.StageId);
             GameServices.Progress.AddMoney(e.Result.Reward);
 
             UILoader loader = UILoader.Instance;

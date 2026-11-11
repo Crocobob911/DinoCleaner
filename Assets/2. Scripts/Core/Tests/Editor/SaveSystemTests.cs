@@ -196,6 +196,38 @@ namespace DinoCleaner.Core.Tests
             Assert.AreEqual(0, SaveSystem.Data.upgrades.Count);
         }
 
+        // ===== 스테이지 클리어 =====
+
+        [Test]
+        public void 새_게임에서는_클리어한_스테이지가_없음()
+        {
+            Assert.IsFalse(SaveSystem.Data.IsStageCleared(1));
+            Assert.AreEqual(0, SaveSystem.Data.clearedStageIds.Count);
+        }
+
+        [Test]
+        public void 클리어를_저장하면_다시_불러와도_유지()
+        {
+            Assert.IsTrue(SaveSystem.Data.MarkStageCleared(1));
+            Assert.IsFalse(SaveSystem.Data.MarkStageCleared(1), "두 번째 클리어는 새 기록이 아님");
+            SaveSystem.Save();
+
+            SaveSystem.Load();
+            Assert.IsTrue(SaveSystem.Data.IsStageCleared(1));
+            Assert.IsFalse(SaveSystem.Data.IsStageCleared(2));
+            Assert.AreEqual(1, SaveSystem.Data.clearedStageIds.Count, "중복 기록 없음");
+        }
+
+        [Test]
+        public void 클리어_필드가_없는_예전_세이브는_미클리어로_불러옴()
+        {
+            File.WriteAllText(SaveSystem.FilePath, "{\"version\":1,\"money\":50}");
+            SaveSystem.Load();
+
+            Assert.IsNotNull(SaveSystem.Data.clearedStageIds);
+            Assert.IsFalse(SaveSystem.Data.IsStageCleared(1));
+        }
+
         // ===== 설정 (settings.json) =====
 
         [Test]

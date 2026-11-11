@@ -59,6 +59,8 @@ namespace DinoCleaner.Core.Editor
             DrawSeparator();
             DrawTutorialSection();
             DrawSeparator();
+            DrawStageSection();
+            DrawSeparator();
             DrawUpgradeSection();
             DrawSeparator();
             DrawSettingsSection();
@@ -146,6 +148,49 @@ namespace DinoCleaner.Core.Editor
                     lastResult = $"튜토리얼 완료 여부 → {!completed}";
                 }
             }
+        }
+
+        private void DrawStageSection()
+        {
+            EditorGUILayout.LabelField("공룡(스테이지)별 클리어", EditorStyles.boldLabel);
+
+            // 프로젝트의 모든 StageDefinition (stageId 순)
+            var stages = new List<StageDefinition>();
+            foreach (string guid in AssetDatabase.FindAssets("t:StageDefinition"))
+            {
+                var s = AssetDatabase.LoadAssetAtPath<StageDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+                if (s != null) stages.Add(s);
+            }
+            stages.Sort((a, b) => a.stageId.CompareTo(b.stageId));
+
+            var seen = new HashSet<int>();
+            foreach (StageDefinition stage in stages)
+            {
+                bool cleared = SaveSystem.Data.IsStageCleared(stage.stageId);
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField($"[{stage.stageId}] {stage.displayName} ({stage.name})", GUILayout.Width(260));
+                    EditorGUILayout.LabelField(cleared ? "클리어" : "미클리어", GUILayout.Width(60));
+
+                    using (new EditorGUI.DisabledScope(stage.stageId <= 0))
+                    {
+                        if (GUILayout.Button(cleared ? "기록 지우기" : "클리어 처리", GUILayout.Width(90)))
+                        {
+                            if (cleared) SaveSystem.Data.clearedStageIds.Remove(stage.stageId);
+                            else SaveSystem.Data.MarkStageCleared(stage.stageId);
+                            SaveSystem.Save();
+                            lastResult = $"[{stage.stageId}] {stage.displayName} → {(cleared ? "미클리어" : "클리어")}";
+                        }
+                    }
+                }
+
+                if (stage.stageId <= 0)
+                    EditorGUILayout.HelpBox($"{stage.name}: Stage Id가 0이라 클리어가 기록되지 않습니다. Inspector에서 지정하세요.", MessageType.Warning);
+                else if (!seen.Add(stage.stageId))
+                    EditorGUILayout.HelpBox($"{stage.name}: Stage Id {stage.stageId}가 다른 스테이지와 겹칩니다. 클리어 기록이 섞입니다.", MessageType.Error);
+            }
+
+            if (stages.Count == 0) EditorGUILayout.LabelField("StageDefinition 에셋이 없습니다.");
         }
 
         private void DrawUpgradeSection()

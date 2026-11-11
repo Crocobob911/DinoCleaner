@@ -6,6 +6,9 @@ namespace DinoCleaner.Core
     [CreateAssetMenu(menuName = "DinoCleaner/Stage Definition", fileName = "Stage_")]
     public class StageDefinition : ScriptableObject
     {
+        [Tooltip("세이브(클리어 기록)에 쓰는 고정 ID. 실제 공룡 1·2·3, 테스트용 101~. 한 번 정하면 바꾸지 말 것. 0이면 클리어가 기록되지 않음")]
+        public int stageId;
+
         [Tooltip("레벨 선택 화면에 보일 이름")]
         public string displayName = "Stage 1";
 

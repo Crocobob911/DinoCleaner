@@ -7,7 +7,7 @@ namespace DinoCleaner.UI
 {
     /// <summary>
     /// 실제 저장/재화 시스템이 생기기 전까지 쓰는 임시 구현.
-    /// 돈·업그레이드 단계·튜토리얼 완료 여부는 SaveSystem(save.json), 설정값은 SettingsSystem(settings.json)에 저장됩니다.
+    /// 돈·업그레이드 단계·튜토리얼 완료 여부·스테이지 클리어 여부는 SaveSystem(save.json), 설정값은 SettingsSystem(settings.json)에 저장됩니다.
     /// </summary>
     public class TemporaryGameServices : IGameProgress, IGameSettings
     {
@@ -113,6 +113,21 @@ namespace DinoCleaner.UI
             if (field == value) return;
             field = value;
             SettingsSystem.MarkDirty();
+        }
+
+        public bool IsStageCleared(int stageId) => SaveSystem.Data.IsStageCleared(stageId);
+
+        public void MarkStageCleared(int stageId)
+        {
+            if (stageId <= 0)
+            {
+                Debug.LogWarning($"[TemporaryGameServices] stageId가 {stageId}라 클리어를 기록하지 않습니다. StageDefinition의 Stage Id를 지정하세요.");
+                return;
+            }
+            if (!SaveSystem.Data.MarkStageCleared(stageId)) return; // 이미 클리어한 스테이지
+
+            SaveSystem.Save();
+            Changed?.Invoke();
         }
 
         public void SaveCleaningProgress()
