@@ -19,7 +19,9 @@ namespace DinoCleaner.Stage
             float total = progress != null ? progress.TotalProgress : 0f;
             var regions = progress != null ? progress.Regions.ToArray() : new RegionProgress[0];
             bool success = total >= stage.minSuccessProgress;
-            int reward = success ? Mathf.RoundToInt(stage.baseReward * total) : 0;
+            // 이미 클리어한 공룡을 다시 씻기면 보상 없음 (2026-11-11 기획 결정)
+            bool alreadyCleared = GameServices.Progress != null && GameServices.Progress.IsStageCleared(stage.stageId);
+            int reward = success && !alreadyCleared ? Mathf.RoundToInt(stage.baseReward * total) : 0;
 
             Controller.LastResult = new StageResult(success, total, regions, Controller.WashTime, reward, stage.stageId);
             _elapsed = 0f;

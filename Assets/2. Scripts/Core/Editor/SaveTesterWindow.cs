@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using DinoCleaner.Cleaning;
 using DinoCleaner.UI;
 using UnityEditor;
 using UnityEngine;
@@ -64,6 +65,8 @@ namespace DinoCleaner.Core.Editor
             DrawUpgradeSection();
             DrawSeparator();
             DrawSettingsSection();
+            DrawSeparator();
+            DrawDirtMaskSection();
 
             if (!string.IsNullOrEmpty(lastResult)) EditorGUILayout.HelpBox(lastResult, MessageType.Info);
             if (Application.isPlaying)
@@ -297,6 +300,73 @@ namespace DinoCleaner.Core.Editor
                 }
             }
         }
+
+        // ===== [기술 검증] 오물 지도 저장/불러오기 =====
+
+        private static string DirtTestPath(CleanableObject obj) =>
+            Path.Combine(SaveSystem.SaveDirectory, "DirtTest", obj.name.Replace("(Clone)", "").Trim() + ".png");
+
+        // 저장 시점의 진행도. Play를 다시 시작해도 비교할 수 있도록 EditorPrefs에 보관
+        private static string SavedProgressKey(string path) => "DinoCleaner.DirtTest.Progress." + path;
+
+        private void DrawDirtMaskSection()
+        {
+            EditorGUILayout.LabelField("[기술 검증] 오물 지도 저장/불러오기", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(
+                "① Play → 공룡을 반쯤 닦기 → 저장   ② Play 종료 후 다시 Play → 공룡 도착 후 불러오기   ③ 모양과 진행도가 저장할 때와 같은지 비교",
+                EditorStyles.wordWrappedMiniLabel);
+
+            if (!Application.isPlaying)
+            {
+                EditorGUILayout.HelpBox("Play 중에만 동작합니다. (오물 지도는 공룡이 생성될 때 만들어짐)", MessageType.Info);
+                return;
+            }
+
+            CleanableObject[] targets = Object.FindObjectsByType<CleanableObject>(FindObjectsSortMode.None);
+            if (targets.Length == 0)
+            {
+                EditorGUILayout.LabelField("씬에 공룡(CleanableObject)이 없습니다. 도착할 때까지 기다리세요.");
+                return;
+            }
+
+            foreach (CleanableObject target in targets)
+            {
+                string path = DirtTestPath(target);
+                string key = SavedProgressKey(path);
+                string progress = target.IsReady ? $"{target.TotalProgress:P1}" : "측정 중…";
+                string saved = EditorPrefs.HasKey(key) ? $"{EditorPrefs.GetFloat(key):P1}" : "-";
+
+                EditorGUILayout.LabelField(target.name, $"지금 진행도 {progress}   |   저장할 때 진행도 {saved}");
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (GUILayout.Button("오물 저장"))
+                    {
+                        DirtMaskSnapshot.Result r = DirtMaskSnapshot.Save(target, path);
+                        if (r.Ok) EditorPrefs.SetFloat(key, target.TotalProgress);
+                        lastResult = Describe(target, r);
+                    }
+
+                    using (new EditorGUI.DisabledScope(!File.Exists(path)))
+                    {
+                        if (GUILayout.Button("오물 불러오기"))
+                        {
+                            DirtMaskSnapshot.Result r = DirtMaskSnapshot.Load(target, path);
+                            lastResult = Describe(target, r) +
+                                (r.Ok ? "\n0.25초쯤 뒤 '지금 진행도'가 '저장할 때 진행도'와 같아지는지 확인하세요. (부위 완료 알림이 다시 뜰 수 있음: 정식 구현 때 부위 완료 기록 저장으로 해결)" : "");
+                        }
+                        if (GUILayout.Button("파일 열기 위치"))
+                        {
+                            EditorUtility.RevealInFinder(path);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static string Describe(CleanableObject target, DirtMaskSnapshot.Result r) =>
+            r.Ok ? $"[{target.name}] {r.Message} — 파일 {r.Bytes / 1024f:F0} KB, {r.Milliseconds:F1} ms"
+                 : $"[{target.name}] {r.Message}";
 
         private static string ReadOrNone(string path) => File.Exists(path) ? File.ReadAllText(path) : "(파일 없음)";
 

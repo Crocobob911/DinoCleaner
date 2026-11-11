@@ -115,6 +115,10 @@ namespace DinoCleaner.Cleaning
             _maskChanged = true;
         }
 
+        // === 오물 지도 저장/불러오기(DirtMaskSnapshot)용 ===
+        internal RenderTexture MaskTexture => _mask?.Texture;
+        internal void MarkMaskChanged() => _maskChanged = true;
+
         //============================디버그용 기능============================
         // Debug용(Play 중 컴포넌트에서 실행가능)
         [ContextMenu("Test/표면 더럽히기")]
