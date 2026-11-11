@@ -26,6 +26,9 @@ namespace DinoCleaner.Core
         // 보유 돈. 직접 바꾸지 말고 Wallet을 거칠 것
         public int money = NewGameMoney;
 
+        // 튜토리얼을 끝까지 마쳤는지. true면 스테이지에서 튜토리얼을 다시 띄우지 않음
+        public bool tutorialCompleted = false;
+
         // 구매한 업그레이드 단계. 목록에 없는 업그레이드는 시작 단계로 취급. 직접 고치지 말고 아래 메서드를 쓸 것
         public List<UpgradeSaveEntry> upgrades = new();
 

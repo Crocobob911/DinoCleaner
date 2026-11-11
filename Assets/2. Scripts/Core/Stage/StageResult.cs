@@ -14,8 +14,8 @@ namespace DinoCleaner.Core
         public StageResult(bool success, float totalProgress, IReadOnlyList<RegionProgress> regions,
                            float washTime, int reward)
         {
-            //Success = success;
-            //TotalProgress = totalProgress;
+            Success = success;
+            TotalProgress = totalProgress;
             Regions = regions;
             WashTime = washTime;
             Reward = reward;

@@ -57,6 +57,8 @@ namespace DinoCleaner.Core.Editor
             DrawSeparator();
             DrawMoneySection();
             DrawSeparator();
+            DrawTutorialSection();
+            DrawSeparator();
             DrawUpgradeSection();
 
             if (!string.IsNullOrEmpty(lastResult)) EditorGUILayout.HelpBox(lastResult, MessageType.Info);
@@ -118,6 +120,27 @@ namespace DinoCleaner.Core.Editor
                 {
                     bool ok = wallet.TryConsume(amount);
                     lastResult = ok ? $"Consume {amount} 성공 → {wallet.Money}" : $"Consume {amount} 실패 (돈 부족) → {wallet.Money}";
+                }
+            }
+        }
+
+        private void DrawTutorialSection()
+        {
+            EditorGUILayout.LabelField("튜토리얼", EditorStyles.boldLabel);
+            bool completed = SaveSystem.Data.tutorialCompleted;
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUILayout.LabelField("완료 여부", completed ? "완료 (다시 안 뜸)" : "미완료 (스테이지에서 뜸)");
+                if (GUILayout.Button(completed ? "미완료로 되돌리기" : "완료로 표시", GUILayout.Width(130)))
+                {
+                    // Play 중에는 실제 게임 경로(GameServices.Progress)로 바꿔야 실행 중인 게임에도 반영됨
+                    if (Application.isPlaying && GameServices.Progress != null) GameServices.Progress.IsTutorialCompleted = !completed;
+                    else
+                    {
+                        SaveSystem.Data.tutorialCompleted = !completed;
+                        SaveSystem.Save();
+                    }
+                    lastResult = $"튜토리얼 완료 여부 → {!completed}";
                 }
             }
         }

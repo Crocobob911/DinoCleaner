@@ -7,7 +7,7 @@ namespace DinoCleaner.UI
 {
     /// <summary>
     /// 실제 저장/재화 시스템이 생기기 전까지 쓰는 임시 구현.
-    /// 돈과 업그레이드 단계는 SaveSystem으로 로컬에 저장되고, 나머지 값은 아직 Play 중에만 유지됩니다.
+    /// 돈·업그레이드 단계·튜토리얼 완료 여부는 SaveSystem으로 로컬에 저장되고, 설정값은 아직 Play 중에만 유지됩니다.
     /// </summary>
     public class TemporaryGameServices : IGameProgress, IGameSettings
     {
@@ -26,7 +26,16 @@ namespace DinoCleaner.UI
 
         public int Money => wallet.Money;
         public IReadOnlyList<UpgradeInfo> Upgrades => upgrades;
-        public bool IsTutorialCompleted { get; set; }
+        public bool IsTutorialCompleted
+        {
+            get => SaveSystem.Data.tutorialCompleted;
+            set
+            {
+                if (SaveSystem.Data.tutorialCompleted == value) return;
+                SaveSystem.Data.tutorialCompleted = value;
+                SaveSystem.Save();
+            }
+        }
         public int BgmVolume { get; set; } = 50;
         public int SfxVolume { get; set; } = 65;
         public int MouseSensitivity { get; set; } = 40;
