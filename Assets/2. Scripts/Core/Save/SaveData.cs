@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace DinoCleaner.Core
 {
@@ -25,7 +26,28 @@ namespace DinoCleaner.Core
         // 보유 돈. 직접 바꾸지 말고 Wallet을 거칠 것
         public int money = NewGameMoney;
 
-        // TODO(다음 작업): 구매한 업그레이드 단계
-        // public List<UpgradeSaveEntry> upgrades = new();
+        // 구매한 업그레이드 단계. 목록에 없는 업그레이드는 시작 단계로 취급. 직접 고치지 말고 아래 메서드를 쓸 것
+        public List<UpgradeSaveEntry> upgrades = new();
+
+        public int GetUpgradeLevel(string id, int defaultLevel)
+        {
+            foreach (UpgradeSaveEntry entry in upgrades)
+            {
+                if (entry.id == id) return entry.level;
+            }
+            return defaultLevel;
+        }
+
+        // 메모리 값만 바꿈. 파일 저장은 호출한 쪽에서 SaveSystem.Save() (또는 돈 차감과 함께) 처리
+        public void SetUpgradeLevel(string id, int level)
+        {
+            foreach (UpgradeSaveEntry entry in upgrades)
+            {
+                if (entry.id != id) continue;
+                entry.level = level;
+                return;
+            }
+            upgrades.Add(new UpgradeSaveEntry(id, level));
+        }
     }
 }

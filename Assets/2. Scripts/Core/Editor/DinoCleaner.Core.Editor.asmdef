@@ -2,7 +2,8 @@
     "name": "DinoCleaner.Core.Editor",
     "rootNamespace": "DinoCleaner.Core.Editor",
     "references": [
-        "DinoCleaner.Core"
+        "DinoCleaner.Core",
+        "DinoCleaner.UI"
     ],
     "includePlatforms": [
         "Editor"

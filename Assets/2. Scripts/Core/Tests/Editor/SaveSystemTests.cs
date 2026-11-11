@@ -124,6 +124,51 @@ namespace DinoCleaner.Core.Tests
         }
 
         [Test]
+        public void 업그레이드_단계가_없으면_기본값()
+        {
+            Assert.AreEqual(1, SaveSystem.Data.GetUpgradeLevel("pressure", 1));
+        }
+
+        [Test]
+        public void 업그레이드_단계를_저장하면_다시_불러와도_유지()
+        {
+            SaveSystem.Data.SetUpgradeLevel("pressure", 2);
+            SaveSystem.Data.SetUpgradeLevel("fairyDino", 1);
+            SaveSystem.Data.SetUpgradeLevel("pressure", 3); // 같은 id는 덮어씀
+            SaveSystem.Save();
+
+            SaveSystem.Load();
+            Assert.AreEqual(3, SaveSystem.Data.GetUpgradeLevel("pressure", 1));
+            Assert.AreEqual(1, SaveSystem.Data.GetUpgradeLevel("fairyDino", 0));
+            Assert.AreEqual(2, SaveSystem.Data.upgrades.Count);
+        }
+
+        [Test]
+        public void 업그레이드와_돈_차감이_한_번의_저장에_함께_기록()
+        {
+            var wallet = new Wallet();
+            wallet.Income(500);
+
+            SaveSystem.Data.SetUpgradeLevel("pressure", 2);
+            wallet.TryConsume(100); // 이 저장에 업그레이드 단계도 포함되어야 함
+
+            SaveSystem.Load();
+            Assert.AreEqual(2, SaveSystem.Data.GetUpgradeLevel("pressure", 1));
+            Assert.AreEqual(SaveData.NewGameMoney + 400, new Wallet().Money);
+        }
+
+        [Test]
+        public void 업그레이드_필드가_없는_예전_세이브도_불러옴()
+        {
+            File.WriteAllText(SaveSystem.FilePath, "{\"version\":1,\"money\":700}");
+            SaveSystem.Load();
+
+            Assert.AreEqual(700, new Wallet().Money);
+            Assert.IsNotNull(SaveSystem.Data.upgrades);
+            Assert.AreEqual(0, SaveSystem.Data.upgrades.Count);
+        }
+
+        [Test]
         public void 덮어쓰기_저장후_임시파일이_남지_않음()
         {
             var wallet = new Wallet();
