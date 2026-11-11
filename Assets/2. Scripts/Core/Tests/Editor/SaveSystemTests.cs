@@ -228,6 +228,95 @@ namespace DinoCleaner.Core.Tests
             Assert.IsFalse(SaveSystem.Data.IsStageCleared(1));
         }
 
+        // ===== 공룡별 진행도 슬롯 =====
+
+        private static StageSlot MakeSlot(int id, float progress, float time, params RegionSlot[] regions)
+        {
+            var slot = new StageSlot { stageId = id, progress = progress, washTime = time };
+            slot.regions.AddRange(regions);
+            return slot;
+        }
+
+        private static RegionSlot Region(int id, float progress, bool completed) =>
+            new RegionSlot { id = id, progress = progress, completed = completed };
+
+        [Test]
+        public void 슬롯이_없으면_진행도_없음()
+        {
+            Assert.IsNull(StageSlots.Get(1));
+            Assert.IsFalse(StageSlots.TryGetProgress(1, out _));
+        }
+
+        [Test]
+        public void 슬롯을_저장하면_다시_불러와도_유지()
+        {
+            StageSlots.Save(MakeSlot(1, 0.6f, 42.5f, Region(1, 0.4f, false), Region(2, 1f, true)));
+            StageSlots.Save(MakeSlot(2, 0.15f, 10f));
+
+            SaveSystem.Load();
+            StageSlot slot = StageSlots.Get(1);
+            Assert.IsNotNull(slot);
+            Assert.AreEqual(0.6f, slot.progress, 0.0001f);
+            Assert.AreEqual(42.5f, slot.washTime, 0.0001f);
+            Assert.AreEqual(2, slot.regions.Count);
+            Assert.AreEqual(0.4f, slot.GetRegion(1).progress, 0.0001f);
+            Assert.IsFalse(slot.GetRegion(1).completed);
+            Assert.IsTrue(slot.GetRegion(2).completed);
+            Assert.IsNull(slot.GetRegion(99));
+
+            Assert.IsTrue(StageSlots.TryGetProgress(2, out float p2));
+            Assert.AreEqual(0.15f, p2, 0.0001f);
+        }
+
+        [Test]
+        public void 같은_공룡_슬롯은_덮어씀()
+        {
+            StageSlots.Save(MakeSlot(1, 0.3f, 5f));
+            StageSlots.Save(MakeSlot(1, 0.7f, 9f));
+
+            SaveSystem.Load();
+            Assert.AreEqual(1, SaveSystem.Data.stageSlots.Count);
+            Assert.AreEqual(0.7f, StageSlots.Get(1).progress, 0.0001f);
+        }
+
+        [Test]
+        public void 슬롯을_지우면_오물지도_파일도_삭제()
+        {
+            Directory.CreateDirectory(StageSlots.DirtDirectory);
+            File.WriteAllBytes(StageSlots.DirtPath(1), new byte[] { 1, 2, 3 }); // 가짜 PNG
+            StageSlots.Save(MakeSlot(1, 0.5f, 1f));
+
+            StageSlots.Delete(1);
+
+            Assert.IsFalse(File.Exists(StageSlots.DirtPath(1)));
+            SaveSystem.Load();
+            Assert.IsNull(StageSlots.Get(1));
+        }
+
+        [Test]
+        public void 새_게임하면_슬롯과_오물지도_모두_삭제()
+        {
+            Directory.CreateDirectory(StageSlots.DirtDirectory);
+            File.WriteAllBytes(StageSlots.DirtPath(1), new byte[] { 1 });
+            File.WriteAllBytes(StageSlots.DirtPath(2), new byte[] { 1 });
+            StageSlots.Save(MakeSlot(1, 0.5f, 1f));
+
+            SaveSystem.DeleteSave();
+
+            Assert.IsNull(StageSlots.Get(1));
+            Assert.AreEqual(0, Directory.GetFiles(StageSlots.DirtDirectory, "dirt_*.png").Length);
+        }
+
+        [Test]
+        public void 슬롯_필드가_없는_예전_세이브도_불러옴()
+        {
+            File.WriteAllText(SaveSystem.FilePath, "{\"version\":1,\"money\":10}");
+            SaveSystem.Load();
+
+            Assert.IsNotNull(SaveSystem.Data.stageSlots);
+            Assert.AreEqual(0, SaveSystem.Data.stageSlots.Count);
+        }
+
         // ===== 설정 (settings.json) =====
 
         [Test]

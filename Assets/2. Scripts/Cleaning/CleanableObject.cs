@@ -118,6 +118,7 @@ namespace DinoCleaner.Cleaning
         // === 오물 지도 저장/불러오기(DirtMaskSnapshot)용 ===
         internal RenderTexture MaskTexture => _mask?.Texture;
         internal void MarkMaskChanged() => _maskChanged = true;
+        internal void RestoreCompletedRegions(ICollection<int> completedIds) => _tracker?.RestoreCompletedRegions(completedIds);
 
         //============================디버그용 기능============================
         // Debug용(Play 중 컴포넌트에서 실행가능)
