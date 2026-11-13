@@ -15,8 +15,8 @@ namespace DinoCleaner.Tutorial
         [Tooltip("튜토리얼을 진행할 스테이지의 StageDefinition.stageId (스테고사우루스 = Stage_1)")]
         [SerializeField] private int _tutorialStageId = 1;
 
-        [Tooltip("튜토리얼 전체를 건너뛰는 키. 바꾸면 UI의 '건너뛰기 [Backspace]' 문구도 같이 바꿀 것")]
-        [SerializeField] private Key _skipKey = Key.Backspace;
+        [Tooltip("튜토리얼 전체를 건너뛰는 키. 바꾸면 UI의 '건너뛰기 [F]' 문구도 같이 바꿀 것")]
+        [SerializeField] private Key _skipKey = Key.F;
 
         private readonly Queue<TutorialStepData> _remaining = new();
         private AsyncOperationHandle<TutorialSequence> _loadHandle;
@@ -127,24 +127,32 @@ namespace DinoCleaner.Tutorial
         {
             if (_remaining.Count == 0)
             {
-                Finish();
+                Finish("완료");
                 return;
             }
 
             _current = _remaining.Dequeue();
             _stepNumber++;
+            LogInEditor($"{_stepNumber}/{_stepCount}: {_current.Message}");
             EventBus<TutorialStepChangedEvent>.Publish(new TutorialStepChangedEvent(_current.Message, _stepNumber, _stepCount));
         }
 
         // 마지막 단계 완료 또는 건너뛰기: 완료로 저장
-        private void Finish()
+        private void Finish(string reason)
         {
             if (!_isTestRun && GameServices.Progress != null) GameServices.Progress.IsTutorialCompleted = true;
-            Stop();
+            LogInEditor($"종료({reason})");
+            End();
         }
 
         // 저장하지 않고 끝냄
         private void Stop()
+        {
+            LogInEditor("종료(중단)");
+            End();
+        }
+
+        private void End()
         {
             _current = null;
             _remaining.Clear();
@@ -161,7 +169,7 @@ namespace DinoCleaner.Tutorial
 
             if (_skipKey != Key.None && keyboard[_skipKey].wasPressedThisFrame)
             {
-                Finish();
+                Finish("건너뛰기");
                 return;
             }
 
@@ -180,5 +188,8 @@ namespace DinoCleaner.Tutorial
             if (IsRunning) Stop();
             RequestStart(true);
         }
+
+        [System.Diagnostics.Conditional("UNITY_EDITOR")]
+        private void LogInEditor(string message) => Debug.Log($"[Tutorial] {message}", this);
     }
 }
