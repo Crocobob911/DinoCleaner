@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5c3aa674b1589c488dece02e2a707b1, type: 3}
+  m_Name: TutorialSequence
+  m_EditorClassIdentifier: DinoCleaner.Tutorial::DinoCleaner.Tutorial.TutorialSequence
+  _steps:
+  - {fileID: 11400000, guid: d2857b8ace2c4304791a8404da553ff0, type: 2}
+  - {fileID: 11400000, guid: 40de6ffb11a96144696213d0dcf5701b, type: 2}
+  - {fileID: 11400000, guid: 0d3721191c2ea5d43b9aa3b17a7e57fe, type: 2}
