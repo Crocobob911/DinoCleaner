@@ -10,6 +10,8 @@ namespace DinoCleaner.Player
         public float height;
         public float centerY; // 보통 X, Z는 0으로 고정이니 Y값만 뺍니다.
         public float cameraHeight;
+        public Vector3 pivotPosition;
+        public Vector3 pivotRotation;
     }
     public enum PlayerStance { Standing, Crouching, Prone }
     [RequireComponent(typeof(CharacterController))]
@@ -31,9 +33,9 @@ namespace DinoCleaner.Player
 
         [Header("자세별 물리 세팅")]
         // 공식: centerY는 항상 height의 절반(height / 2)이어야 발바닥이 Y=0에 고정됩니다!
-        public StanceSetting standSetting = new StanceSetting { height = 1.0f, centerY = 0.5f, cameraHeight = 0.8f };
-        public StanceSetting crouchSetting = new StanceSetting { height = 0.6f, centerY = 0.3f, cameraHeight = 0.45f };
-        public StanceSetting proneSetting = new StanceSetting { height = 0.3f, centerY = 0.15f, cameraHeight = 0.2f };
+        public StanceSetting standSetting = new StanceSetting { height = 1.0f, centerY = 0.5f, cameraHeight = 0.8f, pivotPosition = Vector3.zero, pivotRotation = Vector3.zero };
+        public StanceSetting crouchSetting = new StanceSetting { height = 0.6f, centerY = 0.3f, cameraHeight = 0.45f, pivotPosition = Vector3.zero, pivotRotation = Vector3.zero };
+        public StanceSetting proneSetting = new StanceSetting { height = 0.3f, centerY = 0.15f, cameraHeight = 0.2f, pivotPosition = Vector3.zero, pivotRotation = Vector3.zero };
         public float stanceTransitionSpeed = 10f;
         private StanceSetting targetStanceSetting;
 
@@ -55,10 +57,11 @@ namespace DinoCleaner.Player
 
         [Header("애니메이션 세팅")]
         public Animator playerAnimator;
+        public Transform weaponPivot;
         
         // 장비류 세팅
         PlayerEquipment equipment;
-        private bool isFiring = false;
+        public bool isFiring = false;
 
         [Header("점프/비행 세팅")]
         private bool wasGrounded = true;
@@ -286,6 +289,11 @@ namespace DinoCleaner.Player
                 case PlayerStance.Standing: targetStanceSetting = standSetting; break;
                 case PlayerStance.Crouching: targetStanceSetting = crouchSetting; break;
                 case PlayerStance.Prone: targetStanceSetting = proneSetting; break;
+            }
+            if (weaponPivot != null)
+            {
+                weaponPivot.localPosition = targetStanceSetting.pivotPosition;
+                weaponPivot.localEulerAngles = targetStanceSetting.pivotRotation;
             }
         }
 
