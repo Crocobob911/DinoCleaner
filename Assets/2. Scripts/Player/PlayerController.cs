@@ -18,24 +18,27 @@ namespace DinoCleaner.Player
     public class PlayerController : MonoBehaviour
     {
         
-        [Header("움직임 세팅")]
-        public float walkSpeed = 5f;
-        public float crouchSpeed = 2.5f;
-        public float proneSpeed = 1.0f;
-        public float jumpHeight = 1.5f;
-        public float gravity = -9.81f;
-
         [Header("시야(감도) 세팅")]
         public Transform cameraTransform; // Main Camera를 할당해주세요
         public float mouseSensitivity = 20f;
         private float xRotation = 0f;
 
+        [Header("3인칭 카메라 세팅 (F5 전환)")]
+        public bool isThirdPerson = false;
+        public Vector3 thirdPersonOffset = new Vector3(0.5f, 0.4f, -2.5f); // 캐릭터 뒤쪽 및 약간 오른쪽(숄더뷰) 거리
+        public float cameraSmoothSpeed = 15f;
+        private float currentCameraHeight;
+
         [Header("자세별 물리 세팅")]
-        public StanceSetting standSetting = new StanceSetting { height = 2f, centerY = 0f, cameraHeight = 0.6f };
-        public StanceSetting crouchSetting = new StanceSetting { height = 1f, centerY = -0.5f, cameraHeight = 0.1f };
-        public StanceSetting proneSetting = new StanceSetting { height = 0.5f, centerY = -0.75f, cameraHeight = -0.4f };
+        // 공식: centerY는 항상 height의 절반(height / 2)이어야 발바닥이 Y=0에 고정됩니다!
+        public StanceSetting standSetting = new StanceSetting { height = 1.0f, centerY = 0.5f, cameraHeight = 0.8f };
+        public StanceSetting crouchSetting = new StanceSetting { height = 0.6f, centerY = 0.3f, cameraHeight = 0.45f };
+        public StanceSetting proneSetting = new StanceSetting { height = 0.3f, centerY = 0.15f, cameraHeight = 0.2f };
         public float stanceTransitionSpeed = 10f;
         private StanceSetting targetStanceSetting;
+
+        [Header("렌더링 세팅")]
+        public Renderer[] bodyRenderers;
 
         // Components & Input
         private CharacterController controller;
@@ -48,12 +51,22 @@ namespace DinoCleaner.Player
         private bool isGrounded;
         private PlayerStance currentStance = PlayerStance.Standing;
         private float defaultSlopeLimit;
+        private bool isSprinting = false;
 
+        [Header("애니메이션 세팅")]
+        public Animator playerAnimator;
         
         // 장비류 세팅
         PlayerEquipment equipment;
         private bool isFiring = false;
 
+        [Header("점프/비행 세팅")]
+        private bool wasGrounded = true;
+        private float prevElevationInput = 0f;
+        private bool suppressJumpUntilRelease = false;
+        private float airTime = 0f; // 공중에 떠 있는 시간을 누적할 변수
+        private float doubleJumpCooldown = 0.15f; // 첫 점프 후 요정 변신까지의 최소 대기 시간
+        private bool isFairyEquipped = false;
         // 카메라 잠금 선택
         private bool isCameraLocked = false;
 
@@ -64,18 +77,21 @@ namespace DinoCleaner.Player
             controller = GetComponent<CharacterController>();
             equipment = GetComponent<PlayerEquipment>();
             interaction = GetComponent<PlayerInteraction>();
+            UpdatePlayerVisibility();
+            if (playerAnimator == null) playerAnimator = GetComponentInChildren<Animator>();
             
             defaultSlopeLimit = controller.slopeLimit;
 
             // Input System 초기화
             inputActions = new PlayerControls();
             
-            // 점프 입력
-            inputActions.Player.Jump.performed += ctx => Jump();
             // 웅크리기 입력
             inputActions.Player.Crouch.performed += ctx => ToggleStance();
             inputActions.Player.Fire.started += ctx => isFiring = true;  // 마우스 누름
             inputActions.Player.Fire.canceled += ctx => isFiring = false; // 마우스 뗌
+            // 달리기 입력
+            inputActions.Player.Sprint.started += ctx => isSprinting = true;
+            inputActions.Player.Sprint.canceled += ctx => isSprinting = false;
             // 상호작용 입력
             inputActions.Player.Interact.performed += ctx => interaction.TryInteract();
             // c 키로 카메라 잠금 입력
@@ -92,8 +108,15 @@ namespace DinoCleaner.Player
                     // 청소 도구 회전 구현 TODO
                 }
             };
+            inputActions.Player.ToggleCamera.performed += ctx => 
+            {
+                isThirdPerson = !isThirdPerson;
+                UpdatePlayerVisibility();
+            };
+
             currentStance = PlayerStance.Standing;
             targetStanceSetting = standSetting;
+            currentCameraHeight = standSetting.cameraHeight;
         }
 
         private void OnEnable()
@@ -114,59 +137,146 @@ namespace DinoCleaner.Player
             // 1. 매 프레임 입력값 읽기
             moveInput = inputActions.Player.Move.ReadValue<Vector2>();
             lookInput = inputActions.Player.Look.ReadValue<Vector2>();
+            float rawElevationInput = inputActions.Player.FlyElevation.ReadValue<float>();
+            bool isJumpPressedThisFrame = rawElevationInput > 0 && prevElevationInput <= 0;
 
+            prevElevationInput = rawElevationInput;
+            if(rawElevationInput <= 0f) suppressJumpUntilRelease = false;
             // 2. 상태 업데이트
             CheckGrounded();
+
+            if (isJumpPressedThisFrame && currentStance != PlayerStance.Standing)
+            {
+                currentStance = PlayerStance.Standing;
+                targetStanceSetting = standSetting;
+                
+                // 일어서기만 하고 실제 점프(위로 솟구침)는 하지 않도록 이번 프레임 점프 입력을 0으로 덮어씀
+                suppressJumpUntilRelease = true;
+                isJumpPressedThisFrame = false;
+            }
+
+            float flyElevationInput = suppressJumpUntilRelease ? 0f : rawElevationInput;
             
             // 3. 실행
             HandleLook();
-            HandleMovement();
-            ApplyGravity();
 
             if(isFiring)
             {
                 equipment.UseCurrentTool();
             }
             HandleStanceTransition();
+
+            if (equipment.CurrentMovement == null)
+            {
+                Debug.LogWarning("[PlayerController] PlayerEquipment에 movement 장비가 할당되지 않았습니다. 기본 이동 장비를 확인하세요.");
+                return;
+            }
+
+            if (controller.isGrounded)
+            {
+                airTime = 0f; // 땅에 닿아있으면 0으로 초기화
+            }
+            else
+            {
+                airTime += Time.deltaTime; // 공중에 있으면 시간 계속 누적
+            }
+
+            
+            
+            Stance st;
+            switch(currentStance)
+            {
+                case PlayerStance.Standing:
+                    st = Stance.Standing;
+                    break;
+                case PlayerStance.Crouching:
+                    st = Stance.Crouching;
+                    break;
+                case PlayerStance.Prone:
+                    st = Stance.Prone;
+                    break;
+                default:
+                    st = Stance.Standing;
+                    break;
+            }
+            Vector3 frameMovement = equipment.CurrentMovement.CalculateMovement(
+            transform, 
+            moveInput, 
+            flyElevationInput, 
+            controller.isGrounded, 
+            Time.deltaTime,
+            st,
+            isSprinting
+            );
+
+            // 5. 캐릭터 컨트롤러로 실제 이동
+            controller.Move(frameMovement);
+
+            if (controller.isGrounded && !wasGrounded)
+            {
+                equipment.EquipDefaultShoes();
+                isFairyEquipped = false;
+            }
+
+            if (!controller.isGrounded && airTime > doubleJumpCooldown && isJumpPressedThisFrame)
+            {
+                equipment.EquipFairyDino();
+                isFairyEquipped = true;
+            }
+
+            if (playerAnimator != null)
+            {
+                // WASD 입력 크기를 0 ~ 1 사이 값으로 변환해 Speed에 전달 (0이면 Idle, 1이면 Walk 재생)
+                float currentSpeed = Mathf.Clamp01(moveInput.magnitude);
+                playerAnimator.SetFloat("Speed", currentSpeed, 0.1f, Time.deltaTime); // 0.1초 동안 부드럽게 값 변경
+                
+                // 현재 자세(Standing=0, Crouching=1, Prone=2)를 정수(int)로 변환해 전달
+                playerAnimator.SetInteger("Stance", (int)currentStance);
+                
+                // 바닥 착지 여부 전달
+                playerAnimator.SetBool("IsGrounded", controller.isGrounded);
+
+                // 물 발사 여부 전달
+                playerAnimator.SetBool("IsFiring", isFiring);
+            }
+
+
+            wasGrounded = controller.isGrounded;
         }
 
         private void HandleLook()
         {
             if (isCameraLocked || cameraTransform == null) return;
-            if (cameraTransform == null) return;
 
             // 마우스 상하 이동 (X축 회전) - 위아래로 고개 끄덕이기
             float mouseY = lookInput.y * mouseSensitivity * Time.deltaTime;
             xRotation -= mouseY;
-            xRotation = Mathf.Clamp(xRotation, -90f, 90f); // 고개가 뒤로 꺾이지 않도록 제한
-            cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+            xRotation = Mathf.Clamp(xRotation, -80f, 80f); // 고개가 뒤로 꺾이지 않도록 제한
+            Quaternion camRot = Quaternion.Euler(xRotation, 0f, 0f);
+            cameraTransform.localRotation = camRot;
 
             // 마우스 좌우 이동 (Y축 회전) - 몸통 전체가 회전
             float mouseX = lookInput.x * mouseSensitivity * Time.deltaTime;
             transform.Rotate(Vector3.up * mouseX);
-        }
 
-        private void HandleMovement()
-        {
-            float currentSpeed = walkSpeed;
-            if (currentStance == PlayerStance.Crouching) currentSpeed = crouchSpeed;
-            else if (currentStance == PlayerStance.Prone) currentSpeed = proneSpeed;
-
-            // 카메라가 보는 방향을 기준으로 이동 벡터 계산
-            Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
-            controller.Move(move * currentSpeed * Time.deltaTime);
-        }
-
-        private void Jump()
-        {
-            if (isGrounded && currentStance == PlayerStance.Standing)
+            Vector3 pivotPos = new Vector3(0f, currentCameraHeight, 0f);
+            Vector3 targetCamPos;
+            if (isThirdPerson)
             {
-                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                // 피벗(머리 높이)을 기준으로 상하 회전각(camRot)만큼 오프셋을 회전시켜 뒤로 뺌
+                targetCamPos = pivotPos + (camRot * new Vector3(thirdPersonOffset.x, thirdPersonOffset.y, thirdPersonOffset.z));
             }
+            else
+            {
+                // 1인칭은 정해진 눈높이 위치 그대로 사용
+                targetCamPos = pivotPos;
+            }
+            cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, targetCamPos, Time.deltaTime * cameraSmoothSpeed);
         }
 
         private void ToggleStance()
         {
+            if (isFairyEquipped) return; // 요정 공룡 상태에서는 자세 전환 불가
             // 다음 상태로 즉시 변경
             currentStance = (PlayerStance)(((int)currentStance + 1) % 3);
 
@@ -186,14 +296,7 @@ namespace DinoCleaner.Player
             controller.height = Mathf.Lerp(controller.height, targetStanceSetting.height, Time.deltaTime * stanceTransitionSpeed);
             controller.center = new Vector3(0, Mathf.Lerp(controller.center.y, targetStanceSetting.centerY, Time.deltaTime * stanceTransitionSpeed), 0);
 
-            if (cameraTransform != null)
-            {
-                cameraTransform.localPosition = new Vector3(
-                    cameraTransform.localPosition.x,
-                    Mathf.Lerp(cameraTransform.localPosition.y, targetStanceSetting.cameraHeight, Time.deltaTime * stanceTransitionSpeed),
-                    cameraTransform.localPosition.z
-                );
-            }
+            currentCameraHeight = Mathf.Lerp(currentCameraHeight, targetStanceSetting.cameraHeight, Time.deltaTime * stanceTransitionSpeed);
         }
 
         private void ToggleCameraLock()
@@ -224,12 +327,6 @@ namespace DinoCleaner.Player
             }
         }
 
-        private void ApplyGravity()
-        {
-            velocity.y += gravity * Time.deltaTime;
-            controller.Move(velocity * Time.deltaTime);
-        }
-
         private void OnTriggerEnter(Collider other)
         {
             // 플레이어가 "Ladder" 태그를 가진 투명 박스 안에 들어가면 한계를 80으로 늘림
@@ -244,6 +341,25 @@ namespace DinoCleaner.Player
             if (other.CompareTag("Ladder"))
             {
                 controller.slopeLimit = defaultSlopeLimit;
+            }
+        }
+
+        private void UpdatePlayerVisibility()
+        {
+            if (bodyRenderers == null || bodyRenderers.Length == 0) return;
+
+            foreach (Renderer r in bodyRenderers)
+            {
+                if (isThirdPerson)
+                {
+                    // 3인칭: 내 몸이 정상적으로 보임
+                    r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+                }
+                else
+                {
+                    // 1인칭: 내 몸은 안 보이지만, 바닥에 내 그림자는 정상적으로 출력됨
+                    r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+                }
             }
         }
     }

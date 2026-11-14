@@ -9,10 +9,15 @@ namespace DinoCleaner.Player
         public Tool waterGun;
         public Tool deployTool;
         [SerializeField] private Transform firePoint;
-
         private Tool currentTool;
-
         public bool hasDeployItem = false;
+
+        [Header("이동 장비")]
+        public MovementEquipment defaultShoes;
+        public MovementEquipment fairyDino;
+
+        public bool isFairyUnlocked = false;
+        public MovementEquipment CurrentMovement {get; private set;}
 
         private void Start()
         {
@@ -23,6 +28,7 @@ namespace DinoCleaner.Player
             {
                 dt.OnDeployed += ConsumeDeployItem;
             }
+            CurrentMovement = defaultShoes;
         }
 
         public bool EquipDeployTool(DeployItemData itemData)
@@ -65,6 +71,24 @@ namespace DinoCleaner.Player
             if (waterGun != null) waterGun.gameObject.SetActive(true);
             currentTool = waterGun;
             Debug.Log("[PlayerEquipment] 설치용 아이템 사용 완료, 일반 모드로 전환");
+        }
+
+        public void EquipFairyDino()
+        {
+            if (isFairyUnlocked && CurrentMovement != fairyDino)
+            {
+                CurrentMovement = fairyDino;
+                // TODO: 필요하다면 여기서 요정 공룡 UI 갱신 이벤트(PlayerEquipmentChangedEvent)를 발행할 수 있습니다.
+            }
+        }
+
+        public void EquipDefaultShoes()
+        {
+            if (CurrentMovement != defaultShoes)
+            {
+                CurrentMovement = defaultShoes;
+                // TODO: 필요하다면 여기서 UI 갱신 이벤트 발행
+            }
         }
 
     }
