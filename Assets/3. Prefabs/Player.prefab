@@ -112,6 +112,37 @@ Transform:
   - {fileID: 3648774125693453707}
   m_Father: {fileID: 4201332889155601594}
   m_LocalEulerAnglesHint: {x: -19.872, y: -253.743, z: 346.259}
+--- !u!1 &2105994454852175336
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2081584109536665664}
+  m_Layer: 0
+  m_Name: FirePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2081584109536665664
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2105994454852175336}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.00001, y: 0.00107, z: 0.00658}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3648774125693453707}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2941952903622433376
 GameObject:
   m_ObjectHideFlags: 0
@@ -538,7 +569,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c9d5d11fcd1ba341bc48219aa8c55a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DinoCleaner.Player::DinoCleaner.Player.PlayerEquipment
-  waterGun: {fileID: 8732176352037203132}
+  waterGun: {fileID: 3318667034798690528}
   deployTool: {fileID: 4141286036235176928}
   firePoint: {fileID: 7620575900240781947}
   hasDeployItem: 0
@@ -740,10 +771,13 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5908029891837099295, guid: 5df9c5ecf8ca93d41bc0f448875f4a0b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5703075800624266769}
+    - targetCorrespondingSourceObject: {fileID: 5908029891837099295, guid: 5df9c5ecf8ca93d41bc0f448875f4a0b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2081584109536665664}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 6536510104674936741, guid: 5df9c5ecf8ca93d41bc0f448875f4a0b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8732176352037203132}
+      addedObject: {fileID: 3318667034798690528}
   m_SourcePrefab: {fileID: 100100000, guid: 5df9c5ecf8ca93d41bc0f448875f4a0b, type: 3}
 --- !u!4 &3648774125693453707 stripped
 Transform:
@@ -755,7 +789,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6536510104674936741, guid: 5df9c5ecf8ca93d41bc0f448875f4a0b, type: 3}
   m_PrefabInstance: {fileID: 7160307097594149012}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8732176352037203132
+--- !u!114 &3318667034798690528
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -764,10 +798,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 4172827018740113201}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a302cf0e37ca10a498a4b75a26cbb0ae, type: 3}
+  m_Script: {fileID: 11500000, guid: 996fef12c564c1641a24d98314c244eb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: DinoCleaner.Equipment::DinoCleaner.Equipment.RaycastCleaner
-  toolData: {fileID: 11400000, guid: 03a348b78832e1c479e29568b9534398, type: 2}
+  m_EditorClassIdentifier: DinoCleaner.Equipment::DinoCleaner.Equipment.CleaningTool
+  toolData: {fileID: 11400000, guid: 130793db591d96e4e87d7e3e6c32b77e, type: 2}
+  firePoint: {fileID: 2081584109536665664}
+  maxUnlockedLengthStep: 4
+  maxUnlockedWidthStep: 4
+  pressureLevel: 3
+  currentLengthStep: 1
+  currentWidthStep: 1
+  currentDirection: 0
 --- !u!1001 &8618859749574576050
 PrefabInstance:
   m_ObjectHideFlags: 0

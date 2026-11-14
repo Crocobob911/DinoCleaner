@@ -9,7 +9,7 @@ namespace DinoCleaner.Player
         public Tool waterGun;
         public Tool deployTool;
         [SerializeField] private Transform firePoint;
-        private Tool currentTool;
+        public Tool currentTool;
         public bool hasDeployItem = false;
 
         [Header("이동 장비")]

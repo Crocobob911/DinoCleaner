@@ -106,11 +106,35 @@ namespace DinoCleaner.Player
                 if (equipment.hasDeployItem && equipment.deployTool is DeployableTool tool)
                 {
                     tool.RotateHologram();
-                } else
+                } else if (equipment.currentTool is CleaningTool cleaner)
                 {
-                    // 청소 도구 회전 구현 TODO
+                    cleaner.ToggleDirection();
                 }
             };
+
+            inputActions.Player.ToggleLength.performed += ctx =>
+            {
+                if (equipment.currentTool is CleaningTool cleaner)
+                    cleaner.ToggleLengthStep();
+            };
+
+            inputActions.Player.ScrollWidth.performed += ctx =>
+            {
+                if (equipment.currentTool is CleaningTool cleaner)
+                {
+                    float scrollValue = ctx.ReadValue<float>();
+                    cleaner.ToggleWidthStep(scrollValue);
+                }
+            };
+
+            inputActions.Player.ToggleWaterBubble.performed += ctx =>
+            {
+                if (equipment.currentTool is CleaningTool cleaner)
+                {
+                    cleaner.ToggleWaterBubble();
+                }
+            };
+
             inputActions.Player.ToggleCamera.performed += ctx => 
             {
                 isThirdPerson = !isThirdPerson;
@@ -370,5 +394,6 @@ namespace DinoCleaner.Player
                 }
             }
         }
+
     }
 }

@@ -3,7 +3,8 @@
     "rootNamespace": "DinoCleaner.Equipment",
     "references": [
         "GUID:f867894c16d0b944d9c31e2bd594e9c7",
-        "GUID:75469ad4d38634e559750d17036d5f7c"
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:3216fefec988c784c8c21827e2f5abb2"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
