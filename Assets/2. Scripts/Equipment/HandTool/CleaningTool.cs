@@ -1,7 +1,8 @@
 
 using UnityEngine;
 using DinoCleaner.Core;
-using DinoCleaner.Data; // 💡 Enum 참조
+using DinoCleaner.Data;
+using UnityEngine.InputSystem; // 💡 Enum 참조
 
 namespace DinoCleaner.Equipment
 {
@@ -37,7 +38,18 @@ namespace DinoCleaner.Equipment
             // -------------------------------------------------------------
             // [Step 1] 카메라 정중앙(크로스헤어)으로 레이를 쏴서 '목표 지점' 찾기
             // -------------------------------------------------------------
-            Ray camRay = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+            Ray camRay;
+            if (Cursor.lockState == CursorLockMode.Locked)
+            {
+                // 1. 고정 모드: 화면 정중앙(카메라 정면)으로 쏜다
+                camRay = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+            }
+            else
+            {
+                // 2. 마우스 자유 모드: 현재 마우스 커서가 위치한 화면 좌표에서 쏜다
+                Vector2 mousePos = Mouse.current.position.ReadValue();
+                camRay = Camera.main.ScreenPointToRay(mousePos);
+            }
             Vector3 targetPoint;
             
             // 조준용 레이는 청소기 사거리(finalDistance)보다 훨씬 멀리 쏴야 영점이 정확하게 잡힙니다.
