@@ -24,9 +24,9 @@ namespace DinoCleaner.Player
         private float xRotation = 0f;
 
         [Header("자세별 물리 세팅")]
-        public StanceSetting standSetting = new StanceSetting { height = 2f, centerY = 0f, cameraHeight = 0.6f };
-        public StanceSetting crouchSetting = new StanceSetting { height = 1f, centerY = -0.5f, cameraHeight = 0.1f };
-        public StanceSetting proneSetting = new StanceSetting { height = 0.5f, centerY = -0.75f, cameraHeight = -0.4f };
+        public StanceSetting standSetting = new StanceSetting { height = 1f, centerY = 0.5f, cameraHeight = 0.7f };
+        public StanceSetting crouchSetting = new StanceSetting { height = 0.5f, centerY = -1f, cameraHeight = 0.1f };
+        public StanceSetting proneSetting = new StanceSetting { height = 0.2f, centerY = -1.25f, cameraHeight = -0.4f };
         public float stanceTransitionSpeed = 10f;
         private StanceSetting targetStanceSetting;
 
@@ -43,6 +43,8 @@ namespace DinoCleaner.Player
         private float defaultSlopeLimit;
         private bool isSprinting = false;
 
+        [Header("애니메이션 세팅")]
+        public Animator playerAnimator;
         
         // 장비류 세팅
         PlayerEquipment equipment;
@@ -51,6 +53,7 @@ namespace DinoCleaner.Player
         [Header("점프/비행 세팅")]
         private bool wasGrounded = true;
         private float prevElevationInput = 0f;
+        private bool suppressJumpUntilRelease = false;
         private float airTime = 0f; // 공중에 떠 있는 시간을 누적할 변수
         private float doubleJumpCooldown = 0.15f; // 첫 점프 후 요정 변신까지의 최소 대기 시간
         private bool isFairyEquipped = false;
@@ -64,6 +67,8 @@ namespace DinoCleaner.Player
             controller = GetComponent<CharacterController>();
             equipment = GetComponent<PlayerEquipment>();
             interaction = GetComponent<PlayerInteraction>();
+
+            if (playerAnimator == null) playerAnimator = GetComponentInChildren<Animator>();
             
             defaultSlopeLimit = controller.slopeLimit;
 
@@ -116,10 +121,25 @@ namespace DinoCleaner.Player
             // 1. 매 프레임 입력값 읽기
             moveInput = inputActions.Player.Move.ReadValue<Vector2>();
             lookInput = inputActions.Player.Look.ReadValue<Vector2>();
-            float flyElevationInput = inputActions.Player.FlyElevation.ReadValue<float>();
-            bool isJumpPressedThisFrame = flyElevationInput > 0 && prevElevationInput <= 0;
+            float rawElevationInput = inputActions.Player.FlyElevation.ReadValue<float>();
+            bool isJumpPressedThisFrame = rawElevationInput > 0 && prevElevationInput <= 0;
+
+            prevElevationInput = rawElevationInput;
+            if(rawElevationInput <= 0f) suppressJumpUntilRelease = false;
             // 2. 상태 업데이트
             CheckGrounded();
+
+            if (isJumpPressedThisFrame && currentStance != PlayerStance.Standing)
+            {
+                currentStance = PlayerStance.Standing;
+                targetStanceSetting = standSetting;
+                
+                // 일어서기만 하고 실제 점프(위로 솟구침)는 하지 않도록 이번 프레임 점프 입력을 0으로 덮어씀
+                suppressJumpUntilRelease = true;
+                isJumpPressedThisFrame = false;
+            }
+
+            float flyElevationInput = suppressJumpUntilRelease ? 0f : rawElevationInput;
             
             // 3. 실행
             HandleLook();
@@ -188,8 +208,21 @@ namespace DinoCleaner.Player
                 isFairyEquipped = true;
             }
 
+            if (playerAnimator != null)
+            {
+                // WASD 입력 크기를 0 ~ 1 사이 값으로 변환해 Speed에 전달 (0이면 Idle, 1이면 Walk 재생)
+                float currentSpeed = Mathf.Clamp01(moveInput.magnitude);
+                playerAnimator.SetFloat("Speed", currentSpeed, 0.1f, Time.deltaTime); // 0.1초 동안 부드럽게 값 변경
+                
+                // 현재 자세(Standing=0, Crouching=1, Prone=2)를 정수(int)로 변환해 전달
+                playerAnimator.SetInteger("Stance", (int)currentStance);
+                
+                // 바닥 착지 여부 전달
+                playerAnimator.SetBool("IsGrounded", controller.isGrounded);
+            }
+
+
             wasGrounded = controller.isGrounded;
-            prevElevationInput = flyElevationInput;
         }
 
         private void HandleLook()
