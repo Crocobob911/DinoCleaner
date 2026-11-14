@@ -10,10 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ecffd6c5f796ba34ab1890349f6bf600, type: 3}
-  m_Name: RaycastCleaner
+  m_Name: CleaningToolData
   m_EditorClassIdentifier: DinoCleaner.Equipment::DinoCleaner.Equipment.CleaningToolData
-  toolName: 
-  Range: 20
-  Radius: 0.3
-  Strength: 1
+  toolName: "\uCCAD\uC18C \uB3C4\uAD6C"
+  BaseDistance: 5
+  BaseWidth: 0.5
+  BaseStrength: 1
+  Shape: 0
+  IsRotatable: 1
+  IsPressureAffected: 1
   Flags: 1
