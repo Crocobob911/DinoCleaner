@@ -163,6 +163,7 @@ namespace DinoCleaner.Equipment
                 toolData.IsPressureAffected = false;
                 currentLengthStep = 1;
                 currentWidthStep = 1;
+                currentDirection = NozzleDirection.Horizontal; // 거품은 방향 전환 불가
                 Debug.Log("[CleaningTool] 청소기 모드 변경: 거품");
             }
             else if(toolData.Flags == CleanerFlags.Bubble)
@@ -173,12 +174,30 @@ namespace DinoCleaner.Equipment
                 toolData.IsPressureAffected = true;
                 currentLengthStep = 1;
                 currentWidthStep = 1;
+                currentDirection = NozzleDirection.Horizontal;
                 Debug.Log("[CleaningTool] 청소기 모드 변경: 물");
             }
             else
             {
                 Debug.LogWarning("[CleaningTool] 알 수 없는 청소기 모드입니다.");
             }
+        }
+
+        private void PublishCurrentState()
+        {
+            int currentMaxLimit = (toolData.Shape == CastShape.Capsule) 
+                ? maxUnlockedWaterWidthStep 
+                : maxUnlockedBubbleWidthStep;
+
+            // 현재 무기의 모든 스펙을 영혼까지 끌어모아서 한 방에 발송!
+            EventBus<CleaningToolStateChangedEvent>.Publish(new CleaningToolStateChangedEvent(
+                currentLengthStep,
+                currentWidthStep,
+                currentMaxLimit,
+                toolData.Shape,
+                toolData.Flags,
+                currentDirection
+            ));
         }
     }
 }
