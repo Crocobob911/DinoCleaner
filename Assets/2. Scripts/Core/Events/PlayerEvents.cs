@@ -7,30 +7,16 @@ namespace DinoCleaner.Core
     // 용도: UI에 현재 자세(서기/앉기/엎드리기) 아이콘을 표시하거나, 발소리 크기/종류를 바꿀 때
     public readonly struct PlayerStanceChangedEvent : IEvent
     {
-        // TODO: 자세 바뀔 때 자세 값 넘겨주기 해야 함.
-    }
+        public readonly PlayerStance NewStance;
 
-    // 2. 플레이어 장비/도구(Equipment) 변경 이벤트
-    // 용도: 우측 하단 UI에 현재 들고 있는 무기(물총/사다리 등) 이름이나 아이콘을 갱신할 때
-    public readonly struct PlayerEquipmentChangedEvent : IEvent
-    {
-
-        // 생성자 1: 일반 도구 장착 시 (예: 사다리 빌더)
-        public PlayerEquipmentChangedEvent(Object a)
+        public PlayerStanceChangedEvent(PlayerStance newStance)
         {
-            throw new System.NotImplementedException("일반 도구 장착 이벤트는 아직 구현되지 않았습니다.");
-            // TODO: 할 것
-        }
-
-        // 생성자 2: 청소 도구 장착 및 상태(모드) 변경 시
-        public PlayerEquipmentChangedEvent(Object a, Object b)
-        {
-            throw new System.NotImplementedException("일반 도구 장착 이벤트는 아직 구현되지 않았습니다.");
-            // TODO: 할 것
+            NewStance = newStance;
         }
     }
 
-    // 3. 카메라(마우스 커서) 고정 모드 전환 이벤트
+
+    // 2. 카메라(마우스 커서) 고정 모드 전환 이벤트
     // 용도: UI에서 마우스 커서가 나왔을 때 크로스헤어를 숨기거나, 화면에 블러 효과를 줄 때
     public readonly struct PlayerCameraModeChangedEvent : IEvent
     {
@@ -39,6 +25,18 @@ namespace DinoCleaner.Core
         public PlayerCameraModeChangedEvent(bool isCameraLocked)
         {
             IsCameraLocked = isCameraLocked;
+        }
+    }
+
+    // 3. 카메라 시점 변환 이벤트(혹시나 해서)
+    // 용도 미정
+    public readonly struct PlayerCameraPerspectiveChangedEvent : IEvent
+    {
+        public readonly bool IsFirstPerson; // true: 1인칭, false: 3인칭
+
+        public PlayerCameraPerspectiveChangedEvent(bool isFirstPerson)
+        {
+            IsFirstPerson = isFirstPerson;
         }
     }
 }

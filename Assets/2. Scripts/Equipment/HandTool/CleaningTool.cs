@@ -117,6 +117,7 @@ namespace DinoCleaner.Equipment
                 currentLengthStep = 1;
             }
             Debug.Log($"[CleaningTool] 노즐 길이 변경: {currentLengthStep}단계");
+            PublishCurrentState();
         }
 
         // 💡 2. 노즐 너비 조절 (마우스 휠: 최소 1 ~ 최대 해금치 사이로 제한)
@@ -133,6 +134,7 @@ namespace DinoCleaner.Equipment
             // Mathf.Clamp로 1단계 아래로 내려가거나 최대치를 뚫지 못하게 가둠
             currentWidthStep = Mathf.Clamp(currentWidthStep, 1, currentMaxLimit);
             Debug.Log($"[CleaningTool] 노즐 너비 변경: {currentWidthStep}단계");
+            PublishCurrentState();
         }
 
         // 💡 3. 가로/세로 방향 전환 (R키)
@@ -151,6 +153,7 @@ namespace DinoCleaner.Equipment
                 : NozzleDirection.Horizontal;
                 
             Debug.Log($"[CleaningTool] 노즐 방향 전환: {currentDirection}");
+            PublishCurrentState();
         }
 
         public void ToggleWaterBubble()
@@ -181,6 +184,7 @@ namespace DinoCleaner.Equipment
             {
                 Debug.LogWarning("[CleaningTool] 알 수 없는 청소기 모드입니다.");
             }
+            PublishCurrentState();
         }
 
         private void PublishCurrentState()

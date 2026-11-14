@@ -1,19 +1,11 @@
 using UnityEngine;
 using DinoCleaner.Equipment;
+using DinoCleaner.Data;
+using DinoCleaner.Core;
 
 namespace DinoCleaner.Player
 {
-
-    [System.Serializable]
-    public struct StanceSetting
-    {
-        public float height;
-        public float centerY; // 보통 X, Z는 0으로 고정이니 Y값만 뺍니다.
-        public float cameraHeight;
-        public Vector3 pivotPosition;
-        public Vector3 pivotRotation;
-    }
-    public enum PlayerStance { Standing, Crouching, Prone }
+    
     [RequireComponent(typeof(CharacterController))]
     [RequireComponent(typeof(PlayerEquipment))]
     [RequireComponent(typeof(PlayerInteraction))]
@@ -306,6 +298,8 @@ namespace DinoCleaner.Player
             if (isFairyEquipped) return; // 요정 공룡 상태에서는 자세 전환 불가
             // 다음 상태로 즉시 변경
             currentStance = (PlayerStance)(((int)currentStance + 1) % 3);
+            EventBus<PlayerStanceChangedEvent>.Publish(new PlayerStanceChangedEvent(currentStance));
+            Debug.Log($"[PlayerController] 자세 전환, 현재 자세 이벤트 발행 완료: {currentStance}");
 
             // 결정된 다음 상태를 목표치로 세팅
             switch (currentStance)
@@ -347,6 +341,7 @@ namespace DinoCleaner.Player
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
             }
+            EventBus<PlayerCameraModeChangedEvent>.Publish(new PlayerCameraModeChangedEvent(isCameraLocked));
         }
         private void CheckGrounded()
         {
@@ -386,11 +381,13 @@ namespace DinoCleaner.Player
                 {
                     // 3인칭: 내 몸이 정상적으로 보임
                     r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+                    EventBus<PlayerCameraPerspectiveChangedEvent>.Publish(new PlayerCameraPerspectiveChangedEvent(false));
                 }
                 else
                 {
                     // 1인칭: 내 몸은 안 보이지만, 바닥에 내 그림자는 정상적으로 출력됨
                     r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+                    EventBus<PlayerCameraPerspectiveChangedEvent>.Publish(new PlayerCameraPerspectiveChangedEvent(true));
                 }
             }
         }
