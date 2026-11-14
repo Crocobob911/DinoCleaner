@@ -23,12 +23,22 @@ namespace DinoCleaner.Player
         public float mouseSensitivity = 20f;
         private float xRotation = 0f;
 
+        [Header("3인칭 카메라 세팅 (F5 전환)")]
+        public bool isThirdPerson = false;
+        public Vector3 thirdPersonOffset = new Vector3(0.5f, 0.4f, -2.5f); // 캐릭터 뒤쪽 및 약간 오른쪽(숄더뷰) 거리
+        public float cameraSmoothSpeed = 15f;
+        private float currentCameraHeight;
+
         [Header("자세별 물리 세팅")]
-        public StanceSetting standSetting = new StanceSetting { height = 1f, centerY = 0.5f, cameraHeight = 0.7f };
-        public StanceSetting crouchSetting = new StanceSetting { height = 0.5f, centerY = -1f, cameraHeight = 0.1f };
-        public StanceSetting proneSetting = new StanceSetting { height = 0.2f, centerY = -1.25f, cameraHeight = -0.4f };
+        // 공식: centerY는 항상 height의 절반(height / 2)이어야 발바닥이 Y=0에 고정됩니다!
+        public StanceSetting standSetting = new StanceSetting { height = 1.0f, centerY = 0.5f, cameraHeight = 0.8f };
+        public StanceSetting crouchSetting = new StanceSetting { height = 0.6f, centerY = 0.3f, cameraHeight = 0.45f };
+        public StanceSetting proneSetting = new StanceSetting { height = 0.3f, centerY = 0.15f, cameraHeight = 0.2f };
         public float stanceTransitionSpeed = 10f;
         private StanceSetting targetStanceSetting;
+
+        [Header("렌더링 세팅")]
+        public Renderer[] bodyRenderers;
 
         // Components & Input
         private CharacterController controller;
@@ -67,7 +77,7 @@ namespace DinoCleaner.Player
             controller = GetComponent<CharacterController>();
             equipment = GetComponent<PlayerEquipment>();
             interaction = GetComponent<PlayerInteraction>();
-
+            UpdatePlayerVisibility();
             if (playerAnimator == null) playerAnimator = GetComponentInChildren<Animator>();
             
             defaultSlopeLimit = controller.slopeLimit;
@@ -98,9 +108,15 @@ namespace DinoCleaner.Player
                     // 청소 도구 회전 구현 TODO
                 }
             };
+            inputActions.Player.ToggleCamera.performed += ctx => 
+            {
+                isThirdPerson = !isThirdPerson;
+                UpdatePlayerVisibility();
+            };
+
             currentStance = PlayerStance.Standing;
             targetStanceSetting = standSetting;
-
+            currentCameraHeight = standSetting.cameraHeight;
         }
 
         private void OnEnable()
@@ -219,6 +235,9 @@ namespace DinoCleaner.Player
                 
                 // 바닥 착지 여부 전달
                 playerAnimator.SetBool("IsGrounded", controller.isGrounded);
+
+                // 물 발사 여부 전달
+                playerAnimator.SetBool("IsFiring", isFiring);
             }
 
 
@@ -228,17 +247,31 @@ namespace DinoCleaner.Player
         private void HandleLook()
         {
             if (isCameraLocked || cameraTransform == null) return;
-            if (cameraTransform == null) return;
 
             // 마우스 상하 이동 (X축 회전) - 위아래로 고개 끄덕이기
             float mouseY = lookInput.y * mouseSensitivity * Time.deltaTime;
             xRotation -= mouseY;
-            xRotation = Mathf.Clamp(xRotation, -90f, 90f); // 고개가 뒤로 꺾이지 않도록 제한
-            cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+            xRotation = Mathf.Clamp(xRotation, -80f, 80f); // 고개가 뒤로 꺾이지 않도록 제한
+            Quaternion camRot = Quaternion.Euler(xRotation, 0f, 0f);
+            cameraTransform.localRotation = camRot;
 
             // 마우스 좌우 이동 (Y축 회전) - 몸통 전체가 회전
             float mouseX = lookInput.x * mouseSensitivity * Time.deltaTime;
             transform.Rotate(Vector3.up * mouseX);
+
+            Vector3 pivotPos = new Vector3(0f, currentCameraHeight, 0f);
+            Vector3 targetCamPos;
+            if (isThirdPerson)
+            {
+                // 피벗(머리 높이)을 기준으로 상하 회전각(camRot)만큼 오프셋을 회전시켜 뒤로 뺌
+                targetCamPos = pivotPos + (camRot * new Vector3(thirdPersonOffset.x, thirdPersonOffset.y, thirdPersonOffset.z));
+            }
+            else
+            {
+                // 1인칭은 정해진 눈높이 위치 그대로 사용
+                targetCamPos = pivotPos;
+            }
+            cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, targetCamPos, Time.deltaTime * cameraSmoothSpeed);
         }
 
         private void ToggleStance()
@@ -263,14 +296,7 @@ namespace DinoCleaner.Player
             controller.height = Mathf.Lerp(controller.height, targetStanceSetting.height, Time.deltaTime * stanceTransitionSpeed);
             controller.center = new Vector3(0, Mathf.Lerp(controller.center.y, targetStanceSetting.centerY, Time.deltaTime * stanceTransitionSpeed), 0);
 
-            if (cameraTransform != null)
-            {
-                cameraTransform.localPosition = new Vector3(
-                    cameraTransform.localPosition.x,
-                    Mathf.Lerp(cameraTransform.localPosition.y, targetStanceSetting.cameraHeight, Time.deltaTime * stanceTransitionSpeed),
-                    cameraTransform.localPosition.z
-                );
-            }
+            currentCameraHeight = Mathf.Lerp(currentCameraHeight, targetStanceSetting.cameraHeight, Time.deltaTime * stanceTransitionSpeed);
         }
 
         private void ToggleCameraLock()
@@ -315,6 +341,25 @@ namespace DinoCleaner.Player
             if (other.CompareTag("Ladder"))
             {
                 controller.slopeLimit = defaultSlopeLimit;
+            }
+        }
+
+        private void UpdatePlayerVisibility()
+        {
+            if (bodyRenderers == null || bodyRenderers.Length == 0) return;
+
+            foreach (Renderer r in bodyRenderers)
+            {
+                if (isThirdPerson)
+                {
+                    // 3인칭: 내 몸이 정상적으로 보임
+                    r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+                }
+                else
+                {
+                    // 1인칭: 내 몸은 안 보이지만, 바닥에 내 그림자는 정상적으로 출력됨
+                    r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+                }
             }
         }
     }
