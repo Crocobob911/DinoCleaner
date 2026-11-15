@@ -11,17 +11,9 @@ namespace DinoCleaner.UI
     /// </summary>
     public class TemporaryGameServices : IGameProgress, IGameSettings
     {
-        // 업그레이드 정의. 단계만 저장되고 이름·설명·비용은 여기서 계산하므로, 문구나 비용을 바꿔도 세이브와 충돌하지 않음.
-        // id는 세이브 파일의 키이므로 한 번 정하면 바꾸지 말 것
-        private static readonly UpgradeDefinition[] Definitions =
-        {
-            new("pressure", "수압", "수압이 더 강해져서 오물이 더 빨리 씻깁니다.", 1, 3, 100),
-            new("nozzleWidth", "노즐 너비", "노즐이 넓어져서 한 번에 더 넓게 씻을 수 있습니다.", 1, 3, 100),
-            new("foamWidth", "거품 너비", "거품을 한 번에 더 넓게 뿌릴 수 있습니다.", 1, 3, 100),
-            new("fairyDino", "요정 공룡", "요정 공룡의 도움으로 높은 곳까지 날아갈 수 있습니다.", 0, 1, 500),
-        };
-
         private readonly Wallet wallet = new();
+        // 업그레이드 정의는 Resources/UpgradeCatalog 에셋에서 읽음. upgrades와 같은 인덱스로 짝지어짐
+        private readonly List<UpgradeData> _upgradeData = new();
         private readonly List<UpgradeInfo> upgrades = new();
 
         public int Money => wallet.Money;
@@ -78,11 +70,20 @@ namespace DinoCleaner.UI
         {
             wallet.Changed += () => Changed?.Invoke();
 
-            SaveData save = SaveSystem.Data;
-            foreach (UpgradeDefinition def in Definitions)
+            UpgradeCatalog catalog = UpgradeCatalog.Load();
+            if (catalog == null)
             {
-                int level = Mathf.Clamp(save.GetUpgradeLevel(def.Id, def.StartLevel), def.StartLevel, def.MaxLevel);
-                upgrades.Add(def.ToInfo(level));
+                Debug.LogWarning($"[TemporaryGameServices] Resources/{UpgradeCatalog.ResourcesPath} 에셋이 없어 상점 업그레이드가 비어 있습니다. 메뉴 DinoCleaner/Upgrade/상점 업그레이드 에셋 생성을 실행하세요.");
+                return;
+            }
+
+            SaveData save = SaveSystem.Data;
+            foreach (UpgradeData data in catalog.Upgrades)
+            {
+                if (data == null) continue;
+                int level = data.ClampLevel(save.GetUpgradeLevel(data.Id, data.StartLevel));
+                _upgradeData.Add(data);
+                upgrades.Add(data.ToInfo(level));
             }
         }
 
@@ -101,10 +102,10 @@ namespace DinoCleaner.UI
 
         public bool TryUpgrade(string upgradeId)
         {
-            int index = Array.FindIndex(Definitions, d => d.Id == upgradeId);
+            int index = _upgradeData.FindIndex(d => d.Id == upgradeId);
             if (index < 0) return false;
 
-            UpgradeDefinition def = Definitions[index];
+            UpgradeData def = _upgradeData[index];
             UpgradeInfo current = upgrades[index];
             int cost = current.NextCost;
             if (current.IsMaxLevel || !wallet.CanAfford(cost)) return false;
@@ -152,32 +153,6 @@ namespace DinoCleaner.UI
         public void SaveCleaningProgress()
         {
             Debug.Log("[TemporaryGameServices] 저장 시스템 연결 전이라 실제로 저장하지 않습니다.");
-        }
-
-        private readonly struct UpgradeDefinition
-        {
-            private const int CostStepPerLevel = 100;
-
-            public readonly string Id;
-            public readonly string DisplayName;
-            public readonly string Description;
-            public readonly int StartLevel;
-            public readonly int MaxLevel;
-            public readonly int BaseCost;
-
-            public UpgradeDefinition(string id, string displayName, string description, int startLevel, int maxLevel, int baseCost)
-            {
-                Id = id;
-                DisplayName = displayName;
-                Description = description;
-                StartLevel = startLevel;
-                MaxLevel = maxLevel;
-                BaseCost = baseCost;
-            }
-
-            // 기존 규칙과 동일: 시작 단계에서 BaseCost, 한 단계 오를 때마다 100씩 증가
-            public UpgradeInfo ToInfo(int level) => new(Id, DisplayName, Description, level, MaxLevel,
-                BaseCost + (level - StartLevel) * CostStepPerLevel);
         }
     }
 }
