@@ -29,6 +29,9 @@ namespace DinoCleaner.Core
         // 튜토리얼을 끝까지 마쳤는지. true면 스테이지에서 튜토리얼을 다시 띄우지 않음
         public bool tutorialCompleted = false;
 
+        // 날기 튜토리얼을 끝까지 마쳤는지. true면 스테이지에서 날기 튜토리얼을 다시 띄우지 않음
+        public bool flyTutorialCompleted = false;
+
         // 한 번이라도 성공한 스테이지의 stageId (StageDefinition.stageId). 직접 고치지 말고 아래 메서드를 쓸 것
         public List<int> clearedStageIds = new();
 

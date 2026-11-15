@@ -153,6 +153,22 @@ namespace DinoCleaner.Core.Editor
                     lastResult = $"튜토리얼 완료 여부 → {!completed}";
                 }
             }
+
+            bool flyCompleted = SaveSystem.Data.flyTutorialCompleted;
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUILayout.LabelField("날기 튜토리얼 완료 여부", flyCompleted ? "완료 (다시 안 뜸)" : "미완료 (요정 공룡 구매 후 뜸)");
+                if (GUILayout.Button(flyCompleted ? "미완료로 되돌리기" : "완료로 표시", GUILayout.Width(130)))
+                {
+                    if (Application.isPlaying && GameServices.Progress != null) GameServices.Progress.IsFlyTutorialCompleted = !flyCompleted;
+                    else
+                    {
+                        SaveSystem.Data.flyTutorialCompleted = !flyCompleted;
+                        SaveSystem.Save();
+                    }
+                    lastResult = $"날기 튜토리얼 완료 여부 → {!flyCompleted}";
+                }
+            }
         }
 
         private void DrawStageSection()

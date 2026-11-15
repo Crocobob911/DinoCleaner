@@ -17,6 +17,8 @@ namespace DinoCleaner.Core
         }
     }
 
+    public readonly struct TutorialStepCompletedEvent : IEvent { }
+
     // 튜토리얼이 끝남 (Tutorial -> UI). 완료, 건너뛰기, 중단 모두 포함. UI는 튜토리얼 창을 닫으면 됨
     public readonly struct TutorialEndedEvent : IEvent { }
 }

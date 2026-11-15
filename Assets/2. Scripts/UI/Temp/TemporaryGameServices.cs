@@ -36,6 +36,23 @@ namespace DinoCleaner.UI
                 SaveSystem.Save();
             }
         }
+
+        /// <summary>날기 튜토리얼 완료 여부를 조회하거나 저장합니다.</summary>
+        public bool IsFlyTutorialCompleted
+        {
+            get => SaveSystem.Data.flyTutorialCompleted;
+            set
+            {
+                if (SaveSystem.Data.flyTutorialCompleted == value) return;
+                SaveSystem.Data.flyTutorialCompleted = value;
+                SaveSystem.Save();
+            }
+        }
+
+        /// <summary>요정 공룡을 구매했고 날기 튜토리얼이 미완료인지 조회합니다.</summary>
+        public bool ShouldShowFlyTutorial =>
+            SaveSystem.Data.GetUpgradeLevel("fairyDino", 0) >= 1 && !SaveSystem.Data.flyTutorialCompleted;
+
         // 설정값: 바꾸면 메모리에 바로 반영하고 저장 예약. 실제 저장은 설정 창이 닫힐 때(UI_Settings)·게임 종료 시
         public int BgmVolume
         {
