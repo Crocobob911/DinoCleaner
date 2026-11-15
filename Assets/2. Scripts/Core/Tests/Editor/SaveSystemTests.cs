@@ -152,6 +152,32 @@ namespace DinoCleaner.Core.Tests
         }
 
         [Test]
+        public void 날기_튜토리얼_완료여부는_새_게임에서_false()
+        {
+            Assert.IsFalse(SaveSystem.Data.flyTutorialCompleted);
+        }
+
+        [Test]
+        public void 날기_튜토리얼_완료를_저장하면_다시_불러와도_유지()
+        {
+            SaveSystem.Data.flyTutorialCompleted = true;
+            SaveSystem.Save();
+
+            SaveSystem.Load();
+            Assert.IsTrue(SaveSystem.Data.flyTutorialCompleted);
+        }
+
+        [Test]
+        public void 날기_튜토리얼_필드가_없는_예전_세이브는_미완료로_불러옴()
+        {
+            File.WriteAllText(SaveSystem.FilePath, "{\"version\":1,\"money\":300,\"tutorialCompleted\":true}");
+            SaveSystem.Load();
+
+            Assert.IsFalse(SaveSystem.Data.flyTutorialCompleted);
+            Assert.AreEqual(300, new Wallet().Money);
+        }
+
+        [Test]
         public void 업그레이드_단계가_없으면_기본값()
         {
             Assert.AreEqual(1, SaveSystem.Data.GetUpgradeLevel("pressure", 1));

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5c3aa674b1589c488dece02e2a707b1, type: 3}
+  m_Name: FlyTutorialSequence
+  m_EditorClassIdentifier: DinoCleaner.Tutorial::DinoCleaner.Tutorial.TutorialSequence
+  _steps:
+  - {fileID: 11400000, guid: edf0077490d708945a8a7699e37dcfea, type: 2}
+  - {fileID: 11400000, guid: 8964c4574f2a6b84fb508e99144c2788, type: 2}
+  - {fileID: 11400000, guid: e3175229ce7e9564ab94586641dfc7e0, type: 2}
+  - {fileID: 11400000, guid: cc215630542a89e4ba5eb21f2d3b287b, type: 2}

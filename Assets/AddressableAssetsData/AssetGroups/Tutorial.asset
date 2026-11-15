@@ -15,6 +15,11 @@ MonoBehaviour:
   m_GroupName: Tutorial
   m_GUID: 2e079f1a8238f554fa50b369c9476b95
   m_SerializeEntries:
+  - m_GUID: 163005f37bf293f48ac046c3676dec7a
+    m_Address: FlyTutorialSequence
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5aa4d8d7acdd765429f81b21eb6599f2
     m_Address: TutorialSequence
     m_ReadOnly: 0

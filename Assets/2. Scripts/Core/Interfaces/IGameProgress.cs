@@ -10,6 +10,12 @@ namespace DinoCleaner.Core
         IReadOnlyList<UpgradeInfo> Upgrades { get; }
         bool IsTutorialCompleted { get; set; }
 
+        /// <summary>날기 튜토리얼 완료 여부를 조회하거나 저장합니다.</summary>
+        bool IsFlyTutorialCompleted { get; set; }
+
+        /// <summary>요정 공룡을 구매했고 날기 튜토리얼이 미완료인지 조회합니다.</summary>
+        bool ShouldShowFlyTutorial { get; }
+
         // 돈이나 업그레이드가 바뀔 때마다 호출
         event Action Changed;
 
