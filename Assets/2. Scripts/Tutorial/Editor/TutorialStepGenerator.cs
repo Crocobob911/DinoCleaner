@@ -29,27 +29,27 @@ namespace DinoCleaner.Tutorial.Editor
 
         private static readonly StepDef[] Steps =
         {
-            new("WASD를 눌러 이동할 수 있습니다.", TutorialInputType.Key, Key.W, Key.A, Key.S, Key.D),
-            new("마우스를 움직여 주위를 둘러볼 수 있습니다.", TutorialInputType.MouseMove),
-            new("Shift를 누른 채로 이동하면 달릴 수 있습니다.", TutorialInputType.KeyWhileMoving, Key.LeftShift),
-            new("Space를 눌러 점프할 수 있습니다.", TutorialInputType.Key, Key.Space),
-            new("Ctrl을 눌러 자세를 바꿀 수 있습니다. 서기 → 앉기 → 웅크리기 순서로 바뀝니다.", TutorialInputType.Key, Key.LeftCtrl),
-            new("좌클릭을 누르고 있으면 물을 발사할 수 있습니다.", TutorialInputType.LeftClick),
-            new("마우스 휠을 굴려 물줄기 너비를 바꿀 수 있습니다. 좁을수록 강하고, 넓을수록 약합니다.", TutorialInputType.Scroll),
-            new("2를 눌러 노즐 길이를 바꿀 수 있습니다. 노즐이 길수록 물이 멀리 나가지만, 물줄기는 좁아집니다.", TutorialInputType.Key, Key.Digit2),
-            new("R을 눌러 물줄기 방향을 가로/세로로 바꿀 수 있습니다.", TutorialInputType.Key, Key.R),
-            new("1을 눌러 물과 거품을 바꿀 수 있습니다. 거품을 뿌린 뒤 물을 뿌리면 오물이 더 쉽게 지워집니다.", TutorialInputType.Key, Key.Digit1),
-            new("C를 눌러 에임 모드를 바꿀 수 있습니다. 자유 모드에서는 화면을 멈춘 채 마우스로 조준할 수 있습니다.", TutorialInputType.Key, Key.C),
-            new("F5를 눌러 1인칭/3인칭 시점을 바꿀 수 있습니다.", TutorialInputType.Key, Key.F5),
-            new("Tab을 눌러 청소 진행도를 자세히 볼 수 있습니다.", TutorialInputType.Key, Key.Tab),
+            new("Press WASD to move.", TutorialInputType.Key, Key.W, Key.A, Key.S, Key.D),
+            new("Move the mouse to look around.", TutorialInputType.MouseMove),
+            new("Hold Shift while moving to run.", TutorialInputType.KeyWhileMoving, Key.LeftShift),
+            new("Press Space to jump.", TutorialInputType.Key, Key.Space),
+            new("Press Ctrl to change your stance. It cycles through Standing → Kneeling → Prone.", TutorialInputType.Key, Key.LeftCtrl),
+            new("Hold Left Click to spray water.", TutorialInputType.LeftClick),
+            new("Scroll the mouse wheel to change the stream width. Narrower is stronger; wider is weaker.", TutorialInputType.Scroll),
+            new("Press 2 to change the nozzle length. A longer nozzle reaches farther, but the stream gets narrower.", TutorialInputType.Key, Key.Digit2),
+            new("Press R to switch the stream between horizontal and vertical.", TutorialInputType.Key, Key.R),
+            new("Press 1 to switch between water and foam. Spray foam first, then water, to wash dirt off more easily.", TutorialInputType.Key, Key.Digit1),
+            new("Press C to change the aim mode. In free mode, the camera stays still while you aim with the mouse.", TutorialInputType.Key, Key.C),
+            new("Press F5 to switch between first-person and third-person view.", TutorialInputType.Key, Key.F5),
+            new("Press Tab to see detailed cleaning progress.", TutorialInputType.Key, Key.Tab),
         };
 
         private static readonly StepDef[] FlySteps =
         {
-            new("이제 날 수 있습니다! 점프한 뒤 공중에서 Space를 한 번 더 누르면 날아오릅니다.", TutorialInputType.FairyEquipped),
-            new("날고 있는 동안 Space를 누르고 있으면 위로 올라갑니다.", TutorialInputType.KeyWhileFlying, Key.Space),
-            new("날고 있는 동안 Ctrl을 누르고 있으면 아래로 내려갑니다.", TutorialInputType.KeyWhileFlying, Key.LeftCtrl),
-            new("땅에 닿으면 날기가 풀립니다. 다시 날려면 점프한 뒤 Space를 한 번 더 누르세요.", TutorialInputType.FairyUnequipped),
+            new("You can fly now! Jump, then press Space again in midair to take off.", TutorialInputType.FairyEquipped),
+            new("While flying, hold Space to go up.", TutorialInputType.KeyWhileFlying, Key.Space),
+            new("While flying, hold Ctrl to go down.", TutorialInputType.KeyWhileFlying, Key.LeftCtrl),
+            new("Flying ends when you touch the ground. To fly again, jump and press Space again in midair.", TutorialInputType.FairyUnequipped),
         };
 
         [MenuItem("DinoCleaner/Tutorial/첫 튜토리얼 단계 생성")]

@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7896a6576ab79e74e8760041cd2b533e, type: 3}
   m_Name: TutorialStep_7
   m_EditorClassIdentifier: DinoCleaner.Tutorial::DinoCleaner.Tutorial.TutorialStepData
-  _message: "\uB9C8\uC6B0\uC2A4 \uD720\uC744 \uAD74\uB824 \uBB3C\uC904\uAE30 \uB108\uBE44\uB97C
-    \uBC14\uAFC0 \uC218 \uC788\uC2B5\uB2C8\uB2E4. \uC881\uC744\uC218\uB85D \uAC15\uD558\uACE0,
-    \uB113\uC744\uC218\uB85D \uC57D\uD569\uB2C8\uB2E4."
+  _message: Scroll the mouse wheel to change the stream width. Narrower is stronger;
+    wider is weaker.
   _inputType: 4
   _keys: 

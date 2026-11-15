@@ -12,8 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7896a6576ab79e74e8760041cd2b533e, type: 3}
   m_Name: FlyTutorialStep_1
   m_EditorClassIdentifier: DinoCleaner.Tutorial::DinoCleaner.Tutorial.TutorialStepData
-  _message: "\uC774\uC81C \uB0A0 \uC218 \uC788\uC2B5\uB2C8\uB2E4! \uC810\uD504\uD55C
-    \uB4A4 \uACF5\uC911\uC5D0\uC11C Space\uB97C \uD55C \uBC88 \uB354 \uB204\uB974\uBA74
-    \uB0A0\uC544\uC624\uB985\uB2C8\uB2E4."
+  _message: You can fly now! Jump, then press Space again in midair to take off.
   _inputType: 7
   _keys: 
