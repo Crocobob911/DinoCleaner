@@ -36,10 +36,10 @@ namespace DinoCleaner.Core.Editor
         // id는 세이브 키. pressure·foamWidth·fairyDino는 기존 세이브와 호환되도록 유지
         private static readonly UpgradeDef[] Defs =
         {
-            new("Upgrade_Pressure", "pressure", "수압", "수압이 더 강해져서 오물이 더 잘 지워집니다.", 1, 3, 100, 200),
-            new("Upgrade_NozzleLength", "nozzleLength", "노즐 길이", "노즐을 더 길게 늘릴 수 있어서 멀리서 쏴도 오물이 잘 지워집니다.", 1, 4, 100, 200, 300),
-            new("Upgrade_FoamWidth", "foamWidth", "거품 너비", "거품을 한 번에 더 넓게 뿌릴 수 있습니다.", 1, 3, 100, 200),
-            new("Upgrade_FairyDino", "fairyDino", "요정 공룡", "요정 공룡의 도움으로 날아다닐 수 있습니다.", 0, 1, 500),
+            new("Upgrade_Pressure", UpgradeIds.Pressure, "수압", "수압이 더 강해져서 오물이 더 잘 지워집니다.", 1, 3, 100, 200),
+            new("Upgrade_NozzleLength", UpgradeIds.NozzleLength, "노즐 길이", "노즐을 더 길게 늘릴 수 있어서 멀리서 쏴도 오물이 잘 지워집니다.", 1, 4, 100, 200, 300),
+            new("Upgrade_FoamWidth", UpgradeIds.FoamWidth, "거품 너비", "거품을 한 번에 더 넓게 뿌릴 수 있습니다.", 1, 3, 100, 200),
+            new("Upgrade_FairyDino", UpgradeIds.FairyDino, "요정 공룡", "요정 공룡의 도움으로 날아다닐 수 있습니다.", 0, 1, 500),
         };
 
         [MenuItem("DinoCleaner/Upgrade/상점 업그레이드 에셋 생성")]
