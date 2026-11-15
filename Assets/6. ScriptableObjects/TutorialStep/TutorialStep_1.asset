@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7896a6576ab79e74e8760041cd2b533e, type: 3}
   m_Name: TutorialStep_1
   m_EditorClassIdentifier: DinoCleaner.Tutorial::DinoCleaner.Tutorial.TutorialStepData
-  _message: "WASD\uB97C \uB20C\uB7EC \uC774\uB3D9\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+  _message: Press WASD to move.
   _inputType: 0
   _keys: 250000000f0000002100000012000000

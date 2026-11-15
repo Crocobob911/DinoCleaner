@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7896a6576ab79e74e8760041cd2b533e, type: 3}
   m_Name: TutorialStep_11
   m_EditorClassIdentifier: DinoCleaner.Tutorial::DinoCleaner.Tutorial.TutorialStepData
-  _message: "C\uB97C \uB20C\uB7EC \uC5D0\uC784 \uBAA8\uB4DC\uB97C \uBC14\uAFC0 \uC218
-    \uC788\uC2B5\uB2C8\uB2E4. \uC790\uC720 \uBAA8\uB4DC\uC5D0\uC11C\uB294 \uD654\uBA74\uC744
-    \uBA48\uCD98 \uCC44 \uB9C8\uC6B0\uC2A4\uB85C \uC870\uC900\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+  _message: Press C to change the aim mode. In free mode, the camera stays still
+    while you aim with the mouse.
   _inputType: 0
   _keys: 11000000

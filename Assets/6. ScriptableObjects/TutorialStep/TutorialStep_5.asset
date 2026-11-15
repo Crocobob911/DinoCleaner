@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7896a6576ab79e74e8760041cd2b533e, type: 3}
   m_Name: TutorialStep_5
   m_EditorClassIdentifier: DinoCleaner.Tutorial::DinoCleaner.Tutorial.TutorialStepData
-  _message: "Ctrl\uC744 \uB20C\uB7EC \uC790\uC138\uB97C \uBC14\uAFC0 \uC218 \uC788\uC2B5\uB2C8\uB2E4.
-    \uC11C\uAE30 \u2192 \uC549\uAE30 \u2192 \uC6C5\uD06C\uB9AC\uAE30 \uC21C\uC11C\uB85C
-    \uBC14\uB01D\uB2C8\uB2E4."
+  _message: "Press Ctrl to change your stance. It cycles through Standing \u2192
+    Kneeling \u2192 Prone."
   _inputType: 0
   _keys: 37000000
