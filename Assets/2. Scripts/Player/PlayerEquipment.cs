@@ -1,6 +1,7 @@
 using UnityEngine;
 using DinoCleaner.Equipment;
 using DinoCleaner.Core;
+using DinoCleaner.Data;
 namespace DinoCleaner.Player
 {
     public class PlayerEquipment : MonoBehaviour, IEquipper
@@ -9,10 +10,15 @@ namespace DinoCleaner.Player
         public Tool waterGun;
         public Tool deployTool;
         [SerializeField] private Transform firePoint;
-
-        private Tool currentTool;
-
+        public Tool currentTool;
         public bool hasDeployItem = false;
+
+        [Header("이동 장비")]
+        public MovementEquipment defaultShoes;
+        public MovementEquipment fairyDino;
+
+        public bool isFairyUnlocked = false;
+        public MovementEquipment CurrentMovement {get; private set;}
 
         private void Start()
         {
@@ -23,6 +29,7 @@ namespace DinoCleaner.Player
             {
                 dt.OnDeployed += ConsumeDeployItem;
             }
+            CurrentMovement = defaultShoes;
         }
 
         public bool EquipDeployTool(DeployItemData itemData)
@@ -41,6 +48,7 @@ namespace DinoCleaner.Player
 
             currentTool = deployTool;
             hasDeployItem = true;
+            EventBus<CurrentToolChangedEvent>.Publish(new CurrentToolChangedEvent(ToolType.Builder));
             Debug.Log("[PlayerEquipment] 빌드 모드로 전환");
             return true;
         }
@@ -64,7 +72,28 @@ namespace DinoCleaner.Player
             if (deployTool != null) deployTool.gameObject.SetActive(false);
             if (waterGun != null) waterGun.gameObject.SetActive(true);
             currentTool = waterGun;
+            EventBus<CurrentToolChangedEvent>.Publish(new CurrentToolChangedEvent(ToolType.CleaningTool));
             Debug.Log("[PlayerEquipment] 설치용 아이템 사용 완료, 일반 모드로 전환");
+        }
+
+        public void EquipFairyDino()
+        {
+            if (isFairyUnlocked && CurrentMovement != fairyDino)
+            {
+                CurrentMovement = fairyDino;
+                EventBus<UsingFairyDinoEvent>.Publish(new UsingFairyDinoEvent(true));
+                Debug.Log("[PlayerEquipment] 요정 공룡 장착");
+            }
+        }
+
+        public void EquipDefaultShoes()
+        {
+            if (CurrentMovement != defaultShoes)
+            {
+                CurrentMovement = defaultShoes;
+                EventBus<UsingFairyDinoEvent>.Publish(new UsingFairyDinoEvent(false));
+                Debug.Log("[PlayerEquipment] 기본 신발 장착");
+            }
         }
 
     }

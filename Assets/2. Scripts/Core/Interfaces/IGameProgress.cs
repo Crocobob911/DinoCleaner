@@ -1,0 +1,38 @@
+using System;
+using System.Collections.Generic;
+
+namespace DinoCleaner.Core
+{
+    // 돈, 업그레이드, 저장처럼 스테이지를 넘어 유지되는 진행 정보. For UI & Stage
+    public interface IGameProgress
+    {
+        int Money { get; }
+        IReadOnlyList<UpgradeInfo> Upgrades { get; }
+        bool IsTutorialCompleted { get; set; }
+
+        /// <summary>날기 튜토리얼 완료 여부를 조회하거나 저장합니다.</summary>
+        bool IsFlyTutorialCompleted { get; set; }
+
+        /// <summary>요정 공룡을 구매했고 날기 튜토리얼이 미완료인지 조회합니다.</summary>
+        bool ShouldShowFlyTutorial { get; }
+
+        // 돈이나 업그레이드가 바뀔 때마다 호출
+        event Action Changed;
+
+        void AddMoney(int amount);
+
+        // 돈이 부족하거나 최대 단계면 false
+        bool TryUpgrade(string upgradeId);
+
+        // 공룡(스테이지)별 클리어 여부. stageId는 StageDefinition.stageId
+        bool IsStageCleared(int stageId);
+
+        // 성공 판정이 났을 때 호출. 처음 클리어면 저장하고 Changed 호출
+        void MarkStageCleared(int stageId);
+
+        // 공룡별 진행도 슬롯(StageSlots)이 있으면 true와 전체 진행도(0~1). 게시판 "N% 진행 중" 표시용
+        bool TryGetStageProgress(int stageId, out float progress);
+
+        void SaveCleaningProgress();
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "name": "DinoCleaner.Tutorial",
+    "rootNamespace": "DinoCleaner.Tutorial",
+    "references": [
+        "GUID:f867894c16d0b944d9c31e2bd594e9c7",
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "Unity.Addressables",
+        "Unity.ResourceManager"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

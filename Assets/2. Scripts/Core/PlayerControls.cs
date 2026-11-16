@@ -190,6 +190,60 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CameraLock"",
+                    ""type"": ""Button"",
+                    ""id"": ""2d9777b4-9abe-4b3c-8bc3-9cba1c48ba38"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FlyElevation"",
+                    ""type"": ""Value"",
+                    ""id"": ""15a9129b-6b37-4499-850a-f0e07f88b493"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""ToggleCamera"",
+                    ""type"": ""Button"",
+                    ""id"": ""d3934778-a3d0-4186-b7ba-3ca4977b3bf6"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToggleLength"",
+                    ""type"": ""Button"",
+                    ""id"": ""4f0b84a1-e89a-4780-9caa-41114608b3bd"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ScrollWidth"",
+                    ""type"": ""Value"",
+                    ""id"": ""428dd26d-f5ca-45dd-99f6-88f3e4088be1"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""ToggleWaterBubble"",
+                    ""type"": ""Button"",
+                    ""id"": ""913aefef-aac3-46ae-8f9e-4a7878716d7f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -570,7 +624,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""36e52cba-0905-478e-a818-f4bfcb9f3b9a"",
-                    ""path"": ""<Keyboard>/c"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
@@ -597,6 +651,94 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Rotate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cba26040-b741-4c28-8827-879c6c968f41"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CameraLock"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""6ca62040-0b42-4ba4-bc10-8a112c80522d"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FlyElevation"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""37ea12dc-3595-42ea-b8c0-7ae70bf098c7"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FlyElevation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""744ae3d7-6f47-46c5-badc-d30b48456352"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FlyElevation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""683f2dd2-d461-4477-a6b9-d1fca01b3e41"",
+                    ""path"": ""<Keyboard>/f5"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleCamera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4834f0c7-c0e9-42ff-abd8-d9fa335b3c6f"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleLength"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3f336789-8011-45cd-bac1-c3340f31cb44"",
+                    ""path"": ""<Mouse>/scroll/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ScrollWidth"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c5446ec2-d1d3-4ec4-946a-7b94fb1607ce"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleWaterBubble"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1195,6 +1337,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
         m_Player_Rotate = m_Player.FindAction("Rotate", throwIfNotFound: true);
+        m_Player_CameraLock = m_Player.FindAction("CameraLock", throwIfNotFound: true);
+        m_Player_FlyElevation = m_Player.FindAction("FlyElevation", throwIfNotFound: true);
+        m_Player_ToggleCamera = m_Player.FindAction("ToggleCamera", throwIfNotFound: true);
+        m_Player_ToggleLength = m_Player.FindAction("ToggleLength", throwIfNotFound: true);
+        m_Player_ScrollWidth = m_Player.FindAction("ScrollWidth", throwIfNotFound: true);
+        m_Player_ToggleWaterBubble = m_Player.FindAction("ToggleWaterBubble", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1299,6 +1447,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_Fire;
     private readonly InputAction m_Player_Rotate;
+    private readonly InputAction m_Player_CameraLock;
+    private readonly InputAction m_Player_FlyElevation;
+    private readonly InputAction m_Player_ToggleCamera;
+    private readonly InputAction m_Player_ToggleLength;
+    private readonly InputAction m_Player_ScrollWidth;
+    private readonly InputAction m_Player_ToggleWaterBubble;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1354,6 +1508,30 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Rotate".
         /// </summary>
         public InputAction @Rotate => m_Wrapper.m_Player_Rotate;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/CameraLock".
+        /// </summary>
+        public InputAction @CameraLock => m_Wrapper.m_Player_CameraLock;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/FlyElevation".
+        /// </summary>
+        public InputAction @FlyElevation => m_Wrapper.m_Player_FlyElevation;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/ToggleCamera".
+        /// </summary>
+        public InputAction @ToggleCamera => m_Wrapper.m_Player_ToggleCamera;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/ToggleLength".
+        /// </summary>
+        public InputAction @ToggleLength => m_Wrapper.m_Player_ToggleLength;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/ScrollWidth".
+        /// </summary>
+        public InputAction @ScrollWidth => m_Wrapper.m_Player_ScrollWidth;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/ToggleWaterBubble".
+        /// </summary>
+        public InputAction @ToggleWaterBubble => m_Wrapper.m_Player_ToggleWaterBubble;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1413,6 +1591,24 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Rotate.started += instance.OnRotate;
             @Rotate.performed += instance.OnRotate;
             @Rotate.canceled += instance.OnRotate;
+            @CameraLock.started += instance.OnCameraLock;
+            @CameraLock.performed += instance.OnCameraLock;
+            @CameraLock.canceled += instance.OnCameraLock;
+            @FlyElevation.started += instance.OnFlyElevation;
+            @FlyElevation.performed += instance.OnFlyElevation;
+            @FlyElevation.canceled += instance.OnFlyElevation;
+            @ToggleCamera.started += instance.OnToggleCamera;
+            @ToggleCamera.performed += instance.OnToggleCamera;
+            @ToggleCamera.canceled += instance.OnToggleCamera;
+            @ToggleLength.started += instance.OnToggleLength;
+            @ToggleLength.performed += instance.OnToggleLength;
+            @ToggleLength.canceled += instance.OnToggleLength;
+            @ScrollWidth.started += instance.OnScrollWidth;
+            @ScrollWidth.performed += instance.OnScrollWidth;
+            @ScrollWidth.canceled += instance.OnScrollWidth;
+            @ToggleWaterBubble.started += instance.OnToggleWaterBubble;
+            @ToggleWaterBubble.performed += instance.OnToggleWaterBubble;
+            @ToggleWaterBubble.canceled += instance.OnToggleWaterBubble;
         }
 
         /// <summary>
@@ -1457,6 +1653,24 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Rotate.started -= instance.OnRotate;
             @Rotate.performed -= instance.OnRotate;
             @Rotate.canceled -= instance.OnRotate;
+            @CameraLock.started -= instance.OnCameraLock;
+            @CameraLock.performed -= instance.OnCameraLock;
+            @CameraLock.canceled -= instance.OnCameraLock;
+            @FlyElevation.started -= instance.OnFlyElevation;
+            @FlyElevation.performed -= instance.OnFlyElevation;
+            @FlyElevation.canceled -= instance.OnFlyElevation;
+            @ToggleCamera.started -= instance.OnToggleCamera;
+            @ToggleCamera.performed -= instance.OnToggleCamera;
+            @ToggleCamera.canceled -= instance.OnToggleCamera;
+            @ToggleLength.started -= instance.OnToggleLength;
+            @ToggleLength.performed -= instance.OnToggleLength;
+            @ToggleLength.canceled -= instance.OnToggleLength;
+            @ScrollWidth.started -= instance.OnScrollWidth;
+            @ScrollWidth.performed -= instance.OnScrollWidth;
+            @ScrollWidth.canceled -= instance.OnScrollWidth;
+            @ToggleWaterBubble.started -= instance.OnToggleWaterBubble;
+            @ToggleWaterBubble.performed -= instance.OnToggleWaterBubble;
+            @ToggleWaterBubble.canceled -= instance.OnToggleWaterBubble;
         }
 
         /// <summary>
@@ -1834,6 +2048,48 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRotate(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CameraLock" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCameraLock(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "FlyElevation" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnFlyElevation(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ToggleCamera" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnToggleCamera(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ToggleLength" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnToggleLength(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ScrollWidth" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnScrollWidth(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ToggleWaterBubble" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnToggleWaterBubble(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
