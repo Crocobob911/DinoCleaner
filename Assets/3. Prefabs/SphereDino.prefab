@@ -138,6 +138,13 @@ MonoBehaviour:
   - id: 3
     displayName: Bottom
   regionCompleteThreshold: 0.9
+  mossPatches: 3
+  mossRadius: 0.35
+  poopSplats: 5
+  poopRadius: 0.12
+  brushHardness: 0.85
+  cleanSnap: 0.2
+  cleanRules: {fileID: 11400000, guid: 07379c4eb7cde3246a74c873793c5be5, type: 2}
   cleanThreshold: 0.1
   progressResolution: 256
   progressInterval: 0.25

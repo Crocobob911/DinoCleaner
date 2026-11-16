@@ -1,6 +1,6 @@
 using UnityEngine;
-using DinoCleaner.Core;
-namespace DinoCleaner.Equipment
+
+namespace DinoCleaner.Core
 {
     [CreateAssetMenu(fileName = "NewCleaningTool", menuName = "DinoCleaner/Equipment/Cleaning Tool")]
     public class CleaningToolData : ToolData

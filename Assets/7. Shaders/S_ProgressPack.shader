@@ -18,7 +18,7 @@ Shader "Hidden/DinoWash/ProgressPack"
             float4 frag(v2f_img i) : SV_Target
             {
                 float4 mask = tex2D(_MaskTex, i.uv);
-                float dirt = max(mask.r, max(mask.g, mask.b));   // 비누(A)는 오물이 아님
+                float dirt = max(max(mask.r, mask.g), max(mask.b, mask.a));   // A(거품)도 포함
                 float region = tex2D(_RegionMap, i.uv).r;
                 return float4(dirt, region, 0, 1);
             }

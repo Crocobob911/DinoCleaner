@@ -44,6 +44,9 @@ namespace DinoCleaner.Cleaning
         [Tooltip("브러시에 닿은 곳이 이 값 아래로 내려가면 바로 0(깨끗)으로. Clean Threshold 이상으로 둘 것")]
         [SerializeField, Range(0f, 0.5f)] float cleanSnap = 0.2f;
 
+        [Tooltip("오물 종류별로 각 노즐이 얼마나 빨리 지우는지 (DirtCleanRules 에셋)")]
+        [SerializeField] DirtCleanRules cleanRules;
+
         [Header("진행도 측정")]
         [Tooltip("오염도 값이 이 이하로 내려가야 깨끗한 픽셀로 센다")]
         [SerializeField, Range(0f, 1f)] float cleanThreshold = 0.1f;
@@ -69,9 +72,9 @@ namespace DinoCleaner.Cleaning
 
         void Awake()
         {
-            if (paintShader == null || progressPackShader == null)
+            if (paintShader == null || progressPackShader == null || cleanRules == null)
             {
-                Debug.LogError($"[{name}]에 PaintShader/ProgressPackSHader연결 필요.", this);
+                Debug.LogError($"[{name}]에 PaintShader, ProgressPackSHader, CleanRules 연결 필요.", this);
                 enabled = false;
                 return;
             }
@@ -130,11 +133,16 @@ namespace DinoCleaner.Cleaning
         {
             if (_painter == null) return;
 
+            var cleanRates = cleanRules.GetRates(stroke.Flags);
+            var foam = cleanRules.GetFoam(stroke.Flags);
+
+            if (cleanRates == Vector4.zero && foam.x == 0f && foam.y == 0f) return; // 이 브러시로는 아무것도 지워지지 않음
+
             // DEBUG: 1초에 한 번쯤 스트로크 값 출력
             //if (Time.frameCount % 60 == 0)
             //    Debug.Log($"[{name}] Stroke: 위치 {stroke.Position}, 반경 {stroke.Radius}, 세기 {stroke.Strength}, dt {stroke.DeltaTime:F4}");
 
-            _painter.Paint(stroke);
+            _painter.Paint(stroke, cleanRates, foam);
             _maskChanged = true;
         }
 
