@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using DinoCleaner.Core;
+using UnityEngine.InputSystem;
 
 namespace DinoCleaner.Equipment
 {
@@ -105,25 +106,31 @@ namespace DinoCleaner.Equipment
         private void Update()
         {
             if (currentHologram == null || collisionChecker == null) return;
-            if (Camera.main == null) {
-                Debug.LogWarning("[DeployableTool] 메인 카메라가 없습니다. 홀로그램 위치 업데이트를 건너뜁니다.");
-                return;
-            }
-            Transform cam = Camera.main.transform;
-            Ray ray = new Ray(cam.position, cam.forward);
+            if (Camera.main == null) return;
 
-            // 1. 카메라 정면으로 레이저를 쏴서 '바닥(groundLayer)'에 맞았을 때만
+            // 💡 [개선됨] 카메라 정면 고정(cam.forward) 대신 PlayerController와 똑같이 
+            // 마우스 커서 잠금 여부에 따라 레이 방향을 구하도록 통일성 확보
+            Ray ray;
+            if (Cursor.lockState == CursorLockMode.Locked)
+            {
+                ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+            }
+            else
+            {
+                Vector2 mousePos = Mouse.current.position.ReadValue();
+                ray = Camera.main.ScreenPointToRay(mousePos);
+            }
+
+            // 설치는 100f 거리가 아니라 지정된 짧은 사거리(deployRange)와 바닥(groundLayer)만 체크해야 합니다.
             if (Physics.Raycast(ray, out RaycastHit hit, deployRange, groundLayer))
             {
                 currentHologram.SetActive(true);
                 isPointingGround = true;
-                targetPosition = hit.point + new Vector3(0, heightOffset, 0); // 정확히 바닥에 닿은 좌표
+                targetPosition = hit.point + new Vector3(0, heightOffset, 0); 
 
-                // 좌표 반영 및 Y축 회전 적용
                 Quaternion rotation = Quaternion.Euler(0, currentYRotation, 0);
                 currentHologram.transform.SetPositionAndRotation(targetPosition, rotation);
 
-                // 2. 충돌 체크(HologramCollisionChecker) 결과에 따라 색상 변경
                 Material targetMat = collisionChecker.IsValid ? validMaterial : invalidMaterial;
                 foreach (var r in hologramRenderers)
                 {
@@ -136,14 +143,16 @@ namespace DinoCleaner.Equipment
                 isPointingGround = false;
             }
         }
-
-        public override void UseTool(Transform originTransform)
+        public override void UseTool(Transform originTransform, Vector3 targetPoint)
         {
-            // 좌클릭 시 설치 조건이 맞으면 실제 프리팹 생성
-            if (isPointingGround && currentHologram.activeSelf)
+            // 💡 [개선됨] 설치 조건에 collisionChecker.IsValid(빨간색이 아닐 때)를 추가하여
+            // 겹친 상태에서 억지로 지어지는 버그를 차단합니다.
+            if (isPointingGround && currentHologram.activeSelf && collisionChecker.IsValid)
             {
                 Instantiate(deployedPrefab, targetPosition, Quaternion.Euler(0, currentYRotation, 0));
-                Destroy(currentHologram);
+                
+                // 홀로그램을 파괴(Destroy)하지 않고 숨김(SetActive) 처리하여 재사용성을 높임
+                currentHologram.SetActive(false); 
                 OnDeployed?.Invoke();
             }
         }

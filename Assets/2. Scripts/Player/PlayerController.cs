@@ -2,6 +2,7 @@ using UnityEngine;
 using DinoCleaner.Equipment;
 using DinoCleaner.Data;
 using DinoCleaner.Core;
+using UnityEngine.InputSystem;
 
 namespace DinoCleaner.Player
 {
@@ -22,6 +23,10 @@ namespace DinoCleaner.Player
         public Vector3 thirdPersonOffset = new Vector3(0.5f, 0.4f, -2.5f); // 캐릭터 뒤쪽 및 약간 오른쪽(숄더뷰) 거리
         public float cameraSmoothSpeed = 15f;
         private float currentCameraHeight;
+
+        [Header("Aiming & IK")]
+        public Transform aimTarget; // 리깅 세팅에서 만든 AimTarget 오브젝트 연결
+        private Vector3 currentAimPoint; // HandleLook에서 계산된 최종 목표 좌표
 
         [Header("자세별 물리 세팅")]
         // 공식: centerY는 항상 height의 절반(height / 2)이어야 발바닥이 Y=0에 고정됩니다!
@@ -85,14 +90,13 @@ namespace DinoCleaner.Player
             inputActions.Player.Fire.started += ctx => isFiring = true;  // 마우스 누름
             inputActions.Player.Fire.canceled += ctx => {
                 isFiring = false;
-                if (equipment.currentTool is CleaningTool a)
+                 if (equipment.currentTool is CleaningTool cleaner)
                 {
-                    a.StopTool();
+                    cleaner.StopTool(); // 클릭을 떼는 순간 파티클 방출 차단
                 }
             };
             // 달리기 입력
             inputActions.Player.Sprint.started += ctx => isSprinting = true;
-
             inputActions.Player.Sprint.canceled += ctx => isSprinting = false;
 
             // 상호작용 입력
@@ -189,7 +193,7 @@ namespace DinoCleaner.Player
 
             if(isFiring)
             {
-                equipment.UseCurrentTool();
+                equipment.UseCurrentTool(currentAimPoint);
             }
             HandleStanceTransition();
 
@@ -273,34 +277,69 @@ namespace DinoCleaner.Player
 
         private void HandleLook()
         {
-            if (isCameraLocked || cameraTransform == null) return;
-
-            // 마우스 상하 이동 (X축 회전) - 위아래로 고개 끄덕이기
-            float mouseY = lookInput.y * mouseSensitivity * Time.deltaTime;
-            xRotation -= mouseY;
-            xRotation = Mathf.Clamp(xRotation, -80f, 80f); // 고개가 뒤로 꺾이지 않도록 제한
-            Quaternion camRot = Quaternion.Euler(xRotation, 0f, 0f);
-            cameraTransform.localRotation = camRot;
-
-            // 마우스 좌우 이동 (Y축 회전) - 몸통 전체가 회전
-            float mouseX = lookInput.x * mouseSensitivity * Time.deltaTime;
-            transform.Rotate(Vector3.up * mouseX);
-
-            Vector3 pivotPos = new Vector3(0f, currentCameraHeight, 0f);
-            Vector3 targetCamPos;
-            if (isThirdPerson)
+            // --------------------------------------------------------
+            // 1. 카메라 및 캐릭터 몸통 회전
+            // (카메라가 잠기지 않은 FPS/TPS 조작 모드일 때만 실행)
+            // --------------------------------------------------------
+            if (!isCameraLocked && cameraTransform != null)
             {
-                // 피벗(머리 높이)을 기준으로 상하 회전각(camRot)만큼 오프셋을 회전시켜 뒤로 뺌
-                targetCamPos = pivotPos + (camRot * new Vector3(thirdPersonOffset.x, thirdPersonOffset.y, thirdPersonOffset.z));
+                float mouseY = lookInput.y * mouseSensitivity * Time.deltaTime;
+                xRotation -= mouseY;
+                xRotation = Mathf.Clamp(xRotation, -80f, 80f); 
+                Quaternion camRot = Quaternion.Euler(xRotation, 0f, 0f);
+                cameraTransform.localRotation = camRot;
+
+                float mouseX = lookInput.x * mouseSensitivity * Time.deltaTime;
+                transform.Rotate(Vector3.up * mouseX);
+
+                Vector3 pivotPos = new Vector3(0f, currentCameraHeight, 0f);
+                Vector3 targetCamPos = isThirdPerson 
+                    ? pivotPos + (camRot * new Vector3(thirdPersonOffset.x, thirdPersonOffset.y, thirdPersonOffset.z))
+                    : pivotPos;
+                    
+                cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, targetCamPos, Time.deltaTime * cameraSmoothSpeed);
+            }
+
+            // --------------------------------------------------------
+            // 2. 에이밍(Aiming) 연산 
+            // 🚨 (카메라 잠금 여부와 상관없이 매 프레임 무조건 실행되어야 함!)
+            // --------------------------------------------------------
+            Ray camRay;
+            if (Cursor.lockState == CursorLockMode.Locked)
+            {
+                // 십자선 고정 모드: 화면 정중앙 뷰포트 기준
+                camRay = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
             }
             else
             {
-                // 1인칭은 정해진 눈높이 위치 그대로 사용
-                targetCamPos = pivotPos;
+                // 마우스 자유 모드: 현재 마우스 커서 위치 기준
+                Vector2 mousePos = Mouse.current.position.ReadValue();
+                camRay = Camera.main.ScreenPointToRay(mousePos);
             }
-            cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, targetCamPos, Time.deltaTime * cameraSmoothSpeed);
-        }
 
+            float aimDistance = 100f;
+            int layerMask = ~LayerMask.GetMask("Player"); // 내 캐릭터 몸통 피격 무시
+
+            if (Physics.Raycast(camRay, out RaycastHit camHit, aimDistance, layerMask))
+            {
+                currentAimPoint = camHit.point;
+            }
+            else
+            {
+                currentAimPoint = camRay.GetPoint(aimDistance);
+            }
+
+            // 💡 테스트용 마젠타색 디버그 광선 (이제 자유 모드에서도 마우스 커서를 따라 잘 보일 겁니다)
+            Debug.DrawLine(camRay.origin, currentAimPoint, Color.magenta, 2f);
+
+            // --------------------------------------------------------
+            // 3. Animation Rigging 척추 타겟 이동
+            // --------------------------------------------------------
+            if (aimTarget != null)
+            {
+                aimTarget.position = Vector3.Lerp(aimTarget.position, currentAimPoint, Time.deltaTime * 20f);
+            }
+        }
         private void ToggleStance()
         {
             if (isFairyEquipped) return; // 요정 공룡 상태에서는 자세 전환 불가

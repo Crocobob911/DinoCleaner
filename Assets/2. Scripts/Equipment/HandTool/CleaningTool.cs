@@ -46,7 +46,7 @@ namespace DinoCleaner.Equipment
             }
         }
 
-        public override void UseTool(Transform originTransform)
+        public override void UseTool(Transform originTransform, Vector3 targetPoint)
         {
             if (toolData == null) return;
 
@@ -58,31 +58,12 @@ namespace DinoCleaner.Equipment
 
             Vector3 origin = firePoint != null ? firePoint.position : originTransform.position;
 
-            // [Step 1] 조준점 찾기
-            Ray camRay;
-            if (Cursor.lockState == CursorLockMode.Locked)
-            {
-                camRay = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
-            }
-            else
-            {
-                Vector2 mousePos = Mouse.current.position.ReadValue();
-                camRay = Camera.main.ScreenPointToRay(mousePos);
-            }
-            Vector3 targetPoint;
-            float aimDistance = 100f; 
-            
-            if (Physics.Raycast(camRay, out RaycastHit camHit, aimDistance))
-                targetPoint = camHit.point; 
-            else
-                targetPoint = camRay.GetPoint(aimDistance); 
-
-            // [Step 2] 발사 방향 및 충돌 캐스트
             Vector3 fireDirection = (targetPoint - origin).normalized; 
-            
+                    
             RaycastHit hit = default;
             bool isHit = false;
 
+            // 실제 발사체(물/거품) 캐스트 (기존과 동일)
             if (toolData.Shape == CastShape.Sphere)
             {
                 isHit = Physics.SphereCast(origin, finalWidth, fireDirection, out hit, finalDistance);
@@ -100,15 +81,13 @@ namespace DinoCleaner.Equipment
                 isHit = Physics.CapsuleCast(point1, point2, thickness, fireDirection, out hit, finalDistance);
             }
 
-            // 💡 [추가됨] 시각 효과 업데이트 호출
+            // 시각 효과 업데이트 호출
             Vector3 actualEndPos = isHit ? hit.point : origin + (fireDirection * finalDistance);
             HandleVisualEffects(origin, actualEndPos, fireDirection, finalWidth, isHit);
 
-            // [Step 3] 실제 오물 청소 로직
+            // 실제 오물 청소 로직 적용
             if (isHit)
             {
-                Debug.DrawLine(origin, hit.point, Color.green, 1f);
-
                 ICleanable hitTarget = hit.collider.GetComponent<ICleanable>();
                 if (hitTarget != null)
                 {
@@ -122,10 +101,6 @@ namespace DinoCleaner.Equipment
                         DeltaTime = Time.deltaTime,
                     });
                 }
-            }
-            else
-            {
-                Debug.DrawRay(origin, fireDirection * finalDistance, Color.red, 1f);
             }
         }
 
