@@ -61,7 +61,7 @@ namespace DinoCleaner.UI
         private void Refresh()
         {
             IGameProgress progress = GameServices.Progress;
-            moneyText.text = $"보유 돈 : {progress.Money}";
+            moneyText.text = $"MONEY : {progress.Money}";
 
             for (int i = 0; i < cards.Count; i++)
             {
@@ -73,14 +73,14 @@ namespace DinoCleaner.UI
             detailLevelText.text = $"Lv. {selected.Level}";
             detailDots.Set(selected.Level, selected.MaxLevel);
             detailDescriptionText.text = selected.Description;
-            detailCostText.text = selected.IsMaxLevel ? "최대 단계" : $"비용 : {selected.NextCost}";
+            detailCostText.text = selected.IsMaxLevel ? "MAX LEVEL" : $"COST : {selected.NextCost}";
             upgradeButton.interactable = !selected.IsMaxLevel && progress.Money >= selected.NextCost;
         }
 
         private void OnClickUpgrade()
         {
             UpgradeInfo selected = GameServices.Progress.Upgrades[selectedIndex];
-            string message = $"정말로 업그레이드 하시겠습니까?\n{selected.DisplayName} Lv. {selected.Level + 1}  비용 {selected.NextCost}";
+            string message = $"Upgrade {selected.DisplayName} to Lv. {selected.Level + 1}?\nCost : {selected.NextCost}";
             UILoader.Instance.ShowUI(UIName.ConfirmPopup, new ConfirmPopupData(message,
                 () => GameServices.Progress.TryUpgrade(selected.Id)));
         }

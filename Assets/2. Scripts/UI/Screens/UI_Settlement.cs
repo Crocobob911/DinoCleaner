@@ -21,7 +21,7 @@ namespace DinoCleaner.UI
 
         public void ReceiveData(StageResult result)
         {
-            summaryText.text = $"수입 : {result.Reward}    보유액 : {GameServices.Progress.Money}";
+            summaryText.text = $"EARNED : {result.Reward}    MONEY : {GameServices.Progress.Money}";
         }
 
         private void OnClickHome()

@@ -9,7 +9,7 @@ namespace DinoCleaner.Core
         public UIModalChangedEvent(bool isOpen) { IsOpen = isOpen; }
     }
 
-    // 플레이어의 자세, 도구, 노즐, 에임 상태가 바뀜 (Player -> UI)
+    // 플레이어의 자세, 도구, 노즐, 에임 상태가 바뀜. UI의 PlayerHudBridge가 Player 이벤트를 모아 발행 (UI 내부)
     public readonly struct PlayerHudStateChangedEvent : IEvent
     {
         public readonly PlayerHudState State;
