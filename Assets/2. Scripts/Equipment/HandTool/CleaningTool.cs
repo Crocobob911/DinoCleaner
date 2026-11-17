@@ -99,7 +99,7 @@ namespace DinoCleaner.Equipment
                 // 💡 디버그: 총구에서 실제 맞은 곳까지 초록색 선 그리기
                 Debug.DrawLine(origin, hit.point, Color.green, 1f);
 
-                ICleanable hitTarget = hit.collider.GetComponent<ICleanable>();
+                ICleanable hitTarget = hit.collider.GetComponentInParent<ICleanable>();
                 if (hitTarget != null)
                 {
                     hitTarget.ApplyStroke(new CleanStroke

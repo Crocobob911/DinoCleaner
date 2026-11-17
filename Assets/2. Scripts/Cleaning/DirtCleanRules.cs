@@ -10,11 +10,11 @@ namespace DinoCleaner.Cleaning
     public class DirtCleanRules : ScriptableObject
     {
         [Header("진흙 (R)")]
-        public ToolRates mud = new ToolRates { water = 1f, pressure = 1f, soap = 0f };
+        public ToolRates mud = new ToolRates { water = 1f, pressure = 1f, bubble = 0f };
         [Header("이끼·화산재 (G)")]
-        public ToolRates moss = new ToolRates { water = 0.1f, pressure = 1f, soap = 0f };
+        public ToolRates moss = new ToolRates { water = 0.1f, pressure = 1f, bubble = 0f };
         [Header("익룡 배설물 (B)")]
-        public ToolRates poop = new ToolRates { water = 1f, pressure = 1f, soap = 0f }; // 거품 있는 경우에만
+        public ToolRates poop = new ToolRates { water = 1f, pressure = 1f, bubble = 0f }; // 거품 있는 경우에만
 
         [Header("비누 거품 (A)")]
         [Tooltip("비누가 거품을 바르는 속도 (Strength 배수)")]
@@ -32,7 +32,7 @@ namespace DinoCleaner.Cleaning
 
         public Vector4 GetFoam(CleanerFlags flags)
         {
-            float apply = (flags & CleanerFlags.Soap) != 0 ? foamApply : 0f;
+            float apply = (flags & CleanerFlags.Bubble) != 0 ? foamApply : 0f;
             float rinse = (flags & (CleanerFlags.Water | CleanerFlags.Pressure)) != 0 ? foamRinse : 0f;
             return new Vector4(apply, rinse, foamRequired, 0f);
         }
@@ -43,14 +43,14 @@ namespace DinoCleaner.Cleaning
     {
         [Min(0f)] public float water;
         [Min(0f)] public float pressure;
-        [Min(0f)] public float soap;
+        [Min(0f)] public float bubble;
 
         public float For(CleanerFlags flags)
         {
             float rate = 0f;
             if ((flags & CleanerFlags.Water) != 0) rate = Mathf.Max(rate, water);
             if ((flags & CleanerFlags.Pressure) != 0) rate = Mathf.Max(rate, pressure);
-            if ((flags & CleanerFlags.Soap) != 0) rate = Mathf.Max(rate, soap);
+            if ((flags & CleanerFlags.Bubble) != 0) rate = Mathf.Max(rate, bubble);
             return rate;
         }
     }

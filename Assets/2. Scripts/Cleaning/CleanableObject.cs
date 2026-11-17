@@ -24,6 +24,8 @@ namespace DinoCleaner.Cleaning
         [SerializeField] RegionDefinition[] regions;
         [Tooltip("부위의 이 비율 이상이 깨끗해지면 그 부위 완료")]
         [SerializeField, Range(0f, 1f)] float regionCompleteThreshold = 0.9f;
+        [Tooltip("오물을 칠할 렌더러. 비우면 자식 전체 (눈·이빨 등이 따로 있으면 몸통만 넣을 것)")]
+        [SerializeField] Renderer[] targetRenderers;
 
         [Header("처음 묻어 있는 오물")]
         [Tooltip("이끼/화산재 얼룩 개수")]
@@ -79,7 +81,7 @@ namespace DinoCleaner.Cleaning
                 return;
             }
 
-            _renderers = GetComponentsInChildren<Renderer>();
+            _renderers = (targetRenderers != null && targetRenderers.Length > 0) ? targetRenderers : GetComponentsInChildren<Renderer>();
 
             _mask = new DirtMask(maskResolution);
             

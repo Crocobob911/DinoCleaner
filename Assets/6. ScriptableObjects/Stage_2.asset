@@ -12,8 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa124abcd824c5f40b423de42f8252aa, type: 3}
   m_Name: Stage_2
   m_EditorClassIdentifier: DinoCleaner.Core::DinoCleaner.Core.StageDefinition
+  stageId: 0
   displayName: Stage 2
-  dinoPrefab: {fileID: 1481172686120436406, guid: 02fd05cdcb777b042a11ead751c2b415, type: 3}
+  cardImage: {fileID: 0}
+  description: 
+  dinoPrefab: {fileID: 5518630468571480890, guid: 27843cd3c5c4782428ee115dfea04b79, type: 3}
   completeThreshold: 0.95
   autoFinishOnComplete: 1
   minSuccessProgress: 0.7

@@ -34,7 +34,10 @@ namespace DinoCleaner.Stage
             _elapsed += deltaTime;
             float duration = Controller.ArriveDuration;
             float arriveProgress = duration > 0f ? Mathf.Clamp01(_elapsed / duration) : 1f;
+
             // 공룡을 세차 위치까지 이동
+            //TODO: 공룡이 직접 걷는 애니메이션을 재생하도록 변경 필요
+
             Controller.Dino.transform.position = Vector3.Lerp(_from, _to, Mathf.SmoothStep(0f, 1f, arriveProgress));
             // 공룡이 세차 위치에 도착하면 Washing 상태로 전환
             if (arriveProgress >= 1f) Controller.ChangeState(StageState.Washing);
