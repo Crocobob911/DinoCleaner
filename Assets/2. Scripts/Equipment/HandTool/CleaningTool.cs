@@ -9,24 +9,47 @@ namespace DinoCleaner.Equipment
     public class CleaningTool : Tool
     {
         [SerializeField] private CleaningToolData toolData;
-        [SerializeField] private Transform firePoint; // 💡 청소기 총구 끝단 Transform
+        [SerializeField] private Transform firePoint; 
+
+        // 💡 [추가됨] 하이브리드 시각 효과용 변수
+        [Header("Visual Effects")]
+        [SerializeField] private Transform beamPrefab;       // 원기둥 모델 프리팹
+        [SerializeField] private ParticleSystem splashPrefab; // 부딪힌 곳 파티클 프리팹
+
+        private Transform currentBeam;
+        private ParticleSystem currentSplash;
 
         [Header("Player Unlocked Stats (임시 세이브 데이터)")]
         public int maxUnlockedLengthStep = 4;
-        public int maxUnlockedWaterWidthStep = 4;  // 물: 처음부터 끝까지(Full) 개방됨
+        public int maxUnlockedWaterWidthStep = 4;  
         public int maxUnlockedBubbleWidthStep = 1;
         public int pressureLevel = 3; 
 
         [Header("Runtime State (유저 조작 상태)")]
-        public int currentLengthStep = 1; // 2번 키로 조절할 값
-        public int currentWidthStep = 1;  // 휠로 조절할 값
-        public NozzleDirection currentDirection = NozzleDirection.Horizontal; // R키 조절 값
+        public int currentLengthStep = 1; 
+        public int currentWidthStep = 1;  
+        public NozzleDirection currentDirection = NozzleDirection.Horizontal; 
+
+        private void Start()
+        {
+            if (beamPrefab != null)
+            {
+                // 부모(transform)를 지정하지 않고 월드 최상단에 독립적으로 생성합니다.
+                currentBeam = Instantiate(beamPrefab); 
+                currentBeam.gameObject.SetActive(false);
+            }
+            if (splashPrefab != null)
+            {
+                // 파티클 역시 월드에 독립적으로 생성하여 총의 움직임에 끌려가지 않게 합니다.
+                currentSplash = Instantiate(splashPrefab);
+                currentSplash.Stop();
+            }
+        }
 
         public override void UseTool(Transform originTransform)
         {
             if (toolData == null) return;
 
-            // 1. 발사 스펙 산출 (면적 보존 공식)
             float finalDistance = toolData.BaseDistance * currentLengthStep;
             float finalWidth = toolData.BaseWidth * currentWidthStep / currentLengthStep;
             float finalStrength = toolData.IsPressureAffected 
@@ -35,44 +58,31 @@ namespace DinoCleaner.Equipment
 
             Vector3 origin = firePoint != null ? firePoint.position : originTransform.position;
 
-            // -------------------------------------------------------------
-            // [Step 1] 카메라 정중앙(크로스헤어)으로 레이를 쏴서 '목표 지점' 찾기
-            // -------------------------------------------------------------
+            // [Step 1] 조준점 찾기
             Ray camRay;
             if (Cursor.lockState == CursorLockMode.Locked)
             {
-                // 1. 고정 모드: 화면 정중앙(카메라 정면)으로 쏜다
                 camRay = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
             }
             else
             {
-                // 2. 마우스 자유 모드: 현재 마우스 커서가 위치한 화면 좌표에서 쏜다
                 Vector2 mousePos = Mouse.current.position.ReadValue();
                 camRay = Camera.main.ScreenPointToRay(mousePos);
             }
             Vector3 targetPoint;
-            
-            // 조준용 레이는 청소기 사거리(finalDistance)보다 훨씬 멀리 쏴야 영점이 정확하게 잡힙니다.
             float aimDistance = 100f; 
             
             if (Physics.Raycast(camRay, out RaycastHit camHit, aimDistance))
-            {
-                targetPoint = camHit.point; // 크로스헤어가 닿은 실제 벽/오브젝트 좌표
-            }
+                targetPoint = camHit.point; 
             else
-            {
-                targetPoint = camRay.GetPoint(aimDistance); // 허공일 경우 아주 먼 곳의 좌표
-            }
+                targetPoint = camRay.GetPoint(aimDistance); 
 
-            // -------------------------------------------------------------
-            // [Step 2] 총구(origin)에서 목표 지점(targetPoint)으로 실제 청소기 발사
-            // -------------------------------------------------------------
-            Vector3 fireDirection = (targetPoint - origin).normalized; // 총구 -> 타겟 방향
+            // [Step 2] 발사 방향 및 충돌 캐스트
+            Vector3 fireDirection = (targetPoint - origin).normalized; 
             
             RaycastHit hit = default;
             bool isHit = false;
 
-            // 실제 발사체(물/거품) 캐스트
             if (toolData.Shape == CastShape.Sphere)
             {
                 isHit = Physics.SphereCast(origin, finalWidth, fireDirection, out hit, finalDistance);
@@ -80,7 +90,6 @@ namespace DinoCleaner.Equipment
             else if (toolData.Shape == CastShape.Capsule)
             {
                 float thickness = 0.1f;
-                // 가로/세로 퍼짐 방향 (카메라 회전에 맞춤)
                 Vector3 offset = currentDirection == NozzleDirection.Horizontal 
                     ? Camera.main.transform.right * finalWidth 
                     : Camera.main.transform.up * finalWidth;
@@ -91,12 +100,13 @@ namespace DinoCleaner.Equipment
                 isHit = Physics.CapsuleCast(point1, point2, thickness, fireDirection, out hit, finalDistance);
             }
 
-            // -------------------------------------------------------------
-            // [Step 3] 실제 맞은 대상(hit)에게 청소(ApplyStroke) 적용
-            // -------------------------------------------------------------
+            // 💡 [추가됨] 시각 효과 업데이트 호출
+            Vector3 actualEndPos = isHit ? hit.point : origin + (fireDirection * finalDistance);
+            HandleVisualEffects(origin, actualEndPos, fireDirection, finalWidth, isHit);
+
+            // [Step 3] 실제 오물 청소 로직
             if (isHit)
             {
-                // 💡 디버그: 총구에서 실제 맞은 곳까지 초록색 선 그리기
                 Debug.DrawLine(origin, hit.point, Color.green, 1f);
 
                 ICleanable hitTarget = hit.collider.GetComponent<ICleanable>();
@@ -115,11 +125,69 @@ namespace DinoCleaner.Equipment
             }
             else
             {
-                // 💡 디버그: 허공에 쐈을 때 총구에서 나가는 궤적을 빨간색으로 표시
                 Debug.DrawRay(origin, fireDirection * finalDistance, Color.red, 1f);
             }
         }
 
+        // 💡 [추가됨] 마우스 클릭을 뗐을 때 PlayerController에서 호출할 함수
+        public void StopTool()
+        {
+            if (currentBeam != null) currentBeam.gameObject.SetActive(false); 
+            if (currentSplash != null) 
+            {
+                var emission = currentSplash.emission;
+                emission.enabled = false; 
+            }
+        }
+
+        // 💡 [추가됨] Mesh(원기둥) 늘리기 및 파티클 위치 이동 전용 로직
+        private void HandleVisualEffects(Vector3 startPos, Vector3 endPos, Vector3 direction, float currentWidth, bool isHit)
+        {
+            float distance = Vector3.Distance(startPos, endPos);
+
+            // 1. 물줄기(Beam) 처리
+            if (currentBeam != null)
+            {
+                currentBeam.gameObject.SetActive(true);
+                currentBeam.position = startPos + (direction * (distance * 0.5f));
+                
+                // 🚨 매 프레임 도는 Rotate 대신, 타겟을 향하는 명확한 '절대 회전값'을 부여합니다.
+                // LookRotation으로 타겟을 바라보게 한 뒤, 실린더 형태에 맞게 90도 눕혀줍니다.
+                currentBeam.rotation = Quaternion.LookRotation(direction) * Quaternion.Euler(90, 0, 0);
+
+                if (toolData.Shape == CastShape.Capsule)
+                {
+                    if (currentDirection == NozzleDirection.Horizontal)
+                        currentBeam.localScale = new Vector3(currentWidth, distance * 0.5f, 0.1f); 
+                    else
+                        currentBeam.localScale = new Vector3(0.1f, distance * 0.5f, currentWidth);
+                }
+                else 
+                {
+                    currentBeam.localScale = new Vector3(currentWidth, distance * 0.5f, currentWidth); 
+                }
+            }
+
+            // 2. 물보라(Splash) 처리
+            if (currentSplash != null)
+            {
+                var emission = currentSplash.emission;
+
+                if (isHit)
+                {
+                    emission.enabled = true;
+                    if (!currentSplash.isPlaying) currentSplash.Play();
+
+                    // 부모가 없으므로 월드 고정점(hit.point)에 완벽하게 머무릅니다.
+                    currentSplash.transform.position = endPos; 
+                    currentSplash.transform.LookAt(startPos); 
+                }
+                else
+                {
+                    emission.enabled = false;
+                }
+            }
+        }
         // 💡 1. 노즐 길이 토글 (2번 키: 1 -> 2 -> 3 -> 4 -> 1 순환)
         public void ToggleLengthStep()
         {

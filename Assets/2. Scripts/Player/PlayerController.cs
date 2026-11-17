@@ -83,10 +83,18 @@ namespace DinoCleaner.Player
             // 웅크리기 입력
             inputActions.Player.Crouch.performed += ctx => ToggleStance();
             inputActions.Player.Fire.started += ctx => isFiring = true;  // 마우스 누름
-            inputActions.Player.Fire.canceled += ctx => isFiring = false; // 마우스 뗌
+            inputActions.Player.Fire.canceled += ctx => {
+                isFiring = false;
+                if (equipment.currentTool is CleaningTool a)
+                {
+                    a.StopTool();
+                }
+            };
             // 달리기 입력
             inputActions.Player.Sprint.started += ctx => isSprinting = true;
+
             inputActions.Player.Sprint.canceled += ctx => isSprinting = false;
+
             // 상호작용 입력
             inputActions.Player.Interact.performed += ctx => interaction.TryInteract();
             // c 키로 카메라 잠금 입력
