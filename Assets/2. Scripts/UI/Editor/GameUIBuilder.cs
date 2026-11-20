@@ -317,10 +317,15 @@ namespace DinoCleaner.UI.Editor
             var nameText = AddText(cardGo, "Name", "Dino", 40, new Vector2(0, -210), new Vector2(420, 90));
             nameText.raycastTarget = false;
 
+            var lockSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/5. UI/Sprite/kenney_game-icons/PNG/White/2x/locked.png");
+            var lockIcon = AddIcon(cardGo, "LockIcon", lockSprite, Vector2.zero, new Vector2(160, 160), Color.white).gameObject;
+            lockIcon.SetActive(false);
+
             AddHoverLift(cardGo, 16f, 1.03f);
 
             var card = cardGo.AddComponent<UI_RequestCard>();
-            Bind(card, ("button", button), ("dinoImage", dinoImage), ("imagePlaceholderText", placeholder), ("nameText", nameText));
+            Bind(card, ("button", button), ("dinoImage", dinoImage), ("imagePlaceholderText", placeholder), ("nameText", nameText),
+                ("lockIcon", lockIcon));
             cardGo.SetActive(false);
             return card;
         }
