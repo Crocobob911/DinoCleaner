@@ -1,0 +1,41 @@
+{
+  "gameTitle": "DinoCleaner",
+  "licenses": [
+    { "id": "CC0", "displayName": "CC0 1.0", "url": "https://creativecommons.org/publicdomain/zero/1.0/", "attributionRequired": false, "shareTextFileRequired": false },
+    { "id": "CC-BY-4.0", "displayName": "CC BY 4.0", "url": "https://creativecommons.org/licenses/by/4.0/", "attributionRequired": true, "shareTextFileRequired": false },
+    { "id": "CC-BY-NC-4.0", "displayName": "CC BY-NC 4.0", "url": "https://creativecommons.org/licenses/by-nc/4.0/", "attributionRequired": true, "shareTextFileRequired": false },
+    { "id": "OFL-1.1", "displayName": "SIL Open Font License 1.1", "url": "https://openfontlicense.org", "attributionRequired": false, "shareTextFileRequired": true },
+    { "id": "Apache-2.0", "displayName": "Apache License 2.0", "url": "https://www.apache.org/licenses/LICENSE-2.0", "attributionRequired": false, "shareTextFileRequired": true },
+    { "id": "Freeware", "displayName": "Freeware", "url": "", "attributionRequired": true, "shareTextFileRequired": true },
+    { "id": "Unity-EULA", "displayName": "Unity Asset Store EULA", "url": "https://unity.com/legal/as-terms", "attributionRequired": false, "shareTextFileRequired": false }
+  ],
+  "sections": [
+    {
+      "id": "team", "title": "Team 02", "type": "people",
+      "entries": [
+        { "name": "김명준", "roles": ["Game Design", "Project Management", "Save System"] },
+        { "name": "김영준", "roles": ["Core", "Cleaning", "Stage", "Scene Integration"] },
+        { "name": "고성현", "roles": ["Player", "VFX"] },
+        { "name": "김동우", "roles": ["UI", "SFX", "QA"] }
+      ]
+    },
+    {
+      "id": "course", "title": "Made For", "type": "text",
+      "lines": ["Computer Game Design (Fall 2026)", "Chung-Ang University"]
+    },
+    { "id": "models", "title": "3D Models", "type": "assets", "entries": [] },
+    { "id": "music", "title": "Music", "type": "assets", "entries": [] },
+    { "id": "sfx", "title": "Sound Effects", "type": "assets", "entries": [] },
+    { "id": "vfx", "title": "Visual Effects", "type": "assets", "entries": [] },
+    {
+      "id": "ui", "title": "UI & Fonts", "type": "assets",
+      "entries": [
+        { "title": "UI Pack: RPG Expansion", "author": "Kenney", "sourceUrl": "https://opengameart.org/content/ui-pack-rpg-extension", "licenseId": "CC0", "modification": "", "usedFor": "Buttons, panels, bars" },
+        { "title": "Fantasy UI Borders", "author": "Kenney", "sourceUrl": "https://opengameart.org/content/fantasy-ui-borders", "licenseId": "CC0", "modification": "", "usedFor": "Popups, selection frame" },
+        { "title": "Game Icons (expansion)", "author": "Kenney", "sourceUrl": "https://opengameart.org/node/31136", "licenseId": "CC0", "modification": "", "usedFor": "Icons" }
+      ]
+    },
+    { "id": "tools", "title": "Built With", "type": "text", "lines": ["Made with Unity"] },
+    { "id": "thanks", "title": "Special Thanks", "type": "text", "lines": [] }
+  ]
+}
