@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: DinoCleaner.Core::DinoCleaner.Core.StageDefinition
   stageId: 1
   displayName: Stegosaurus
-  cardImage: {fileID: 0}
+  cardImage: {fileID: 21300000, guid: 84e7738c683aec245857816bdbd08d52, type: 3}
   description: "The village chief\u2019s beloved pet. Thanks to the plates on its
     back, the chief\u2019s butt never survives a ride."
   dinoPrefab: {fileID: 2292835161945820159, guid: 6d9278c8df47b3d4ba80520ee6a1148c, type: 3}

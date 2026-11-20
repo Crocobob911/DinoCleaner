@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: DinoCleaner.Core::DinoCleaner.Core.StageDefinition
   stageId: 2
   displayName: T-Rex
-  cardImage: {fileID: 0}
+  cardImage: {fileID: 21300000, guid: 8de4c6bd8f78e864aa36cbdc24f9a52f, type: 3}
   description: "The owner swears it\u2019s vegetarian. Then why is the last cleaner\u2019s
     sandal stuck in its teeth?"
   dinoPrefab: {fileID: 2292835161945820159, guid: 6d9278c8df47b3d4ba80520ee6a1148c, type: 3}

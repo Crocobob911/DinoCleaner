@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: DinoCleaner.Core::DinoCleaner.Core.StageDefinition
   stageId: 3
   displayName: Brachiosaurus
-  cardImage: {fileID: 0}
+  cardImage: {fileID: 21300000, guid: 9d70b840abf475744933af33f16a6f50, type: 3}
   description: Nobody has ever seen its head clean. Some say birds built a whole
     village up there.
   dinoPrefab: {fileID: 2292835161945820159, guid: 6d9278c8df47b3d4ba80520ee6a1148c, type: 3}
