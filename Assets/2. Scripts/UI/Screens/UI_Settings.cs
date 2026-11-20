@@ -84,7 +84,7 @@ namespace DinoCleaner.UI
 
         private void OnClickReturn()
         {
-            UILoader.Instance.ShowUI(UIName.ConfirmPopup, new ConfirmPopupData("집으로 돌아가시겠습니까?", () =>
+            UILoader.Instance.ShowUI(UIName.ConfirmPopup, new ConfirmPopupData("Go back home?", () =>
             {
                 GameServices.Progress.SaveCleaningProgress();
                 GameSession.GoHome();

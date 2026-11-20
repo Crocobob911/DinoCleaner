@@ -9,7 +9,7 @@ namespace DinoCleaner.UI
     /// </summary>
     public class UI_RequestDetail : MonoBehaviour, UI_IDataReceiver<StageDefinition>
     {
-        private const string EmptyDescription = "(의뢰 문구 작성 전)";
+        private const string EmptyDescription = "(No request text yet)";
 
         [SerializeField] private Button backButton;
         [SerializeField] private Button startButton;

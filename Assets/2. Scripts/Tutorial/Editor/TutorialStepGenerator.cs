@@ -33,7 +33,7 @@ namespace DinoCleaner.Tutorial.Editor
             new("Move the mouse to look around.", TutorialInputType.MouseMove),
             new("Hold Shift while moving to run.", TutorialInputType.KeyWhileMoving, Key.LeftShift),
             new("Press Space to jump.", TutorialInputType.Key, Key.Space),
-            new("Press Ctrl to change your stance. It cycles through Standing → Kneeling → Prone.", TutorialInputType.Key, Key.LeftCtrl),
+            new("Press Ctrl to change your stance. It cycles through STAND > CROUCH > PRONE.", TutorialInputType.Key, Key.LeftCtrl),
             new("Hold Left Click to spray water.", TutorialInputType.LeftClick),
             new("Scroll the mouse wheel to change the stream width. Narrower is stronger; wider is weaker.", TutorialInputType.Scroll),
             new("Press 2 to change the nozzle length. A longer nozzle reaches farther, but the stream gets narrower.", TutorialInputType.Key, Key.Digit2),

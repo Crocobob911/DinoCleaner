@@ -15,7 +15,7 @@ namespace DinoCleaner.UI
         private const float EllipseGapScale = 1.4f;
 
         private static readonly float[] AimGaps = { 44f, 60f, 80f, 104f };
-        private static readonly string[] PostureNames = { "서기", "앉기", "눕기", "날기" };
+        private static readonly string[] PostureNames = { "STAND", "CROUCH", "PRONE", "FLY" };
 
         [Header("Progress")]
         [SerializeField] private Text currentRegionText;
@@ -51,6 +51,9 @@ namespace DinoCleaner.UI
             new Color(0f, 0.69f, 0.31f),
             Color.white,
         };
+
+        [Tooltip("청소 도구를 들었을 때만 보이는 오브젝트 (에임, 도구, 노즐)")]
+        [SerializeField] private GameObject[] cleaningToolOnly;
 
         private Sprite defaultNozzleSprite;
 
@@ -118,7 +121,7 @@ namespace DinoCleaner.UI
         {
             if (progress == null || !progress.IsReady)
             {
-                currentRegionText.text = "현재 부위 : 측정 중";
+                currentRegionText.text = "PART : MEASURING...";
                 regionBar.SetValue(0f);
                 totalBar.SetValue(0f);
                 return;
@@ -129,13 +132,13 @@ namespace DinoCleaner.UI
 
             if (currentRegionIndex < 0)
             {
-                currentRegionText.text = "현재 부위 : -";
+                currentRegionText.text = "PART : -";
                 regionBar.SetValue(0f);
                 return;
             }
 
             RegionProgress region = progress.Regions[currentRegionIndex];
-            currentRegionText.text = $"현재 부위 : {region.DisplayName}";
+            currentRegionText.text = $"PART : {region.DisplayName}";
             regionBar.SetValue(region.Progress);
         }
 
@@ -162,8 +165,16 @@ namespace DinoCleaner.UI
             Color color = GetAt(nozzleColors, levelIndex, Color.white);
             bool isWater = state.Tool == CleaningToolType.Water;
 
-            postureIcon.Set(GetAt(postureSprites, (int)state.Posture, null), $"자세\n{PostureNames[(int)state.Posture]}");
-            toolIcon.Set(isWater ? waterSprite : foamSprite, isWater ? "물" : "거품");
+            postureIcon.Set(GetAt(postureSprites, (int)state.Posture, null), PostureNames[(int)state.Posture]);
+            toolIcon.Set(isWater ? waterSprite : foamSprite, isWater ? "WATER" : "FOAM");
+
+            if (cleaningToolOnly != null)
+            {
+                foreach (GameObject go in cleaningToolOnly)
+                {
+                    if (go != null) go.SetActive(state.IsCleaningToolEquipped);
+                }
+            }
 
             Sprite nozzleSprite = GetAt(nozzleSprites, levelIndex, null);
             nozzleIcon.sprite = nozzleSprite != null ? nozzleSprite : defaultNozzleSprite;
@@ -174,7 +185,7 @@ namespace DinoCleaner.UI
             secondBracket.Set(secondBracketSprite, ")");
             firstBracket.SetColor(color);
             secondBracket.SetColor(color);
-            aimDot.Set(isWater ? waterAimSprite : foamAimSprite, isWater ? "●" : "○");
+            aimDot.Set(isWater ? waterAimSprite : foamAimSprite, isWater ? "+" : "o");
 
             float gap = AimGaps[levelIndex] * (state.Shape == AimShape.Circle ? 1f : EllipseGapScale);
             bool isVertical = state.Shape == AimShape.VerticalEllipse;

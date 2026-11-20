@@ -13,9 +13,8 @@ MonoBehaviour:
   m_Name: Upgrade_FoamWidth
   m_EditorClassIdentifier: DinoCleaner.Core::DinoCleaner.Core.UpgradeData
   _id: foamWidth
-  _displayName: "\uAC70\uD488 \uB108\uBE44"
-  _description: "\uAC70\uD488\uC744 \uD55C \uBC88\uC5D0 \uB354 \uB113\uAC8C \uBFCC\uB9B4
-    \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+  _displayName: Foam Width
+  _description: Spray foam over a wider area at once. (Foam only)
   _startLevel: 1
   _maxLevel: 3
   _costs: 64000000c8000000

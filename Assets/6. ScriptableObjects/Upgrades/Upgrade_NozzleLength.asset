@@ -13,9 +13,8 @@ MonoBehaviour:
   m_Name: Upgrade_NozzleLength
   m_EditorClassIdentifier: DinoCleaner.Core::DinoCleaner.Core.UpgradeData
   _id: nozzleLength
-  _displayName: "\uB178\uC990 \uAE38\uC774"
-  _description: "\uB178\uC990\uC744 \uB354 \uAE38\uAC8C \uB298\uB9B4 \uC218 \uC788\uC5B4\uC11C
-    \uBA40\uB9AC\uC11C \uC3F4\uB3C4 \uC624\uBB3C\uC774 \uC798 \uC9C0\uC6CC\uC9D1\uB2C8\uB2E4."
+  _displayName: Nozzle Length
+  _description: A longer nozzle lets you reach farther. (Water and foam)
   _startLevel: 1
   _maxLevel: 4
   _costs: 64000000c80000002c010000

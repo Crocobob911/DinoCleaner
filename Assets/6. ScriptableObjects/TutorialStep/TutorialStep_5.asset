@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7896a6576ab79e74e8760041cd2b533e, type: 3}
   m_Name: TutorialStep_5
   m_EditorClassIdentifier: DinoCleaner.Tutorial::DinoCleaner.Tutorial.TutorialStepData
-  _message: "Press Ctrl to change your stance. It cycles through Standing \u2192
-    Kneeling \u2192 Prone."
+  _message: Press Ctrl to change your stance. It cycles through STAND > CROUCH > PRONE.
   _inputType: 0
   _keys: 37000000

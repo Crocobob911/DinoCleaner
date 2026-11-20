@@ -19,6 +19,10 @@ namespace DinoCleaner.UI
         private void Awake()
         {
             Instance = this;
+
+            // Stage에서 돌아오면 Player가 숨긴 커서가 그대로 남아 있으므로 다시 보이게 합니다.
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
 
         private void OnDestroy()
