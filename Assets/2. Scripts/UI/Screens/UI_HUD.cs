@@ -52,10 +52,19 @@ namespace DinoCleaner.UI
             Color.white,
         };
 
+        [Header("Nozzle Length")]
+        [Tooltip("노즐 길이 막대. 청소 도구를 들었을 때만 보입니다.")]
+        [SerializeField] private GameObject nozzleLengthRoot;
+        [Tooltip("왼쪽에서 오른쪽 순서 (4칸)")]
+        [SerializeField] private Image[] nozzleLengthSegments;
+        [SerializeField] private Color nozzleLengthFilledColor = new Color(0f, 0.69f, 0.94f);
+        [SerializeField] private Color nozzleLengthEmptyColor = Color.white;
+
         [Tooltip("청소 도구를 들었을 때만 보이는 오브젝트 (에임, 도구, 노즐)")]
         [SerializeField] private GameObject[] cleaningToolOnly;
 
         private Sprite defaultNozzleSprite;
+        private bool hasWarnedNozzleLength;
 
         private readonly List<float> lastRegionProgress = new();
         private ICleanProgress progress;
@@ -181,6 +190,8 @@ namespace DinoCleaner.UI
             nozzleIcon.color = nozzleSprite != null ? Color.white : color;
             nozzleNumberText.text = state.NozzleLevel.ToString();
 
+            RefreshNozzleLength();
+
             firstBracket.Set(firstBracketSprite, "(");
             secondBracket.Set(secondBracketSprite, ")");
             firstBracket.SetColor(color);
@@ -198,6 +209,27 @@ namespace DinoCleaner.UI
             Quaternion rotation = Quaternion.Euler(0f, 0f, isVertical ? -90f : 0f);
             first.localRotation = rotation;
             second.localRotation = rotation;
+        }
+
+        // 왼쪽부터 NozzleLength칸을 채웁니다. 연결이 비어 있으면 그 처리만 건너뛰고 경고는 한 번만 남깁니다.
+        private void RefreshNozzleLength()
+        {
+            bool hasSegments = nozzleLengthSegments != null && nozzleLengthSegments.Length > 0;
+            if ((nozzleLengthRoot == null || !hasSegments) && !hasWarnedNozzleLength)
+            {
+                hasWarnedNozzleLength = true;
+                Debug.LogWarning("[UI_HUD] nozzleLengthRoot 또는 nozzleLengthSegments가 연결되지 않아 노즐 길이 막대를 표시하지 않습니다.", this);
+            }
+
+            if (nozzleLengthRoot != null) nozzleLengthRoot.SetActive(state.IsCleaningToolEquipped);
+            if (!hasSegments) return;
+
+            for (int i = 0; i < nozzleLengthSegments.Length; i++)
+            {
+                Image segment = nozzleLengthSegments[i];
+                if (segment == null) continue;
+                segment.color = i < state.NozzleLength ? nozzleLengthFilledColor : nozzleLengthEmptyColor;
+            }
         }
 
         private static T GetAt<T>(T[] items, int index, T fallback)

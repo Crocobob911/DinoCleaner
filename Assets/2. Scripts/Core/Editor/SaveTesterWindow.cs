@@ -18,6 +18,11 @@ namespace DinoCleaner.Core.Editor
         private string lastResult = "";
         private Vector2 scroll;
 
+        // 진행도 슬롯 테스트 입력값 (게시판 진행도 표시 확인용)
+        private int testSlotStageId = 1;
+        private float testSlotProgress = 0.54f;
+        private float testSlotWashTime = 60f;
+
         // Play 중이 아닐 때 업그레이드 정의·구매 로직을 쓰기 위한 진행 정보.
         // TemporaryGameServices가 실제 구현으로 바뀌면 이 부분만 교체
         private IGameProgress editModeProgress;
@@ -219,6 +224,8 @@ namespace DinoCleaner.Core.Editor
             EditorGUILayout.LabelField("공룡별 진행도 슬롯 (save.json + Dirt/dirt_{ID}.png)", EditorStyles.boldLabel);
             EditorGUILayout.LabelField("저장 기능만 있음. 언제 저장·삭제할지(이어하기)는 스테이지 쪽에서 연결 예정.", EditorStyles.wordWrappedMiniLabel);
 
+            DrawTestSlotInput();
+
             List<StageSlot> slots = SaveSystem.Data.stageSlots;
             if (slots.Count == 0)
             {
@@ -248,6 +255,31 @@ namespace DinoCleaner.Core.Editor
                 foreach (RegionSlot r in slot.regions)
                     EditorGUILayout.LabelField($"      부위 [{r.id}] {r.progress:P0}{(r.completed ? " ✔완료" : "")}");
             }
+        }
+
+        // 플레이 없이 원하는 진행도의 슬롯을 만듦. 같은 stageId 슬롯이 있으면 교체되고 부위 정보는 비워짐
+        private void DrawTestSlotInput()
+        {
+            EditorGUILayout.LabelField("테스트 슬롯 만들기 (부위 정보 없이 전체 진행도·청소 시간만)", EditorStyles.miniBoldLabel);
+            testSlotStageId = EditorGUILayout.IntField("Stage Id", testSlotStageId);
+            testSlotProgress = EditorGUILayout.Slider("진행도", testSlotProgress, 0f, 1f);
+            testSlotWashTime = Mathf.Max(0f, EditorGUILayout.FloatField("청소 시간(초)", testSlotWashTime));
+
+            using (new EditorGUI.DisabledScope(testSlotStageId <= 0))
+            {
+                if (GUILayout.Button("테스트 슬롯 저장"))
+                {
+                    StageSlots.Save(new StageSlot
+                    {
+                        stageId = testSlotStageId,
+                        progress = testSlotProgress,
+                        washTime = testSlotWashTime,
+                    });
+                    lastResult = $"[{testSlotStageId}] 테스트 슬롯 저장: 진행도 {testSlotProgress:P0}, 청소 {testSlotWashTime:F0}초";
+                }
+            }
+            if (testSlotStageId <= 0) EditorGUILayout.HelpBox("Stage Id는 1 이상이어야 합니다.", MessageType.Warning);
+            EditorGUILayout.Space(4);
         }
 
         private void DrawUpgradeSection()

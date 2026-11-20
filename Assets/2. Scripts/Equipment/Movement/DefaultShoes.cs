@@ -10,7 +10,7 @@ namespace DinoCleaner.Equipment
 
         public override Vector3 CalculateMovement(Transform playerTransform, Vector2 moveInput, float elevationInput, bool isGrounded, float deltaTime, Stance stance, bool isSprinting)
         {
-            if (isGrounded && verticalVelocity < 0) 
+            if (isGrounded && verticalVelocity < 0)
                 verticalVelocity = -2f;
 
             if (elevationInput > 0 && isGrounded)
@@ -19,7 +19,7 @@ namespace DinoCleaner.Equipment
             }
 
             float currentSpeed;
-            switch(stance)
+            switch (stance)
             {
                 case Stance.Standing:
                     currentSpeed = stats.walkSpeed;
@@ -34,7 +34,7 @@ namespace DinoCleaner.Equipment
                     currentSpeed = stats.walkSpeed;
                     break;
             }
-            if(isSprinting)
+            if (isSprinting)
             {
                 currentSpeed *= stats.sprintScale;
             }

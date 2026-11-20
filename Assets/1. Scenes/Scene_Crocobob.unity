@@ -390,6 +390,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: DinoCleaner.Tutorial::DinoCleaner.Tutorial.TutorialDataManager
   _tutorialStageId: 1
   _skipKey: 20
+  _stepInterval: 3
 --- !u!4 &1960428611
 Transform:
   m_ObjectHideFlags: 0

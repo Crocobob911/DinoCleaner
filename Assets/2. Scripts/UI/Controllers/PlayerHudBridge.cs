@@ -14,6 +14,7 @@ namespace DinoCleaner.UI
         private bool isFlying;
         private CleaningToolType tool = CleaningToolType.Water;
         private int nozzleLevel = PlayerHudState.MinNozzleLevel;
+        private int nozzleLength = PlayerHudState.MinNozzleLevel;
         private AimShape shape = AimShape.HorizontalEllipse;
         private bool isAimFree;
         private bool isCleaningToolEquipped = true;
@@ -53,6 +54,7 @@ namespace DinoCleaner.UI
             bool isFoam = e.flags == CleanerFlags.Bubble;
             tool = isFoam ? CleaningToolType.Foam : CleaningToolType.Water;
             nozzleLevel = Mathf.Clamp(e.CurrentWidth, PlayerHudState.MinNozzleLevel, PlayerHudState.MaxNozzleLevel);
+            nozzleLength = Mathf.Clamp(e.CurrentLength, PlayerHudState.MinNozzleLevel, PlayerHudState.MaxNozzleLevel);
 
             // 거품은 원형(Sphere)으로 뿌리고, 물은 노즐 방향에 따라 가로 또는 세로로 퍼집니다.
             if (e.castShape == CastShape.Sphere) shape = AimShape.Circle;
@@ -75,7 +77,7 @@ namespace DinoCleaner.UI
 
         private void Publish()
         {
-            var state = new PlayerHudState(ToPosture(), tool, nozzleLevel, shape, isAimFree, isCleaningToolEquipped);
+            var state = new PlayerHudState(ToPosture(), tool, nozzleLevel, shape, isAimFree, isCleaningToolEquipped, nozzleLength);
             EventBus<PlayerHudStateChangedEvent>.Publish(new PlayerHudStateChangedEvent(state));
         }
 

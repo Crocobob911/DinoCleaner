@@ -66,6 +66,15 @@ namespace DinoCleaner.UI
 
         public event Action Changed;
 
+        // EventBus는 static event라 도메인 리로드 없이 Play를 다시 시작하면 이전 인스턴스 구독이 남음. 그걸 끊기 위해 기억
+        private static TemporaryGameServices _subscribedInstance;
+
+        // 중도 포기 저장용 스테이지 상태
+        private ICleanProgress _cleanProgress;
+        private int _currentStageId;
+        private bool _isWashing;
+        private float _washStartTime;
+
         public TemporaryGameServices()
         {
             wallet.Changed += () => Changed?.Invoke();
@@ -92,7 +101,45 @@ namespace DinoCleaner.UI
         {
             if (GameServices.Progress != null) return;
             var services = new TemporaryGameServices();
+            services.SubscribeStageEvents();
             GameServices.Register(services, services);
+        }
+
+        // 런타임 등록 경로에서만 호출. 에디트 모드(SaveTesterWindow)에서 만든 인스턴스는 구독하지 않음
+        private void SubscribeStageEvents()
+        {
+            if (_subscribedInstance != null) _subscribedInstance.UnsubscribeStageEvents();
+
+            EventBus<DinoSpawnedEvent>.Subscribe(OnDinoSpawned);
+            EventBus<StageStateChangedEvent>.Subscribe(OnStageStateChanged);
+            _subscribedInstance = this;
+        }
+
+        private void UnsubscribeStageEvents()
+        {
+            EventBus<DinoSpawnedEvent>.Unsubscribe(OnDinoSpawned);
+            EventBus<StageStateChangedEvent>.Unsubscribe(OnStageStateChanged);
+            if (_subscribedInstance == this) _subscribedInstance = null;
+        }
+
+        private void OnDinoSpawned(DinoSpawnedEvent e)
+        {
+            _cleanProgress = e.Progress;
+            StageDefinition stage = GameSession.CurrentStage;
+            _currentStageId = stage != null ? stage.stageId : 0;
+        }
+
+        private void OnStageStateChanged(StageStateChangedEvent e)
+        {
+            if (e.To == StageState.Washing)
+            {
+                _washStartTime = Time.time;
+                _isWashing = true;
+            }
+            else
+            {
+                _isWashing = false;
+            }
         }
 
         public void AddMoney(int amount)
@@ -142,6 +189,7 @@ namespace DinoCleaner.UI
                 Debug.LogWarning($"[TemporaryGameServices] stageId가 {stageId}라 클리어를 기록하지 않습니다. StageDefinition의 Stage Id를 지정하세요.");
                 return;
             }
+            StageSlots.Delete(stageId); // 클리어하면 이어하기 슬롯 삭제 (재클리어 포함)
             if (!SaveSystem.Data.MarkStageCleared(stageId)) return; // 이미 클리어한 스테이지
 
             SaveSystem.Save();
@@ -150,9 +198,34 @@ namespace DinoCleaner.UI
 
         public bool TryGetStageProgress(int stageId, out float progress) => StageSlots.TryGetProgress(stageId, out progress);
 
+        /// <summary>세차 중인 공룡의 진행도를 슬롯에 저장합니다. 세차 중이 아니거나 진행도를 읽을 수 없으면 기존 슬롯을 그대로 둡니다.</summary>
         public void SaveCleaningProgress()
         {
-            Debug.Log("[TemporaryGameServices] 저장 시스템 연결 전이라 실제로 저장하지 않습니다.");
+            ICleanProgress progress = _cleanProgress;
+            // 씬 전환으로 파괴된 컴포넌트는 C# 참조가 남아도 Unity 기준 null
+            if (progress is UnityEngine.Object unityObject && unityObject == null) progress = null;
+
+            if (!_isWashing || _currentStageId <= 0 || progress == null || !progress.IsReady) return;
+
+            var slot = new StageSlot
+            {
+                stageId = _currentStageId,
+                progress = progress.TotalProgress,
+                washTime = Time.time - _washStartTime,
+            };
+            foreach (RegionProgress region in progress.Regions)
+            {
+                slot.regions.Add(new RegionSlot
+                {
+                    id = region.RegionId,
+                    progress = region.Progress,
+                    completed = region.IsCompleted,
+                });
+            }
+
+            StageSlots.Save(slot);
+            Changed?.Invoke();
+            Debug.Log($"[TemporaryGameServices] 슬롯 저장: stageId={slot.stageId}, progress={slot.progress:P0}, regions={slot.regions.Count}");
         }
     }
 }

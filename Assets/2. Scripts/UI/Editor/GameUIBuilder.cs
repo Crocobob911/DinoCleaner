@@ -28,6 +28,7 @@ namespace DinoCleaner.UI.Editor
         private const string HomeScenePath = "Assets/1. Scenes/동우/Home.unity";
         private const string StageScenePath = "Assets/1. Scenes/동우/Stage.unity";
         private const string PlayerPrefabPath = "Assets/3. Prefabs/Player.prefab";
+        private const string CreditsPrefabPath = "Assets/5. UI/Credits/UI_Credits.prefab";
         private const string AddressableGroupName = "UI";
 
         // 씬을 다시 구성할 때 지우는 오브젝트. 기존 임시 UI(Dev~)도 포함합니다.
@@ -105,6 +106,7 @@ namespace DinoCleaner.UI.Editor
             private const string CustomDir = "Assets/5. UI/Sprite/Custom/";
             private const string BodyFontPath = "Assets/5. UI/Font/Luckiest_Guy/LuckiestGuy-Regular.ttf";
             private const string LogoFontPath = "Assets/5. UI/Font/stone-age-font/StoneAge-8MPD.ttf";
+            public const string LogoImagePath = CustomDir + "DinoCleaner_Logo.png";
 
             // 9-slice 경계 (왼쪽, 아래, 오른쪽, 위). Kenney 이미지의 모서리와 그림자 두께에 맞춘 값입니다.
             private static readonly Vector4 PanelBorder = new Vector4(10, 10, 10, 10);
@@ -119,9 +121,11 @@ namespace DinoCleaner.UI.Editor
             public static readonly Color TextLight = new Color(0.98f, 0.94f, 0.85f);
             public static readonly Color SelectedColor = new Color(1f, 0.78f, 0.1f);
             public static readonly Color LogoColor = new Color(1f, 0.86f, 0.45f);
+            public static readonly Color ProgressBadgeColor = new Color(0.35f, 0.65f, 1f); // 회색 원 Sprite에 곱해 파란 배지로 만듦
 
             public static Font BodyFont;
             public static Font LogoFont;
+            public static Sprite LogoImage;   // 로비 로고. 없으면 LogoFont 글자 로고를 씁니다.
 
             public static Sprite Window;      // 창, 패널
             public static Sprite Card;        // 카드
@@ -194,6 +198,8 @@ namespace DinoCleaner.UI.Editor
                 IconFoamAim = Round;
                 AimBracketLeft = LoadSprite(CustomDir + "aim_bracket_left.png");
                 AimBracketRight = LoadSprite(CustomDir + "aim_bracket_right.png");
+                // 로고는 담당자가 정한 가져오기 설정을 유지하도록 LoadSprite를 거치지 않고 그대로 불러옵니다.
+                LogoImage = AssetDatabase.LoadAssetAtPath<Sprite>(LogoImagePath);
 
                 // DefaultControls: 슬라이더 배경·스크롤바 배경 = background, 슬라이더 Fill·스크롤바 손잡이 = standard, 슬라이더 손잡이 = knob
                 ControlResources = new DefaultControls.Resources
@@ -260,9 +266,21 @@ namespace DinoCleaner.UI.Editor
             // 로비 뒤는 3D 배경이 보이므로, 버튼 뒤에만 나무판을 둬 글자가 잘 보이게 합니다.
             AddPanel(root, "MenuBoard", new Vector2(0, -105), new Vector2(640, 590), Theme.Board).pixelsPerUnitMultiplier = 0.3f;
 
-            var logo = AddText(root, "LogoText", "DinoCleaner", 150, new Vector2(0, 300), new Vector2(1400, 260), Theme.LogoColor);
-            logo.font = Theme.LogoFont;
-            AddShadow(logo.gameObject, new Vector2(6, -6));
+            if (Theme.LogoImage != null)
+            {
+                var logoImage = CreateChild(root, "LogoImage");
+                var logoRect = (RectTransform)logoImage.transform;
+                logoRect.anchoredPosition = new Vector2(8.75f, 298f);
+                logoRect.sizeDelta = new Vector2(755.73f, 508.9f);
+                logoImage.AddComponent<Image>().sprite = Theme.LogoImage;
+            }
+            else
+            {
+                Debug.LogWarning($"[GameUI] 로고 이미지를 찾지 못해 글자 로고를 씁니다: {Theme.LogoImagePath}");
+                var logo = AddText(root, "LogoText", "DinoCleaner", 150, new Vector2(0, 300), new Vector2(1400, 260), Theme.LogoColor);
+                logo.font = Theme.LogoFont;
+                AddShadow(logo.gameObject, new Vector2(6, -6));
+            }
 
             var request = AddButton(root, "Btn_Request", "REQUESTS", new Vector2(0, 90), new Vector2(520, 110), ButtonStyle.Brown, Theme.IconRequest);
             var shop = AddButton(root, "Btn_Shop", "SHOP", new Vector2(0, -40), new Vector2(520, 110), ButtonStyle.Brown, Theme.IconShop);
@@ -271,6 +289,15 @@ namespace DinoCleaner.UI.Editor
 
             Bind(root.AddComponent<UI_Lobby>(),
                 ("requestButton", request), ("shopButton", shop), ("settingsButton", settings), ("quitButton", quit));
+
+            // 크레딧은 UI_Lobby와 따로 UI_CreditsLauncher가 띄웁니다. 오른쪽 아래 구석(여백 40)에 둡니다.
+            var credits = AddButton(root, "Btn_Credits", "CREDITS", new Vector2(740, -450), new Vector2(360, 100), ButtonStyle.Brown);
+            var creditsPrefab = AssetDatabase.LoadAssetAtPath<UI_CreditsScreen>(CreditsPrefabPath);
+            if (creditsPrefab == null)
+            {
+                Debug.LogWarning($"[GameUI] 크레딧 프리팹이 없습니다. DinoCleaner/UI/Build Credits Prefab을 먼저 실행하세요: {CreditsPrefabPath}");
+            }
+            Bind(credits.gameObject.AddComponent<UI_CreditsLauncher>(), ("_button", credits), ("_creditsPrefab", creditsPrefab));
             return root;
         }
 
@@ -317,10 +344,22 @@ namespace DinoCleaner.UI.Editor
             var nameText = AddText(cardGo, "Name", "Dino", 40, new Vector2(0, -210), new Vector2(420, 90));
             nameText.raycastTarget = false;
 
+            var lockSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/5. UI/Sprite/kenney_game-icons/PNG/White/2x/locked.png");
+            var lockIcon = AddIcon(cardGo, "LockIcon", lockSprite, Vector2.zero, new Vector2(160, 160), Color.white).gameObject;
+            lockIcon.SetActive(false);
+
+            // 중도 포기한 공룡의 진행도 배지 (카드 오른쪽 위)
+            var progressBadge = AddIcon(cardGo, "ProgressBadge", Theme.Round, new Vector2(200, 260), new Vector2(120, 120), Theme.ProgressBadgeColor).gameObject;
+            var progressText = AddText(progressBadge, "ProgressText", "0%", 36, Vector2.zero, new Vector2(100, 60), Theme.TextLight);
+            progressText.raycastTarget = false;
+            AddShadow(progressText.gameObject, new Vector2(2, -2));
+            progressBadge.SetActive(false);
+
             AddHoverLift(cardGo, 16f, 1.03f);
 
             var card = cardGo.AddComponent<UI_RequestCard>();
-            Bind(card, ("button", button), ("dinoImage", dinoImage), ("imagePlaceholderText", placeholder), ("nameText", nameText));
+            Bind(card, ("button", button), ("dinoImage", dinoImage), ("imagePlaceholderText", placeholder), ("nameText", nameText),
+                ("lockIcon", lockIcon), ("progressBadge", progressBadge), ("progressText", progressText));
             cardGo.SetActive(false);
             return card;
         }
@@ -340,10 +379,14 @@ namespace DinoCleaner.UI.Editor
             description.alignment = TextAnchor.UpperLeft;
             description.resizeTextForBestFit = false;
             var start = AddButton(panel, "Btn_Start", "START CLEANING", new Vector2(470, -320), new Vector2(460, 120), ButtonStyle.Brown);
+            // 중도 포기한 공룡의 전체 진행도 (청소 시작 버튼 왼쪽)
+            var progressText = AddText(panel, "ProgressText", "0%", 54, new Vector2(140, -320), new Vector2(180, 100));
+            progressText.gameObject.SetActive(false);
 
             Bind(root.AddComponent<UI_RequestDetail>(),
                 ("backButton", back), ("startButton", start), ("dinoImage", dinoImage),
-                ("imagePlaceholderText", placeholder), ("nameText", nameText), ("descriptionText", description));
+                ("imagePlaceholderText", placeholder), ("nameText", nameText), ("descriptionText", description),
+                ("progressText", progressText));
             return root;
         }
 
@@ -458,6 +501,25 @@ namespace DinoCleaner.UI.Editor
             nozzleIcon.preserveAspect = true;
             var nozzleNumber = AddText(nozzle, "Number", "1", 56, new Vector2(0, 4), new Vector2(120, 120));
 
+            // 노즐 길이 막대. 자세 패널 왼쪽 끝(-490)부터 노즐 오른쪽 끝(-30)까지 덮고, 버튼 위(y=180)에서 20px 띄웁니다.
+            const float lengthBarWidth = 460f;
+            const float lengthBarHeight = 24f;
+            const float lengthSegmentGap = 4f;
+            const int lengthSegmentCount = 4;
+            var lengthBar = CreateChild(root, "NozzleLengthBar");
+            Anchor(lengthBar, new Vector2(1, 0), new Vector2(1, 0), new Vector2(-30, 200), new Vector2(lengthBarWidth, lengthBarHeight));
+            float segmentWidth = (lengthBarWidth - lengthSegmentGap * (lengthSegmentCount - 1)) / lengthSegmentCount;
+            var lengthSegments = new Object[lengthSegmentCount];
+            for (int i = 0; i < lengthSegmentCount; i++)
+            {
+                var segmentGo = CreateChild(lengthBar, $"Segment{i + 1}");
+                Anchor(segmentGo, new Vector2(0, 0), new Vector2(0, 0), new Vector2(i * (segmentWidth + lengthSegmentGap), 0),
+                    new Vector2(segmentWidth, lengthBarHeight));
+                var segment = AddImage(segmentGo, i == 0 ? new Color(0f, 0.69f, 0.94f) : Color.white);
+                segment.raycastTarget = false;
+                lengthSegments[i] = segment;
+            }
+
             foreach (var graphic in root.GetComponentsInChildren<Graphic>(true)) graphic.raycastTarget = false;
 
             var hud = root.AddComponent<UI_HUD>();
@@ -467,8 +529,10 @@ namespace DinoCleaner.UI.Editor
                 ("firstBracketSprite", Theme.AimBracketLeft), ("secondBracketSprite", Theme.AimBracketRight),
                 ("aimDot", dot), ("waterAimSprite", Theme.IconWaterAim), ("foamAimSprite", Theme.IconFoamAim),
                 ("postureIcon", posture), ("toolIcon", tool),
-                ("nozzleIcon", nozzleIcon), ("nozzleNumberText", nozzleNumber));
+                ("nozzleIcon", nozzleIcon), ("nozzleNumberText", nozzleNumber),
+                ("nozzleLengthRoot", lengthBar));
             BindArray(hud, "cleaningToolOnly", aim, toolPanel, nozzle);
+            BindArray(hud, "nozzleLengthSegments", lengthSegments);
             return root;
         }
 
