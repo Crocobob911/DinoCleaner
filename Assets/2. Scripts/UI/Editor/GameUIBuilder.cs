@@ -475,6 +475,25 @@ namespace DinoCleaner.UI.Editor
             nozzleIcon.preserveAspect = true;
             var nozzleNumber = AddText(nozzle, "Number", "1", 56, new Vector2(0, 4), new Vector2(120, 120));
 
+            // 노즐 길이 막대. 자세 패널 왼쪽 끝(-490)부터 노즐 오른쪽 끝(-30)까지 덮고, 버튼 위(y=180)에서 20px 띄웁니다.
+            const float lengthBarWidth = 460f;
+            const float lengthBarHeight = 24f;
+            const float lengthSegmentGap = 4f;
+            const int lengthSegmentCount = 4;
+            var lengthBar = CreateChild(root, "NozzleLengthBar");
+            Anchor(lengthBar, new Vector2(1, 0), new Vector2(1, 0), new Vector2(-30, 200), new Vector2(lengthBarWidth, lengthBarHeight));
+            float segmentWidth = (lengthBarWidth - lengthSegmentGap * (lengthSegmentCount - 1)) / lengthSegmentCount;
+            var lengthSegments = new Object[lengthSegmentCount];
+            for (int i = 0; i < lengthSegmentCount; i++)
+            {
+                var segmentGo = CreateChild(lengthBar, $"Segment{i + 1}");
+                Anchor(segmentGo, new Vector2(0, 0), new Vector2(0, 0), new Vector2(i * (segmentWidth + lengthSegmentGap), 0),
+                    new Vector2(segmentWidth, lengthBarHeight));
+                var segment = AddImage(segmentGo, i == 0 ? new Color(0f, 0.69f, 0.94f) : Color.white);
+                segment.raycastTarget = false;
+                lengthSegments[i] = segment;
+            }
+
             foreach (var graphic in root.GetComponentsInChildren<Graphic>(true)) graphic.raycastTarget = false;
 
             var hud = root.AddComponent<UI_HUD>();
@@ -484,8 +503,10 @@ namespace DinoCleaner.UI.Editor
                 ("firstBracketSprite", Theme.AimBracketLeft), ("secondBracketSprite", Theme.AimBracketRight),
                 ("aimDot", dot), ("waterAimSprite", Theme.IconWaterAim), ("foamAimSprite", Theme.IconFoamAim),
                 ("postureIcon", posture), ("toolIcon", tool),
-                ("nozzleIcon", nozzleIcon), ("nozzleNumberText", nozzleNumber));
+                ("nozzleIcon", nozzleIcon), ("nozzleNumberText", nozzleNumber),
+                ("nozzleLengthRoot", lengthBar));
             BindArray(hud, "cleaningToolOnly", aim, toolPanel, nozzle);
+            BindArray(hud, "nozzleLengthSegments", lengthSegments);
             return root;
         }
 
