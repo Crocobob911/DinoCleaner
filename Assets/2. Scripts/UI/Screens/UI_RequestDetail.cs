@@ -17,6 +17,7 @@ namespace DinoCleaner.UI
         [SerializeField] private Text imagePlaceholderText;
         [SerializeField] private Text nameText;
         [SerializeField] private Text descriptionText;
+        [SerializeField] private Text progressText;
 
         private StageDefinition stage;
 
@@ -31,6 +32,18 @@ namespace DinoCleaner.UI
             placeholder.gameObject.SetActive(!hasImage);
         }
 
+        /// <summary>
+        /// 중도 포기로 저장된 진행도가 있으면 "N%"로 표시하고, 없으면 숨깁니다. 연결되지 않은 칸은 건너뜁니다.
+        /// </summary>
+        public static void ApplyProgress(StageDefinition stage, GameObject root, Text text)
+        {
+            bool hasProgress = GameServices.Progress.TryGetStageProgress(stage.stageId, out float progress);
+            if (text != null && hasProgress) text.text = $"{Mathf.FloorToInt(progress * 100f)}%";
+
+            GameObject target = root != null ? root : text != null ? text.gameObject : null;
+            if (target != null) target.SetActive(hasProgress);
+        }
+
         private void Awake()
         {
             backButton.onClick.AddListener(OnClickBack);
@@ -43,6 +56,7 @@ namespace DinoCleaner.UI
             nameText.text = data.displayName;
             descriptionText.text = string.IsNullOrEmpty(data.description) ? EmptyDescription : data.description;
             ApplyImage(data, dinoImage, imagePlaceholderText);
+            ApplyProgress(data, null, progressText);
         }
 
         private void OnClickBack()

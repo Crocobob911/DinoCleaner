@@ -119,6 +119,7 @@ namespace DinoCleaner.UI.Editor
             public static readonly Color TextLight = new Color(0.98f, 0.94f, 0.85f);
             public static readonly Color SelectedColor = new Color(1f, 0.78f, 0.1f);
             public static readonly Color LogoColor = new Color(1f, 0.86f, 0.45f);
+            public static readonly Color ProgressBadgeColor = new Color(0.35f, 0.65f, 1f); // 회색 원 Sprite에 곱해 파란 배지로 만듦
 
             public static Font BodyFont;
             public static Font LogoFont;
@@ -321,11 +322,18 @@ namespace DinoCleaner.UI.Editor
             var lockIcon = AddIcon(cardGo, "LockIcon", lockSprite, Vector2.zero, new Vector2(160, 160), Color.white).gameObject;
             lockIcon.SetActive(false);
 
+            // 중도 포기한 공룡의 진행도 배지 (카드 오른쪽 위)
+            var progressBadge = AddIcon(cardGo, "ProgressBadge", Theme.Round, new Vector2(200, 260), new Vector2(120, 120), Theme.ProgressBadgeColor).gameObject;
+            var progressText = AddText(progressBadge, "ProgressText", "0%", 36, Vector2.zero, new Vector2(100, 60), Theme.TextLight);
+            progressText.raycastTarget = false;
+            AddShadow(progressText.gameObject, new Vector2(2, -2));
+            progressBadge.SetActive(false);
+
             AddHoverLift(cardGo, 16f, 1.03f);
 
             var card = cardGo.AddComponent<UI_RequestCard>();
             Bind(card, ("button", button), ("dinoImage", dinoImage), ("imagePlaceholderText", placeholder), ("nameText", nameText),
-                ("lockIcon", lockIcon));
+                ("lockIcon", lockIcon), ("progressBadge", progressBadge), ("progressText", progressText));
             cardGo.SetActive(false);
             return card;
         }
@@ -345,10 +353,14 @@ namespace DinoCleaner.UI.Editor
             description.alignment = TextAnchor.UpperLeft;
             description.resizeTextForBestFit = false;
             var start = AddButton(panel, "Btn_Start", "START CLEANING", new Vector2(470, -320), new Vector2(460, 120), ButtonStyle.Brown);
+            // 중도 포기한 공룡의 전체 진행도 (청소 시작 버튼 왼쪽)
+            var progressText = AddText(panel, "ProgressText", "0%", 54, new Vector2(140, -320), new Vector2(180, 100));
+            progressText.gameObject.SetActive(false);
 
             Bind(root.AddComponent<UI_RequestDetail>(),
                 ("backButton", back), ("startButton", start), ("dinoImage", dinoImage),
-                ("imagePlaceholderText", placeholder), ("nameText", nameText), ("descriptionText", description));
+                ("imagePlaceholderText", placeholder), ("nameText", nameText), ("descriptionText", description),
+                ("progressText", progressText));
             return root;
         }
 

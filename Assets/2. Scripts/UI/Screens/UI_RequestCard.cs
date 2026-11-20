@@ -15,6 +15,8 @@ namespace DinoCleaner.UI
         [SerializeField] private Text imagePlaceholderText;
         [SerializeField] private Text nameText;
         [SerializeField] private GameObject lockIcon;
+        [SerializeField] private GameObject progressBadge;
+        [SerializeField] private Text progressText;
 
         private const float LockedDarkness = 0.35f;
 
@@ -27,6 +29,7 @@ namespace DinoCleaner.UI
         {
             nameText.text = stage.displayName;
             UI_RequestDetail.ApplyImage(stage, dinoImage, imagePlaceholderText);
+            UI_RequestDetail.ApplyProgress(stage, progressBadge, progressText);
 
             bool isUnlocked = StageUnlockRules.IsUnlocked(stage.stageId, GameServices.Progress);
 
