@@ -28,6 +28,7 @@ namespace DinoCleaner.UI.Editor
         private const string HomeScenePath = "Assets/1. Scenes/동우/Home.unity";
         private const string StageScenePath = "Assets/1. Scenes/동우/Stage.unity";
         private const string PlayerPrefabPath = "Assets/3. Prefabs/Player.prefab";
+        private const string CreditsPrefabPath = "Assets/5. UI/Credits/UI_Credits.prefab";
         private const string AddressableGroupName = "UI";
 
         // 씬을 다시 구성할 때 지우는 오브젝트. 기존 임시 UI(Dev~)도 포함합니다.
@@ -105,6 +106,7 @@ namespace DinoCleaner.UI.Editor
             private const string CustomDir = "Assets/5. UI/Sprite/Custom/";
             private const string BodyFontPath = "Assets/5. UI/Font/Luckiest_Guy/LuckiestGuy-Regular.ttf";
             private const string LogoFontPath = "Assets/5. UI/Font/stone-age-font/StoneAge-8MPD.ttf";
+            public const string LogoImagePath = CustomDir + "DinoCleaner_Logo.png";
 
             // 9-slice 경계 (왼쪽, 아래, 오른쪽, 위). Kenney 이미지의 모서리와 그림자 두께에 맞춘 값입니다.
             private static readonly Vector4 PanelBorder = new Vector4(10, 10, 10, 10);
@@ -123,6 +125,7 @@ namespace DinoCleaner.UI.Editor
 
             public static Font BodyFont;
             public static Font LogoFont;
+            public static Sprite LogoImage;   // 로비 로고. 없으면 LogoFont 글자 로고를 씁니다.
 
             public static Sprite Window;      // 창, 패널
             public static Sprite Card;        // 카드
@@ -195,6 +198,8 @@ namespace DinoCleaner.UI.Editor
                 IconFoamAim = Round;
                 AimBracketLeft = LoadSprite(CustomDir + "aim_bracket_left.png");
                 AimBracketRight = LoadSprite(CustomDir + "aim_bracket_right.png");
+                // 로고는 담당자가 정한 가져오기 설정을 유지하도록 LoadSprite를 거치지 않고 그대로 불러옵니다.
+                LogoImage = AssetDatabase.LoadAssetAtPath<Sprite>(LogoImagePath);
 
                 // DefaultControls: 슬라이더 배경·스크롤바 배경 = background, 슬라이더 Fill·스크롤바 손잡이 = standard, 슬라이더 손잡이 = knob
                 ControlResources = new DefaultControls.Resources
@@ -261,9 +266,21 @@ namespace DinoCleaner.UI.Editor
             // 로비 뒤는 3D 배경이 보이므로, 버튼 뒤에만 나무판을 둬 글자가 잘 보이게 합니다.
             AddPanel(root, "MenuBoard", new Vector2(0, -105), new Vector2(640, 590), Theme.Board).pixelsPerUnitMultiplier = 0.3f;
 
-            var logo = AddText(root, "LogoText", "DinoCleaner", 150, new Vector2(0, 300), new Vector2(1400, 260), Theme.LogoColor);
-            logo.font = Theme.LogoFont;
-            AddShadow(logo.gameObject, new Vector2(6, -6));
+            if (Theme.LogoImage != null)
+            {
+                var logoImage = CreateChild(root, "LogoImage");
+                var logoRect = (RectTransform)logoImage.transform;
+                logoRect.anchoredPosition = new Vector2(8.75f, 298f);
+                logoRect.sizeDelta = new Vector2(755.73f, 508.9f);
+                logoImage.AddComponent<Image>().sprite = Theme.LogoImage;
+            }
+            else
+            {
+                Debug.LogWarning($"[GameUI] 로고 이미지를 찾지 못해 글자 로고를 씁니다: {Theme.LogoImagePath}");
+                var logo = AddText(root, "LogoText", "DinoCleaner", 150, new Vector2(0, 300), new Vector2(1400, 260), Theme.LogoColor);
+                logo.font = Theme.LogoFont;
+                AddShadow(logo.gameObject, new Vector2(6, -6));
+            }
 
             var request = AddButton(root, "Btn_Request", "REQUESTS", new Vector2(0, 90), new Vector2(520, 110), ButtonStyle.Brown, Theme.IconRequest);
             var shop = AddButton(root, "Btn_Shop", "SHOP", new Vector2(0, -40), new Vector2(520, 110), ButtonStyle.Brown, Theme.IconShop);
@@ -272,6 +289,15 @@ namespace DinoCleaner.UI.Editor
 
             Bind(root.AddComponent<UI_Lobby>(),
                 ("requestButton", request), ("shopButton", shop), ("settingsButton", settings), ("quitButton", quit));
+
+            // 크레딧은 UI_Lobby와 따로 UI_CreditsLauncher가 띄웁니다. 오른쪽 아래 구석(여백 40)에 둡니다.
+            var credits = AddButton(root, "Btn_Credits", "CREDITS", new Vector2(740, -450), new Vector2(360, 100), ButtonStyle.Brown);
+            var creditsPrefab = AssetDatabase.LoadAssetAtPath<UI_CreditsScreen>(CreditsPrefabPath);
+            if (creditsPrefab == null)
+            {
+                Debug.LogWarning($"[GameUI] 크레딧 프리팹이 없습니다. DinoCleaner/UI/Build Credits Prefab을 먼저 실행하세요: {CreditsPrefabPath}");
+            }
+            Bind(credits.gameObject.AddComponent<UI_CreditsLauncher>(), ("_button", credits), ("_creditsPrefab", creditsPrefab));
             return root;
         }
 
