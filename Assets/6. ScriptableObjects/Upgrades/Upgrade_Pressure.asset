@@ -13,9 +13,8 @@ MonoBehaviour:
   m_Name: Upgrade_Pressure
   m_EditorClassIdentifier: DinoCleaner.Core::DinoCleaner.Core.UpgradeData
   _id: pressure
-  _displayName: "\uC218\uC555"
-  _description: "\uC218\uC555\uC774 \uB354 \uAC15\uD574\uC838\uC11C \uC624\uBB3C\uC774
-    \uB354 \uC798 \uC9C0\uC6CC\uC9D1\uB2C8\uB2E4."
+  _displayName: Pressure
+  _description: Stronger water pressure washes dirt off faster. (Water only)
   _startLevel: 1
   _maxLevel: 3
   _costs: 64000000c8000000

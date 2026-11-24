@@ -13,9 +13,8 @@ MonoBehaviour:
   m_Name: Upgrade_FairyDino
   m_EditorClassIdentifier: DinoCleaner.Core::DinoCleaner.Core.UpgradeData
   _id: fairyDino
-  _displayName: "\uC694\uC815 \uACF5\uB8E1"
-  _description: "\uC694\uC815 \uACF5\uB8E1\uC758 \uB3C4\uC6C0\uC73C\uB85C \uB0A0\uC544\uB2E4\uB2D0
-    \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+  _displayName: Fairy Dino
+  _description: A fairy dino helps you fly. Jump, then press Space again in the air.
   _startLevel: 0
   _maxLevel: 1
   _costs: f4010000

@@ -54,11 +54,11 @@ namespace DinoCleaner.Player
         }
 
 
-        public void UseCurrentTool()
+        public void UseCurrentTool(Vector3 currentAimPoint)
         {
             if (currentTool != null && firePoint != null)
             {
-                currentTool.UseTool(firePoint);
+                currentTool.UseTool(firePoint, currentAimPoint);
             }
             else
             {

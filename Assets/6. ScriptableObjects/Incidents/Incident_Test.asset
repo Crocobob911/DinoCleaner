@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e9a3f694c46bf1d42b79a49971cef5de, type: 3}
-  m_Name: IncidentDefinition
+  m_Name: Incident_Test
   m_EditorClassIdentifier: DinoCleaner.Core::DinoCleaner.Core.IncidentDefinition
   displayName: Incident
   warning: '!WARNING!'

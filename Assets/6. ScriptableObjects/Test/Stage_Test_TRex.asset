@@ -10,19 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa124abcd824c5f40b423de42f8252aa, type: 3}
-  m_Name: Stage_1
+  m_Name: Stage_Test_TRex
   m_EditorClassIdentifier: DinoCleaner.Core::DinoCleaner.Core.StageDefinition
-  stageId: 1
-  displayName: Stage 1
+  stageId: 0
+  displayName: Stage 2
   cardImage: {fileID: 0}
   description: 
-  dinoPrefab: {fileID: 2292835161945820159, guid: 6d9278c8df47b3d4ba80520ee6a1148c, type: 3}
+  dinoPrefab: {fileID: 5518630468571480890, guid: 27843cd3c5c4782428ee115dfea04b79, type: 3}
   completeThreshold: 0.95
   autoFinishOnComplete: 1
   minSuccessProgress: 0.7
   timeLimit: 0
   incidents:
   - {fileID: 11400000, guid: a33801bcd9282884fb40fbdfdcb6699e, type: 2}
-  - {fileID: 11400000, guid: a33801bcd9282884fb40fbdfdcb6699e, type: 2}
-  incidentInterval: {x: 5, y: 8}
+  incidentInterval: {x: 20, y: 40}
   baseReward: 100

@@ -1,0 +1,286 @@
+{
+  "gameTitle": "DinoCleaner",
+  "licenses": [
+    {
+      "id": "CC0",
+      "displayName": "CC0 1.0",
+      "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attributionRequired": false,
+      "shareTextFileRequired": false
+    },
+    {
+      "id": "CC-BY-4.0",
+      "displayName": "CC BY 4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/",
+      "attributionRequired": true,
+      "shareTextFileRequired": false
+    },
+    {
+      "id": "CC-BY-NC-4.0",
+      "displayName": "CC BY-NC 4.0",
+      "url": "https://creativecommons.org/licenses/by-nc/4.0/",
+      "attributionRequired": true,
+      "shareTextFileRequired": false
+    },
+    {
+      "id": "OFL-1.1",
+      "displayName": "SIL Open Font License 1.1",
+      "url": "https://openfontlicense.org",
+      "attributionRequired": false,
+      "shareTextFileRequired": true
+    },
+    {
+      "id": "Apache-2.0",
+      "displayName": "Apache License 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0",
+      "attributionRequired": false,
+      "shareTextFileRequired": true
+    },
+    {
+      "id": "Freeware",
+      "displayName": "Freeware",
+      "url": "",
+      "attributionRequired": true,
+      "shareTextFileRequired": true
+    },
+    {
+      "id": "Unity-EULA",
+      "displayName": "Unity Asset Store EULA",
+      "url": "https://unity.com/legal/as-terms",
+      "attributionRequired": false,
+      "shareTextFileRequired": false
+    },
+    {
+      "id": "Unity-Companion",
+      "displayName": "Unity Companion License",
+      "url": "https://unity.com/legal/licenses/unity-companion-license",
+      "attributionRequired": false,
+      "shareTextFileRequired": false
+    }
+  ],
+  "sections": [
+    {
+      "id": "team",
+      "title": "Team 02",
+      "type": "people",
+      "entries": [
+        {
+          "name": "김명준",
+          "roles": [
+            "Game Design",
+            "Project Management",
+            "Save System"
+          ]
+        },
+        {
+          "name": "김영준",
+          "roles": [
+            "Core",
+            "Cleaning",
+            "Stage",
+            "Scene Integration"
+          ]
+        },
+        {
+          "name": "고성현",
+          "roles": [
+            "Player",
+            "VFX"
+          ]
+        },
+        {
+          "name": "김동우",
+          "roles": [
+            "UI",
+            "SFX",
+            "QA"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "course",
+      "title": "Made For",
+      "type": "text",
+      "lines": [
+        "Computer Game Design (Fall 2026)",
+        "Chung-Ang University"
+      ]
+    },
+    {
+      "id": "models",
+      "title": "3D Models",
+      "type": "assets",
+      "entries": [
+        {
+          "title": "STEGO",
+          "author": "seth the yutyrannus",
+          "sourceUrl": "https://sketchfab.com/3d-models/stego-b07eb05fa95c413bb928eb2ffbdc9523",
+          "licenseId": "CC-BY-4.0",
+          "modification": "",
+          "usedFor": "Stegosaurus"
+        },
+        {
+          "title": "T-REX",
+          "author": "seth the yutyrannus",
+          "sourceUrl": "https://sketchfab.com/3d-models/t-rex-15d380651e0b4cc394ffa308d30e625e",
+          "licenseId": "CC-BY-4.0",
+          "modification": "materials rebuilt for Unity URP",
+          "usedFor": "Tyrannosaurus"
+        },
+        {
+          "title": "Brachiosaurus_AR card",
+          "author": "Zinaida.Kovrova",
+          "sourceUrl": "https://sketchfab.com/3d-models/brachiosaurus-ar-card-751b32784e1a4ddd9c95aa88d7640ab7",
+          "licenseId": "CC-BY-4.0",
+          "modification": "",
+          "usedFor": "Brachiosaurus"
+        },
+        {
+          "title": "Cave Man Creation Variant 1",
+          "author": "Johannes Nienaber Creations",
+          "sourceUrl": "https://sketchfab.com/3d-models/cave-man-creation-variant-1-f50cd8a0b9b84de0bcd851e17923724a",
+          "licenseId": "CC-BY-4.0",
+          "modification": "materials rebuilt for Unity URP",
+          "usedFor": "Player character"
+        },
+        {
+          "title": "Home village. Future, fantasy/rural",
+          "author": "TheFrostyOne",
+          "sourceUrl": "https://sketchfab.com/3d-models/home-village-future-fantasyrural-b25bbdad8f46477db0ff1aa5ea6ffe9d",
+          "licenseId": "CC-BY-4.0",
+          "modification": "materials rebuilt for Unity URP",
+          "usedFor": "Village"
+        },
+        {
+          "title": "Mountain - Stylized Fantasy",
+          "author": "Holotna",
+          "sourceUrl": "",
+          "licenseId": "Unity-EULA",
+          "modification": "",
+          "usedFor": "Background environment"
+        },
+        {
+          "title": "Low Poly Gun Pack 1",
+          "author": "Limitless",
+          "sourceUrl": "",
+          "licenseId": "Unity-EULA",
+          "modification": "",
+          "usedFor": "Equipment model"
+        }
+      ]
+    },
+    {
+      "id": "music",
+      "title": "Music",
+      "type": "assets",
+      "entries": []
+    },
+    {
+      "id": "sfx",
+      "title": "Sound Effects",
+      "type": "assets",
+      "entries": []
+    },
+    {
+      "id": "vfx",
+      "title": "Visual Effects",
+      "type": "assets",
+      "entries": [
+        {
+          "title": "Particle Pack",
+          "author": "Unity Technologies",
+          "sourceUrl": "",
+          "licenseId": "Unity-Companion",
+          "modification": "",
+          "usedFor": "Particle effects"
+        },
+        {
+          "title": "Anime Star VFX - URP",
+          "author": "Vefects",
+          "sourceUrl": "",
+          "licenseId": "Unity-EULA",
+          "modification": "",
+          "usedFor": "Particle effects"
+        },
+        {
+          "title": "Polygonal's Low-Poly Particle Pack",
+          "author": "Polygonal Stuff",
+          "sourceUrl": "",
+          "licenseId": "Unity-EULA",
+          "modification": "",
+          "usedFor": "Particle effects"
+        }
+      ]
+    },
+    {
+      "id": "ui",
+      "title": "UI & Fonts",
+      "type": "assets",
+      "entries": [
+        {
+          "title": "UI Pack: RPG Expansion",
+          "author": "Kenney",
+          "sourceUrl": "https://opengameart.org/content/ui-pack-rpg-extension",
+          "licenseId": "CC0",
+          "modification": "",
+          "usedFor": "Buttons, panels, bars"
+        },
+        {
+          "title": "Fantasy UI Borders",
+          "author": "Kenney",
+          "sourceUrl": "https://opengameart.org/content/fantasy-ui-borders",
+          "licenseId": "CC0",
+          "modification": "",
+          "usedFor": "Popups, selection frame"
+        },
+        {
+          "title": "Game Icons (expansion)",
+          "author": "Kenney",
+          "sourceUrl": "https://opengameart.org/node/31136",
+          "licenseId": "CC0",
+          "modification": "",
+          "usedFor": "Icons"
+        },
+        {
+          "title": "Luckiest Guy",
+          "author": "Astigmatic",
+          "sourceUrl": "https://fonts.google.com/specimen/Luckiest+Guy",
+          "licenseId": "Apache-2.0",
+          "modification": "",
+          "usedFor": "Font"
+        },
+        {
+          "title": "Rubik Dirt",
+          "author": "Hubert & Fischer, NaN",
+          "sourceUrl": "https://fonts.google.com/specimen/Rubik+Dirt",
+          "licenseId": "OFL-1.1",
+          "modification": "",
+          "usedFor": "Font"
+        },
+        {
+          "title": "Stone-Age",
+          "author": "Dave Bastian",
+          "sourceUrl": "https://www.fontspace.com/stone-age-font-f2148",
+          "licenseId": "Freeware",
+          "modification": "",
+          "usedFor": "Font"
+        }
+      ]
+    },
+    {
+      "id": "tools",
+      "title": "Built With",
+      "type": "text",
+      "lines": [
+        "Made with Unity"
+      ]
+    },
+    {
+      "id": "thanks",
+      "title": "Special Thanks",
+      "type": "text",
+      "lines": []
+    }
+  ]
+}
