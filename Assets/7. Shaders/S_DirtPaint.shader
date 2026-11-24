@@ -52,23 +52,44 @@ Shader "Hidden/DinoWash/S_DirtPaint"
     {
         Cull Off ZWrite Off ZTest Always
 
-        // Pass 0: Paint - 브러시 영역의 진흙 지우기
+        // Pass 0: Paint - 브러시 영역의 오물/비누거품 지우기 + 비누거품 바르기
         Pass
         {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment fragPaint
+    
+            float4 _DW_CleanRates;    // RGB채널별로 지우는 속도
+            float4 _DW_Foam;    // x = 거품 바르는 속도, y = 헹구는 속도, z = 배설물에 필요한 거품 양
 
             float4 fragPaint(v2f i) : SV_Target
             {
                 float4 mask = tex2D(_SourceMask, i.uv);
                 float falloff = BrushFalloff(i.worldPos);
+                float amount = _DW_BrushAmount * falloff;
 
-                mask.r = saturate(mask.r - _DW_BrushAmount * falloff);
+                // 배설물(B)은 거품이 충분한 곳에서만 지워진다
+                float foamed = step(_DW_Foam.z, mask.a);                  // 거품 >= 필요량 이면 1
+                float3 rates = _DW_CleanRates.rgb * float3(1, 1, foamed);
 
-                if (falloff > 0 && mask.r < _DW_CleanSnap)
-                    mask.r = 0;    // 덜 씻긴 자국 방지
 
+                // 중심으로부터 거리 & 노즐의 CleanRate 반영해서 채널별로 지우기
+                mask.rgb = saturate(mask.rgb - amount * rates);
+
+                // 거품: 비누는 바르고, 물은 헹군다 (배설물이 남은 곳은 안 헹궈짐)
+                float hasPoop = step(0.0001, mask.b);
+                mask.a = saturate(mask.a + amount * _DW_Foam.x - amount * _DW_Foam.y * (1 - hasPoop));
+
+                if (falloff > 0)
+                {
+
+                    float3 canClean = step(0.0001, rates); // 1 = 지우기 가능, 0 = 못 지움
+                    float3 nearlyClean = step(mask.rgb, _DW_CleanSnap); // 1 = 거의 지워짐, 0 = 아직 남음
+                    mask.rgb = mask.rgb * (1 -  canClean * nearlyClean);
+
+                    if (_DW_Foam.y > 0 && hasPoop == 0 && mask.a < _DW_CleanSnap)
+                        mask.a = 0;   // 헹굼도 깔끔하게
+                }
                 return mask;
             }
             ENDCG

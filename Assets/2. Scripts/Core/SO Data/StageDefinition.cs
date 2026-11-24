@@ -31,6 +31,12 @@ namespace DinoCleaner.Core
         [Tooltip("제한 시간(초). 0이면 없음")]
         public float timeLimit = 0f;
 
+        [Header("돌발 상황")]
+        [Tooltip("이 스테이지에서 일어날 수 있는 사건들. 비우면 사건 없음")]
+        public IncidentDefinition[] incidents;
+        [Tooltip("사건과 사건 사이 간격(초). x = 최소, y = 최대")]
+        public Vector2 incidentInterval = new Vector2(20f, 40f);
+
         [Header("보상")]
         public int baseReward = 100;
     }

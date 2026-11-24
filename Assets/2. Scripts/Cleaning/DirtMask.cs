@@ -11,7 +11,7 @@ namespace DinoCleaner.Cleaning
 
         public DirtMask(int resolution)
         {
-            Texture = new RenderTexture(resolution, resolution, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear)
+            Texture = new RenderTexture(resolution, resolution, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear)
             {
                 name = "DirtMask",
                 wrapMode = TextureWrapMode.Clamp,

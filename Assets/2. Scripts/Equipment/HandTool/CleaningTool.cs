@@ -88,7 +88,7 @@ namespace DinoCleaner.Equipment
             // 실제 오물 청소 로직 적용
             if (isHit)
             {
-                ICleanable hitTarget = hit.collider.GetComponent<ICleanable>();
+                ICleanable hitTarget = hit.collider.GetComponentInParent<ICleanable>();   // 콜라이더는 자식(몸통), CleanableObject는 루트
                 if (hitTarget != null)
                 {
                     hitTarget.ApplyStroke(new CleanStroke

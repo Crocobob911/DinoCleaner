@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DinoCleaner.Equipment
+namespace DinoCleaner.Core
 {
     public class ToolData : ScriptableObject
     {

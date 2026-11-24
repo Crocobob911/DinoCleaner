@@ -17,6 +17,8 @@ namespace DinoCleaner.Cleaning
         static readonly int BrushHardnessId = Shader.PropertyToID("_DW_BrushHardness");
         static readonly int CleanSnapId = Shader.PropertyToID("_DW_CleanSnap");
         static readonly int DirtTypeId = Shader.PropertyToID("_DW_DirtType");
+        static readonly int CleanRatesId = Shader.PropertyToID("_DW_CleanRates");
+        static readonly int FoamId = Shader.PropertyToID("_DW_Foam");
 
         readonly DirtMask _mask;
         readonly Renderer[] _renderers;
@@ -25,9 +27,9 @@ namespace DinoCleaner.Cleaning
         readonly CommandBuffer _cmd;
 
         // Pass 번호 정의 - S_DirtPaint.shader에서 Pass 순서와 일치해야 함
-        const int PaintPass = 0; // 브러시 주변 진흙 지우는 Pass
+        const int PaintPass = 0; // 브러시 주변 오염 지우는 Pass
         const int InitPass = 1; // 메시 영역만 진흙으로 칠하는 Pass
-        const int SetDirtPass = 2; // 메시 영역만 진흙으로 칠하는 Pass
+        const int SetDirtPass = 2; // 브러시 주변 오염 칠하는 Pass
 
         public DirtPainter(DirtMask mask, Renderer[] renderers, Shader paintShader)
         {
@@ -63,7 +65,7 @@ namespace DinoCleaner.Cleaning
             }
         }
 
-        public void Paint(CleanStroke stroke)
+        public void Paint(CleanStroke stroke, Vector4 cleanRates, Vector4 foam)
         {
             _cmd.Clear();
 
@@ -76,6 +78,8 @@ namespace DinoCleaner.Cleaning
             _cmd.SetGlobalFloat(BrushAmountId, stroke.Strength * stroke.DeltaTime);
             _cmd.SetGlobalFloat(BrushHardnessId, Mathf.Clamp(BrushHardness, 0f, 0.95f));   // 1이면 smoothstep이 0으로 나눔
             _cmd.SetGlobalFloat(CleanSnapId, CleanSnap);
+            _cmd.SetGlobalVector(CleanRatesId, cleanRates);
+            _cmd.SetGlobalVector(FoamId, foam);
 
             // 3.그릴 곳 = 원본 마스크
             _cmd.SetRenderTarget(_mask.Texture);
