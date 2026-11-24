@@ -23,5 +23,6 @@ MonoBehaviour:
   timeLimit: 0
   incidents:
   - {fileID: 11400000, guid: a33801bcd9282884fb40fbdfdcb6699e, type: 2}
+  - {fileID: 11400000, guid: a33801bcd9282884fb40fbdfdcb6699e, type: 2}
   incidentInterval: {x: 5, y: 8}
   baseReward: 100

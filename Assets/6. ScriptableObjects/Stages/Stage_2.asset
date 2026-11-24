@@ -21,4 +21,7 @@ MonoBehaviour:
   autoFinishOnComplete: 1
   minSuccessProgress: 0.7
   timeLimit: 0
+  incidents:
+  - {fileID: 11400000, guid: a33801bcd9282884fb40fbdfdcb6699e, type: 2}
+  incidentInterval: {x: 20, y: 40}
   baseReward: 100
