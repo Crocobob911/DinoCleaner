@@ -14,15 +14,21 @@ namespace DinoCleaner.Stage
             Controller.WashTime = 0f;
             _finishRequested = false;
             EventBus<WashFinishRequestedEvent>.Subscribe(OnFinishRequested);
+            Controller.Incidents.Begin();
         }
 
-        public override void Exit() => EventBus<WashFinishRequestedEvent>.Unsubscribe(OnFinishRequested);
+        public override void Exit()
+        {
+            EventBus<WashFinishRequestedEvent>.Unsubscribe(OnFinishRequested);
+            Controller.Incidents.Stop();   // 판정으로 넘어가거나 씬을 떠나면 진행 중인 사건 정리
+        }
 
         void OnFinishRequested(WashFinishRequestedEvent _) => _finishRequested = true;
 
         public override void Tick(float deltaTime)
         {
             Controller.WashTime += deltaTime;
+            Controller.Incidents.Tick(Controller.WashTime);
 
             var stage = Controller.Stage;
             var progress = Controller.Progress;

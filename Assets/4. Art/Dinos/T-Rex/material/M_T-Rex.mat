@@ -117,8 +117,11 @@ Material:
     - _FoamBump: 0.3
     - _FoamCellDensity: 60
     - _FoamEdgeNoise: 0.35
+    - _FoamGlow: 0.25
     - _FoamLumpScale: 0
+    - _FoamRim: 0.6
     - _FoamSmoothness: 0.85
+    - _FoamThickness: 0.05
     - _GlossMapScale: 1
     - _Glossiness: 0.1
     - _GlossyReflections: 1
@@ -144,8 +147,8 @@ Material:
     - _CleanColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 0.79058963, g: 0.79058963, b: 0.79058963, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _FoamColor: {r: 0.23357058, g: 0.9169811, b: 0.32955208, a: 1}
-    - _FoamShadeColor: {r: 0, g: 0, b: 0, a: 1}
+    - _FoamColor: {r: 1, g: 0.827451, b: 0.91764706, a: 1}
+    - _FoamShadeColor: {r: 0.9490196, g: 0.6117647, b: 0.78431374, a: 1}
     - _MossColor: {r: 0.35294116, g: 0.41960776, b: 0.19999996, a: 1}
     - _MudColor: {r: 0.54509807, g: 0.27058816, b: 0.07450979, a: 1}
     - _PoopColor: {r: 0.18914056, g: 0.17850477, b: 0.5169811, a: 1}

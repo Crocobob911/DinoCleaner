@@ -14,9 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: DinoCleaner.Core::DinoCleaner.Core.StageDefinition
   stageId: 1
   displayName: Stage 1
+  cardImage: {fileID: 0}
+  description: 
   dinoPrefab: {fileID: 2292835161945820159, guid: 6d9278c8df47b3d4ba80520ee6a1148c, type: 3}
   completeThreshold: 0.95
   autoFinishOnComplete: 1
   minSuccessProgress: 0.7
   timeLimit: 0
+  incidents:
+  - {fileID: 11400000, guid: a33801bcd9282884fb40fbdfdcb6699e, type: 2}
+  incidentInterval: {x: 5, y: 8}
   baseReward: 100

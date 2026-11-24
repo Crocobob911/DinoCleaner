@@ -30,12 +30,14 @@ namespace DinoCleaner.Stage
         internal ICleanProgress Progress { get; set; }
         internal float WashTime { get; set; }
         internal StageResult LastResult { get; set; }
+        internal IncidentDirector Incidents { get; private set; }   // 세차 중 돌발 상황
 
         Dictionary<StageState, StageStateBase> _states;
         StageStateBase _current;
 
         void Awake()
         {
+            Incidents = new IncidentDirector(this);
             _states = new Dictionary<StageState, StageStateBase>
             {
                 { StageState.Arriving, new ArrivingState(this) },
