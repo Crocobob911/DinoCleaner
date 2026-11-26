@@ -119,6 +119,63 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1001 &220913388
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: cae9c4a4185ef0541932ba895ac05919, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.996934
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cae9c4a4185ef0541932ba895ac05919, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.00000000857699
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cae9c4a4185ef0541932ba895ac05919, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 13.19
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cae9c4a4185ef0541932ba895ac05919, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cae9c4a4185ef0541932ba895ac05919, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cae9c4a4185ef0541932ba895ac05919, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cae9c4a4185ef0541932ba895ac05919, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cae9c4a4185ef0541932ba895ac05919, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cae9c4a4185ef0541932ba895ac05919, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cae9c4a4185ef0541932ba895ac05919, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: cae9c4a4185ef0541932ba895ac05919, type: 3}
+      propertyPath: m_Name
+      value: T-Rex
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: cae9c4a4185ef0541932ba895ac05919, type: 3}
 --- !u!1 &281522260
 GameObject:
   m_ObjectHideFlags: 0
@@ -443,6 +500,7 @@ MonoBehaviour:
   isThirdPerson: 0
   thirdPersonOffset: {x: 0.5, y: 0.4, z: -2.5}
   cameraSmoothSpeed: 15
+  aimTarget: {fileID: 0}
   standSetting:
     height: 1
     centerY: 0.5
@@ -918,7 +976,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6238a5e5b6e6db447bbe10fffdce0130, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DinoCleaner.Stage::DinoCleaner.Stage.StageController
-  testStage: {fileID: 11400000, guid: 3cd15e2baf9ade64887ce3df3761a771, type: 2}
+  testStage: {fileID: 11400000, guid: b7d9b0003ca343f4a846151992ea35a6, type: 2}
   spawnPoint: {fileID: 1497577925}
   washPoint: {fileID: 281522261}
   arriveDuration: 2
@@ -1010,3 +1068,4 @@ SceneRoots:
   - {fileID: 358787888}
   - {fileID: 1168983584}
   - {fileID: 2392251386095325264}
+  - {fileID: 220913388}

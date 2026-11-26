@@ -12,6 +12,10 @@ namespace DinoCleaner.Cleaning
             
         [Tooltip("셰이더 그래프에서 마스크를 받는 텍스처 프로퍼티의 Reference 이름")]
         [SerializeField] string maskProperty = "_DirtMask";
+        [Tooltip("모델 UV가 0~1을 넘을 때 마스크용으로 줄이는 배율. 보통 (1,1). 스테고처럼 u가 0~2면 (0.5, 1)")]
+        [SerializeField] Vector2 maskUVScale = Vector2.one;
+
+        static readonly int MaskUVScaleId = Shader.PropertyToID("_MaskUVScale");   // SG_DirtyLit의 Reference
 
         [Tooltip("Shaders/DirtPaint.shader 연결")]
         [SerializeField] Shader paintShader;
@@ -82,11 +86,12 @@ namespace DinoCleaner.Cleaning
             }
 
             _renderers = (targetRenderers != null && targetRenderers.Length > 0) ? targetRenderers : GetComponentsInChildren<Renderer>();
+            ValidateUVRange();
 
             _mask = new DirtMask(maskResolution);
             
             // DirtPainter 초기화
-            _painter = new DirtPainter(_mask, _renderers, paintShader);
+            _painter = new DirtPainter(_mask, _renderers, paintShader, maskUVScale);
             _painter.BrushHardness = brushHardness;
             _painter.CleanSnap = cleanSnap;
             _painter.Init(); // 전체 진흙으로 덮음
@@ -116,6 +121,28 @@ namespace DinoCleaner.Cleaning
         }
 
 
+        // 모델 UV가 마스크(0~1) 밖으로 나가면 그 부분은 오물이 안 칠해진다 (예: 좌우 대칭 UV를 u+1로 옮겨 둔 모델)
+        void ValidateUVRange()
+        {
+            foreach (var r in _renderers)
+            {
+                Mesh mesh = r is SkinnedMeshRenderer skinned ? skinned.sharedMesh
+                          : r.TryGetComponent(out MeshFilter filter) ? filter.sharedMesh : null;
+                if (mesh == null || !mesh.isReadable) continue;
+
+                var uvs = mesh.uv;
+                if (uvs.Length == 0) continue;
+
+                Vector2 min = uvs[0], max = uvs[0];
+                foreach (var uv in uvs) { min = Vector2.Min(min, uv); max = Vector2.Max(max, uv); }
+
+                Vector2 scaledMin = Vector2.Scale(min, maskUVScale), scaledMax = Vector2.Scale(max, maskUVScale);
+                if (scaledMin.x < -0.001f || scaledMin.y < -0.001f || scaledMax.x > 1.001f || scaledMax.y > 1.001f)
+                    Debug.LogWarning($"[{name}] '{mesh.name}'의 UV가 u[{min.x:F2}~{max.x:F2}] v[{min.y:F2}~{max.y:F2}]라서 마스크(0~1)를 벗어나요. " +
+                                     $"Mask UV Scale을 ({1f / Mathf.Max(1f, Mathf.Ceil(max.x)):0.##}, {1f / Mathf.Max(1f, Mathf.Ceil(max.y)):0.##})로 맞추세요.", this);
+            }
+        }
+
         // 이 오브젝트의 렌더러들에게 셰이더(SG_DirtyLit)의_DirtMask의 프로퍼티가 뭘 가리킬지 연결해준다.
         void BindMaskToRenderers()
         {
@@ -126,6 +153,7 @@ namespace DinoCleaner.Cleaning
             {
                 r.GetPropertyBlock(block);
                 block.SetTexture(id, _mask.Texture);
+                block.SetVector(MaskUVScaleId, maskUVScale);   // 화면에 그릴 때도 같은 배율로 마스크를 읽게
                 r.SetPropertyBlock(block);
             }
         }

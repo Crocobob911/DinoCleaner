@@ -19,6 +19,7 @@ namespace DinoCleaner.Cleaning
         static readonly int DirtTypeId = Shader.PropertyToID("_DW_DirtType");
         static readonly int CleanRatesId = Shader.PropertyToID("_DW_CleanRates");
         static readonly int FoamId = Shader.PropertyToID("_DW_Foam");
+        static readonly int MaskUVId = Shader.PropertyToID("_DW_MaskUV");
 
         readonly DirtMask _mask;
         readonly Renderer[] _renderers;
@@ -31,7 +32,8 @@ namespace DinoCleaner.Cleaning
         const int InitPass = 1; // 메시 영역만 진흙으로 칠하는 Pass
         const int SetDirtPass = 2; // 브러시 주변 오염 칠하는 Pass
 
-        public DirtPainter(DirtMask mask, Renderer[] renderers, Shader paintShader)
+        // maskUVScale: 모델 UV → 마스크 UV 배율 (UV가 0~1을 넘는 모델용. 보통 (1,1))
+        public DirtPainter(DirtMask mask, Renderer[] renderers, Shader paintShader, Vector2 maskUVScale)
         {
             _mask = mask;
             _renderers = renderers;
@@ -42,6 +44,7 @@ namespace DinoCleaner.Cleaning
             _source = new RenderTexture(mask.Texture.descriptor) { name = "DirtMaskSource" };
             _source.Create();
             _material.SetTexture(SourceMaskId, _source);
+            _material.SetVector(MaskUVId, new Vector4(maskUVScale.x, maskUVScale.y, 0f, 0f));
 
             _cmd = new CommandBuffer { name = "S_DirtPaint" };
         }

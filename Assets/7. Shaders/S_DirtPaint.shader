@@ -2,6 +2,11 @@
 // 카메라가 아니라 DirtPainter가 직접 호출한다.
 Shader "Hidden/DinoWash/S_DirtPaint"
 {
+    Properties
+    {
+        _DW_MaskUV ("Mask UV (xy 배율, zw 이동)", Vector) = (1, 1, 0, 0)
+    }
+
     // CGINCLUDE 안의 코드는 아래 모든 Pass에 자동으로 붙는다 (공용 코드)
     CGINCLUDE
     #include "UnityCG.cginc"
@@ -12,6 +17,7 @@ Shader "Hidden/DinoWash/S_DirtPaint"
     float  _DW_BrushAmount;   // 이번 프레임에 지울 양 (Strength × dt)
     float  _DW_BrushHardness; // 0 = 가운데만 세게, 0.85 = 반경 85%까지 꽉 차게
     float  _DW_CleanSnap;     // 이 값 아래로 내려가면 0으로 snap (덜 씻긴 자국 방지)
+    float4 _DW_MaskUV;        // 모델 UV → 마스크 UV 변환 (xy 배율, zw 이동). 보통 (1,1,0,0)
 
     // 이 지점이 브러시 안에서 얼마나 세게 영향받는지 (1 = 최대, 0 = 밖)
     float BrushFalloff(float3 worldPos)
@@ -38,12 +44,13 @@ Shader "Hidden/DinoWash/S_DirtPaint"
     v2f vert(appdata v)
     {
         v2f o;
-        o.pos = float4(v.uv * 2 - 1, 0.5, 1);
+        float2 maskUV = v.uv * _DW_MaskUV.xy + _DW_MaskUV.zw;   // UV가 0~1을 넘는 모델도 마스크 안에 들어오게
+        o.pos = float4(maskUV * 2 - 1, 0.5, 1);
         #if UNITY_UV_STARTS_AT_TOP
         o.pos.y = -o.pos.y;
         #endif
         o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
-        o.uv = v.uv;
+        o.uv = maskUV;
         return o;
     }
     ENDCG
