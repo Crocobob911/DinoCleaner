@@ -56,6 +56,13 @@
       "url": "https://unity.com/legal/licenses/unity-companion-license",
       "attributionRequired": false,
       "shareTextFileRequired": false
+    },
+    {
+      "id": "Envato-Elements",
+      "displayName": "Envato Elements License",
+      "url": "https://help.elements.envato.com/hc/en-us/articles/360000628966-License-Terms",
+      "attributionRequired": false,
+      "shareTextFileRequired": false
     }
   ],
   "sections": [
@@ -174,13 +181,319 @@
       "id": "music",
       "title": "Music",
       "type": "assets",
-      "entries": []
+      "entries": [
+        {
+          "title": "Funk",
+          "author": "RedLionProduction",
+          "sourceUrl": "https://app.envato.com/item/48a887cb-556c-4d2b-a01f-53806a50d339",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Main lobby"
+        },
+        {
+          "title": "Groovy Upbeat Retro",
+          "author": "RedOctopus",
+          "sourceUrl": "https://app.envato.com/item/df23d49b-a524-4c3c-bf5b-1cf5899c0e45",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Shop"
+        },
+        {
+          "title": "African Travel",
+          "author": "Remstunes",
+          "sourceUrl": "https://app.envato.com/item/37ee6c3c-d9b6-4c0b-8f57-a107a133efe8",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Stegosaurus stage"
+        },
+        {
+          "title": "Dark Cyberpunk Metal",
+          "author": "RedOctopus",
+          "sourceUrl": "https://app.envato.com/item/6df9347f-81f1-4734-8b05-a6acbdc99b6b",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "T-Rex stage"
+        },
+        {
+          "title": "Blues Fingerpicking Guitar Loop",
+          "author": "Remstunes",
+          "sourceUrl": "https://app.envato.com/item/140a8347-f8d8-4e04-a9fb-a065dc27aa0e",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Brachiosaurus stage"
+        },
+        {
+          "title": "Shake Your Booty Funky Song",
+          "author": "RedOctopus",
+          "sourceUrl": "https://app.envato.com/item/091989e5-235a-4f0e-90af-6f0be4f4b97b",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Cleaning result"
+        },
+        {
+          "title": "Podcast Intro",
+          "author": "HitsLab",
+          "sourceUrl": "https://app.envato.com/item/5f9735d5-eaf0-4577-837c-0578f6b2b346",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Credits"
+        }
+      ]
     },
     {
       "id": "sfx",
       "title": "Sound Effects",
       "type": "assets",
-      "entries": []
+      "entries": [
+        {
+          "title": "Pop Button Click",
+          "author": "Tomasz_Redman",
+          "sourceUrl": "https://app.envato.com/item/238cd70a-2f44-4ff1-9a8a-ceec46db552e",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Button click"
+        },
+        {
+          "title": "Interface Cancel",
+          "author": "GameChestAudio",
+          "sourceUrl": "https://app.envato.com/item/61306ab3-f69c-41a8-9cef-53d4d4fd26a8",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Back, cancel, close"
+        },
+        {
+          "title": "Simple Pop Up",
+          "author": "OhmLab",
+          "sourceUrl": "https://app.envato.com/item/51d250c6-9c1e-48fe-9994-7487c551bd57",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Popup open"
+        },
+        {
+          "title": "Basic Pop Up",
+          "author": "OhmLab",
+          "sourceUrl": "https://app.envato.com/item/8c20b63a-4c0f-421b-b007-0757e0b0b8a8",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Popup close"
+        },
+        {
+          "title": "Perc Low - Hacienda - InnerCircle03 - InnerCircle03",
+          "author": "soundmorph",
+          "sourceUrl": "https://app.envato.com/item/3a903fb1-fa64-4b86-8042-abdbe7a8a22c",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "SFX volume preview"
+        },
+        {
+          "title": "Swift Button",
+          "author": "Top-Up-Sounds",
+          "sourceUrl": "https://app.envato.com/item/5741917c-5eec-4674-8a14-02bf91b4b41d",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Screen transition"
+        },
+        {
+          "title": "Beep",
+          "author": "Cinematic-Sound-Design",
+          "sourceUrl": "https://app.envato.com/item/69273b27-e051-42f6-94b3-9c8ae46e763c",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Denied action"
+        },
+        {
+          "title": "Save",
+          "author": "Cinematic-Sound-Design",
+          "sourceUrl": "https://app.envato.com/item/610b2aa3-61da-4c5a-8a64-15d943a85cad",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Save complete"
+        },
+        {
+          "title": "Heavy Metal Guitar Chug Strum",
+          "author": "AetherFX",
+          "sourceUrl": "https://app.envato.com/item/31b74759-d1ba-4b0e-880f-852d488c4cd6",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Tutorial popup"
+        },
+        {
+          "title": "Success",
+          "author": "GameChestAudio",
+          "sourceUrl": "https://app.envato.com/item/2912db93-281b-4933-b2fc-42af2555fe9f",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Cleaning complete"
+        },
+        {
+          "title": "Coin",
+          "author": "Top-Up-Sounds",
+          "sourceUrl": "https://app.envato.com/item/97e69533-351b-46ad-ae34-f15aa3ac17be",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Payout"
+        },
+        {
+          "title": "Wood",
+          "author": "GameChestAudio",
+          "sourceUrl": "https://app.envato.com/item/3c7906cc-3223-4bb0-8dc2-78f3f533033e",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Request board open"
+        },
+        {
+          "title": "Success",
+          "author": "SoundJay",
+          "sourceUrl": "https://app.envato.com/item/94a44b44-7213-4fca-8cba-3c69743ef335",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Purchase success"
+        },
+        {
+          "title": "Failed",
+          "author": "Cinematic-Sound-Design",
+          "sourceUrl": "https://app.envato.com/item/8d76fc39-247a-46ec-9a9b-7eee3ee169eb",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Purchase failed"
+        },
+        {
+          "title": "Musical Finish Fanfare",
+          "author": "applehillstudios",
+          "sourceUrl": "https://app.envato.com/item/020dc67c-ce46-4f14-a67b-1c922379d8d7",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Fairy dino purchase"
+        },
+        {
+          "title": "Dirt Path Footstep 2",
+          "author": "StormwaveAudio",
+          "sourceUrl": "https://app.envato.com/item/e37520fc-950e-4a8a-990f-2c108ab3323c",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Footsteps"
+        },
+        {
+          "title": "Footsteps in Muddy Puddle",
+          "author": "FxProSound",
+          "sourceUrl": "https://app.envato.com/item/b3de6f23-d36c-424d-9cd8-56ad2fd9a012",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Wet footsteps"
+        },
+        {
+          "title": "English Warrior Jumping Vocal Hup Jump Male 30s Voice",
+          "author": "ESMTeam",
+          "sourceUrl": "https://app.envato.com/item/be530950-cb5d-4113-8607-b90e9fba8413",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Jump"
+        },
+        {
+          "title": "Ice Jump and Landing",
+          "author": "TibaSFX",
+          "sourceUrl": "https://app.envato.com/item/c4fc0573-5124-4107-9ca9-81d6033807a7",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Landing"
+        },
+        {
+          "title": "Cloth Pillow Movement",
+          "author": "TibaSFX",
+          "sourceUrl": "https://app.envato.com/item/3d7cc830-6969-492b-a49d-d025c43eed20",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Posture change"
+        },
+        {
+          "title": "Wood Hits Wood Lodge Pole 3",
+          "author": "prosoundfx",
+          "sourceUrl": "https://app.envato.com/item/4247e323-fa06-43d7-baf8-ae4a1d8fd99f",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Ladder pick up"
+        },
+        {
+          "title": "Wood Hit",
+          "author": "TibaSFX",
+          "sourceUrl": "https://app.envato.com/item/8db5a294-20de-4e3a-97e0-620780c9e85d",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Ladder put down"
+        },
+        {
+          "title": "Barefoot steps echo on wood",
+          "author": "VadiSoundLibrary",
+          "sourceUrl": "https://app.envato.com/item/76250347-9d15-46d1-aacd-7c1246daba7a",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Ladder climb"
+        },
+        {
+          "title": "Battle Game Weapon Aim Assault Rifle 2 Safety Click",
+          "author": "Ghetty",
+          "sourceUrl": "https://app.envato.com/item/3deea975-857d-4e9d-bdb8-b8e4212b3eb2",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Aim mode toggle"
+        },
+        {
+          "title": "Pressure Washer",
+          "author": "lokohighman",
+          "sourceUrl": "https://app.envato.com/item/a7cd38fd-f7d3-4d91-b744-51b1a4f41443",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Water spray"
+        },
+        {
+          "title": "Analog And Digital Cameras - Nikon F75,On-Off Switch 03",
+          "author": "VadiSoundLibrary",
+          "sourceUrl": "https://app.envato.com/item/a25a5a38-d030-4423-8fbd-91979d0cde90",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Continuous fire toggle"
+        },
+        {
+          "title": "Tick",
+          "author": "SoundJay",
+          "sourceUrl": "https://app.envato.com/item/f6abde41-76c0-48ab-b3b2-6b1348d03ff3",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Nozzle width change"
+        },
+        {
+          "title": "Button Cancel",
+          "author": "Cinematic-Sound-Design",
+          "sourceUrl": "https://app.envato.com/item/03418bdb-fe4a-497c-9d77-3484f0746cfd",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Nozzle width limit"
+        },
+        {
+          "title": "Plastic Switch",
+          "author": "lokohighman",
+          "sourceUrl": "https://app.envato.com/item/63717c9b-2f1f-4019-a529-8471d7692865",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Water/foam switch"
+        },
+        {
+          "title": "Ice Loop Sliding Rubbing Foam Complex Slithering 01",
+          "author": "ESMTeam",
+          "sourceUrl": "https://app.envato.com/item/596e75a6-e570-405d-945a-12a2a07100c6",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Foam spray"
+        },
+        {
+          "title": "Mid Bird Flying Loop",
+          "author": "FxProSound",
+          "sourceUrl": "https://app.envato.com/item/c36787c4-9bba-4137-b17b-3c6e247254ed",
+          "licenseId": "Envato-Elements",
+          "modification": "",
+          "usedFor": "Fairy dino wings"
+        }
+      ]
     },
     {
       "id": "vfx",

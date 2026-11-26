@@ -42,8 +42,6 @@ namespace DinoCleaner.UI
         [Header("Scroll")]
         [Tooltip("자동 스크롤 속도 (1920x1080 기준 px/초)")]
         [SerializeField] private float _scrollSpeed = 70f;
-        [Tooltip("열린 뒤 자동 스크롤을 시작하기까지 기다리는 시간 (초)")]
-        [SerializeField] private float _startDelay = 1.5f;
         [Tooltip("휠로 직접 움직인 뒤 자동 스크롤을 다시 시작하기까지 기다리는 시간 (초)")]
         [SerializeField] private float _resumeDelay = 2f;
         [Tooltip("휠 한 칸에 움직이는 거리 (px)")]
@@ -68,8 +66,14 @@ namespace DinoCleaner.UI
 
         private bool _isBuilt;
         private bool _isOpen;
-        private float _startDelayTimer;
         private float _resumeTimer;
+
+        // 열렸을 때 게임 제목이 화면 세로 중앙에 오도록 Content 맨 앞에 두는 빈 공간입니다.
+        private LayoutElement _leadingSpacer;
+        private RectTransform _titleRect;
+        private VerticalLayoutGroup _contentLayout;
+        private RectTransform _canvasRect;
+        private float _lastViewportHeight = -1f;
 
         /// <summary>
         /// 크레딧 화면이 닫힐 때(ESC 또는 Back) 비활성화 직전에 발생합니다.
@@ -116,6 +120,10 @@ namespace DinoCleaner.UI
             if (_backButton != null) _backButton.onClick.AddListener(Close);
             else Debug.LogWarning("[Credits] Back 버튼이 연결되지 않았습니다.", this);
 
+            Canvas canvas = GetComponentInParent<Canvas>(true);
+            if (canvas != null) _canvasRect = canvas.rootCanvas.transform as RectTransform;
+            if (_content != null) _contentLayout = _content.GetComponent<VerticalLayoutGroup>();
+
             EnsureEventSystem();
         }
 
@@ -147,6 +155,12 @@ namespace DinoCleaner.UI
 
             if (_scrollRect == null || _content == null) return;
 
+            // 첫 프레임에 Canvas 크기가 늦게 잡히거나 해상도가 바뀌면 제목 시작 위치를 다시 맞춥니다.
+            if (!Mathf.Approximately(_scrollRect.viewport.rect.height, _lastViewportHeight))
+            {
+                UpdateLeadingSpace();
+            }
+
             float deltaTime = Time.unscaledDeltaTime;
             Mouse mouse = Mouse.current;
             if (mouse != null)
@@ -160,11 +174,6 @@ namespace DinoCleaner.UI
                 }
             }
 
-            if (_startDelayTimer > 0f)
-            {
-                _startDelayTimer -= deltaTime;
-                return;
-            }
             if (_resumeTimer > 0f)
             {
                 _resumeTimer -= deltaTime;
@@ -190,12 +199,40 @@ namespace DinoCleaner.UI
 
         private void ResetScroll()
         {
-            _startDelayTimer = _startDelay;
             _resumeTimer = 0f;
             if (_scrollRect == null || _content == null) return;
 
+            UpdateLeadingSpace();
             _scrollRect.StopMovement();
             _content.anchoredPosition = new Vector2(_content.anchoredPosition.x, 0f);
+        }
+
+        // 스크롤 위치 0에서 게임 제목의 가운데가 화면 세로 중앙에 오도록 앞쪽 빈 공간 높이를 정합니다.
+        private void UpdateLeadingSpace()
+        {
+            if (_leadingSpacer == null || _scrollRect == null || _scrollRect.viewport == null) return;
+
+            RectTransform viewport = _scrollRect.viewport;
+            Rect viewportRect = viewport.rect;
+            _lastViewportHeight = viewportRect.height;
+
+            float centerY = viewportRect.center.y;
+            if (_canvasRect != null)
+            {
+                Vector3 screenCenter = _canvasRect.TransformPoint(_canvasRect.rect.center);
+                centerY = viewport.InverseTransformPoint(screenCenter).y;
+            }
+            float centerFromTop = viewportRect.yMax - centerY;
+
+            float paddingTop = _contentLayout != null ? _contentLayout.padding.top : 0f;
+            float spacing = _contentLayout != null ? _contentLayout.spacing : 0f;
+            float titleHalfHeight = _titleRect != null ? _titleRect.rect.height * 0.5f : 0f;
+
+            float space = Mathf.Max(0f, centerFromTop - paddingTop - spacing - titleHalfHeight);
+            if (Mathf.Approximately(_leadingSpacer.minHeight, space)) return;
+
+            _leadingSpacer.minHeight = space;
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_content);
         }
 
         private void BuildIfNeeded()
@@ -219,8 +256,9 @@ namespace DinoCleaner.UI
 
             Font font = _font != null ? _font : Resources.GetBuiltinResource<Font>(BuiltinFontName);
 
+            _leadingSpacer = CreateSpacer(0f);
             if (!string.IsNullOrWhiteSpace(data.gameTitle))
-                CreateText(data.gameTitle, _gameTitleStyle, font);
+                _titleRect = CreateText(data.gameTitle, _gameTitleStyle, font);
 
             List<CreditsSectionView> sections = CreditsFormatter.BuildSections(data, _creditsJson.name);
             foreach (CreditsSectionView section in sections)
@@ -259,7 +297,7 @@ namespace DinoCleaner.UI
             }
         }
 
-        private void CreateText(string value, TextStyle style, Font font)
+        private RectTransform CreateText(string value, TextStyle style, Font font)
         {
             var go = new GameObject("Text", typeof(RectTransform), typeof(Text));
             go.transform.SetParent(_content, false);
@@ -275,13 +313,16 @@ namespace DinoCleaner.UI
             text.verticalOverflow = VerticalWrapMode.Overflow;
             text.supportRichText = false;
             text.raycastTarget = false;
+            return (RectTransform)go.transform;
         }
 
-        private void CreateSpacer(float height)
+        private LayoutElement CreateSpacer(float height)
         {
             var go = new GameObject("Spacer", typeof(RectTransform), typeof(LayoutElement));
             go.transform.SetParent(_content, false);
-            go.GetComponent<LayoutElement>().minHeight = height;
+            var element = go.GetComponent<LayoutElement>();
+            element.minHeight = height;
+            return element;
         }
 
         // 빈 씬에서 바로 띄워도 Back 버튼을 누를 수 있도록, EventSystem이 없을 때만 하나 만듭니다.
